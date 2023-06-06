@@ -1,113 +1,61 @@
-import Image from 'next/image'
+import {
+  SignIn,
+  SignInButton,
+  SignUp,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs";
+import { db } from "../db/index";
+import { sql, eq, exists } from "drizzle-orm";
+import { members } from "@/db/schema/members";
+import { redirect } from "next/navigation";
+import Image from "next/image";
 
-export default function Home() {
+export default async function Home() {
+  let { userId } = auth();
+  if (userId === null) {
+    userId = "not a user";
+  }
+  const user = await currentUser();
+
+  const isRegistered = await db.query.members.findFirst({
+    where: eq(members.userId, userId),
+  });
+
+  if (!isRegistered) {
+    redirect("/register");
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="flex flex-col">
+      <SignedOut>
+        {/* <SignInButton /> */}
+        {/* <div> hello {userId === null ? <div>is null</div> : ""}</div> */}
+        {/* <SignUp /> */}
+        <div className="bg-cover">
+          <style>b</style>
         </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+      </SignedOut>
+      <SignedIn>
+        <UserButton afterSignOutUrl="/" />
+        <div>User Id: {!!userId}</div>
+        <div>You are member gang {user?.firstName}</div>
+        <div>
+          hello
+          {isRegistered == null ? <div>is null</div> : <div>real user</div>}
+        </div>
+        <div>
+          <Image
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJQAAACUCAYAAAB1PADUAAAAAklEQVR4AewaftIAAATCSURBVO3BQY4kRxIEQdNA/f/Lun1bPwWQSK/mDGki+CNVS06qFp1ULTqpWnRSteikatFJ1aKTqkUnVYtOqhadVC06qVp0UrXopGrRSdWik6pFn7wE5DepeQLIE2pugGxScwPkN6l546Rq0UnVopOqRZ8sU7MJyA2QSc2kZgIyqZmA3KiZgDyhZgIyqblRswnIppOqRSdVi06qFn3yZUCeUPMGkE1qJiCTmhsg3wTkCTXfdFK16KRq0UnVok/+Y9TcqLlRMwGp/zupWnRSteikatEnfzk1E5BvAnKj5gbIv9lJ1aKTqkUnVYs++TI1fxIgN2qeUDMBmdRMajap+ZOcVC06qVp0UrXok2VAfhOQSc0EZFIzAbkBMqmZgExqJiCTmgnIpOYGyJ/spGrRSdWik6pFn7yk5k8C5Ak1TwB5A8gTav4mJ1WLTqoWnVQtwh95AcikZhOQSc0EZFLzBJBJzRNAnlAzAXlCzQ2QJ9RsOqladFK16KRq0ScvqbkB8oSaSc0bQJ4AMql5Qs0NkDeA3KiZgPymk6pFJ1WLTqoWffISkCfUTEAmIJvU3AC5AbJJzQTkRs0EZFLzhJpvOqladFK16KRqEf7IIiBPqJmATGqeAHKj5gbIpGYTkEnNDZAbNROQSc0EZFKz6aRq0UnVopOqRZ98mZobIDdAJjUTkCeAvAHkRs1vAjKpmYBMaiYgk5o3TqoWnVQtOqla9MkyNTdAJjVPAJnUTEAmNTdAJjU3aiYgE5AbNROQTUD+SSdVi06qFp1ULfrky4A8AeRGzRNAJjWb1ExAJjU3at4A8oaaTSdVi06qFp1ULcIfWQTkRs0mIDdqJiA3am6ATGpugExqboBMaiYgN2omIDdqNp1ULTqpWnRStQh/5BcBmdTcAJnU3ACZ1ExAJjW/Ccik5gkgm9RsOqladFK16KRqEf7IC0Bu1NwAmdQ8AeRGzQ2QJ9Q8AWRSMwGZ1ExAnlBzA+RGzRsnVYtOqhadVC365JcBeQLIpOZGzQ2QSc0TQCY1E5BJzQTkCTVPAJnUTGomIJtOqhadVC06qVqEP/ICkEnNNwGZ1ExANqmZgNyo+SYgT6iZgExqNp1ULTqpWnRSteiTLwNyo2YC8gSQSc0NkBs1E5AbNROQSc0NkN+k5ptOqhadVC06qVr0yUtqbtQ8oeYJIG+o+U1AbtQ8AWRSMwG5UbPppGrRSdWik6pF+CMvAPlNap4AMqmZgExqboDcqJmATGomIJOaCcikZgJyo+Y3nVQtOqladFK16JNlajYB+SY1N0Bu1DwB5Ak1f5OTqkUnVYtOqhZ98mVAnlDzBpAngDyhZgJyo2YCcgPkm4DcqHnjpGrRSdWik6pFn/zLqflNajapuQEyqZmATGomIJtOqhadVC06qVr0yX+cmgnIpGYC8gSQGzUTkAnIG2omIJOaTSdVi06qFp1ULfrky9T8yYBMaiYgk5on1Lyh5gbIBORGzQRkUvPGSdWik6pFJ1WLPlkG5DcBmdTcALkB8gaQSc0EZFIzqZmATGomNTdAbtRsOqladFK16KRqEf5I1ZKTqkUnVYtOqhadVC06qVp0UrXopGrRSdWik6pFJ1WLTqoWnVQtOqladFK16KRq0f8AtfYmQ0dLqsQAAAAASUVORK5CYII="
+            alt="QR Code to check in"
+            width={300}
+            height={300}
+          />
+        </div>
+      </SignedIn>
+    </div>
+  );
 }

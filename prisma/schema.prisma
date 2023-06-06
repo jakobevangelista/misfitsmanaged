@@ -1,0 +1,12 @@
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL2")
+  relationMode = "prisma"
+}
+
+model members {
+  id      BigInt  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
+  name    String? @db.Text
+  user_id String? @db.Text
+  qr_code String? @db.Text
+}

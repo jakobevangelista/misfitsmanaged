@@ -5,8 +5,9 @@ datasource db {
 }
 
 model members {
-  id      BigInt  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
-  name    String? @db.Text
-  user_id String? @db.Text
-  qr_code String? @db.Text
+  id       BigInt  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
+  name     String? @db.Text
+  user_id  String  @db.Text
+  qr_code  String  @db.Text
+  is_admin Boolean @default(false)
 }

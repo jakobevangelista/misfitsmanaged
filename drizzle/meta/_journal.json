@@ -8,6 +8,13 @@
       "when": 1685949664082,
       "tag": "0000_shocking_speed",
       "breakpoints": false
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1686026037727,
+      "tag": "0001_perfect_maggott",
+      "breakpoints": false
     }
   ]
 }

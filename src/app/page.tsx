@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import Image from "next/image";
+import Link from "next/link";
 
 export default async function Home() {
   return (
@@ -11,23 +12,23 @@ export default async function Home() {
           alt="QR Code to check in"
           width={300}
           height={300}
-          className="m-auto"
+          className="flex-grow"
         />
         <Image
           src="https://cdn.shopify.com/s/files/1/0570/7631/8390/files/CS_Text-1_2048x.png?v=1621880690 2048w"
           alt="QR Code to check in"
           width={300}
           height={300}
-          className="m-auto"
+          className="flex-grow"
         />
       </div>
-      <SignInButton afterSignInUrl="/memberHome">
-        <Button className="bg-[#EFE1B2] mb-10 mx-10">Sign in</Button>
-      </SignInButton>
+      <Link href="/sign-in" className={buttonVariants({ variant: "creme" })}>
+        Sign In
+      </Link>
 
-      <SignUpButton afterSignUpUrl="/memberHome">
-        <Button className="bg-[#EA0607] mb-10 mx-10">Sign Up</Button>
-      </SignUpButton>
+      <Link href="/sign-up" className={buttonVariants({ variant: "red" })}>
+        Sign Up
+      </Link>
     </div>
   );
 }

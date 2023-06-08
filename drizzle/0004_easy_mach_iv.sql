@@ -1,0 +1,1 @@
+ALTER TABLE `members` MODIFY COLUMN `is_admin` boolean;

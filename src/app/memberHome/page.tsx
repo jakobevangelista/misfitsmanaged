@@ -10,37 +10,41 @@ import { redirect } from "next/navigation";
 export default async function Page() {
   const { userId } = auth();
 
-  const user = await currentUser();
-
-  const isRegistered = await db.query.members.findFirst({
+  const user = await db.query.members.findFirst({
     where: eq(members.userId, userId!),
   });
 
-  const isAdmin = await db.query.members.findFirst({
-    where: eq(members.isAdmin, true),
-  });
-  if (!isRegistered) {
+  if (!user) {
     redirect("/register");
   }
 
   return (
     <>
-      <UserButton afterSignOutUrl="/" />
-      <div>User Id: {!!userId}</div>
-      <div>You are member gang {user?.firstName}</div>
-      <div>
-        hello
-        {isRegistered == null ? <div>is null</div> : <div>real user</div>}
+      <div className="flex flex-col">
+        <div className="mx-auto">
+          <UserButton afterSignOutUrl="/" />
+        </div>
+        <div className="mx-auto">User Id: {userId}</div>
+        <div className="mx-auto">You are member gang {user.name}</div>
+        {user == null ? (
+          <div className="mx-auto">is null</div>
+        ) : (
+          <div className="mx-auto">real user</div>
+        )}
+        <div className="mx-auto">
+          <Image
+            src={user.qrCodeUrl}
+            alt="QR Code to check in"
+            width={300}
+            height={300}
+          />
+        </div>
+        {user.isAdmin ? (
+          <div className="mx-auto">Admin</div>
+        ) : (
+          <div className="mx-auto">Not Admin</div>
+        )}
       </div>
-      <div>
-        <Image
-          src={isRegistered.qrCodeUrl}
-          alt="QR Code to check in"
-          width={300}
-          height={300}
-        />
-      </div>
-      {isAdmin ? <div>Admin</div> : <div>Not Admin</div>}
     </>
   );
 }

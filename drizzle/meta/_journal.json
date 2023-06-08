@@ -15,6 +15,41 @@
       "when": 1686026037727,
       "tag": "0001_perfect_maggott",
       "breakpoints": false
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1686115076608,
+      "tag": "0002_left_jack_power",
+      "breakpoints": false
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1686116051577,
+      "tag": "0003_overrated_black_knight",
+      "breakpoints": false
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1686118752494,
+      "tag": "0004_easy_mach_iv",
+      "breakpoints": false
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1686118830022,
+      "tag": "0005_mushy_fixer",
+      "breakpoints": false
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1686242455442,
+      "tag": "0006_worried_the_hand",
+      "breakpoints": false
     }
   ]
 }

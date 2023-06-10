@@ -1,4 +1,12 @@
-import { text, mysqlTable, serial, boolean } from "drizzle-orm/mysql-core";
+import { relations } from "drizzle-orm";
+import {
+  text,
+  mysqlTable,
+  serial,
+  boolean,
+  int,
+  datetime,
+} from "drizzle-orm/mysql-core";
 
 export const members = mysqlTable("members", {
   id: serial("id").primaryKey(),
@@ -10,3 +18,25 @@ export const members = mysqlTable("members", {
   phoneNumber: text("phone_number"),
   isWaiverSigned: boolean("is_waiver_signed").default(false),
 });
+
+export const memebersRelations = relations(members, ({ many }) => ({
+  contracts: many(contracts),
+}));
+
+export const contracts = mysqlTable("contracts", {
+  id: serial("id").primaryKey(),
+  ownerId: int("owner_id").notNull(),
+  status: text("status").notNull(),
+  type: text("type").notNull(),
+  length: datetime("length").notNull(),
+  startDate: datetime("start_date").notNull(),
+  endDate: datetime("email_address").notNull(),
+  paid: boolean("paid").default(false),
+});
+
+export const contractsRelations = relations(contracts, ({ one }) => ({
+  ownerId: one(members, {
+    fields: [contracts.ownerId],
+    references: [members.id],
+  }),
+}));

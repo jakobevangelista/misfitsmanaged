@@ -14,12 +14,13 @@ export default async function Home() {
           height={300}
           className="flex-grow"
         />
+
         <Image
           src="https://cdn.shopify.com/s/files/1/0570/7631/8390/files/CS_Text-1_2048x.png?v=1621880690 2048w"
           alt="QR Code to check in"
           width={300}
           height={300}
-          className="flex-grow"
+          className="flex-grow hidden md:block"
         />
       </div>
       <Link href="/sign-in" className={buttonVariants({ variant: "creme" })}>

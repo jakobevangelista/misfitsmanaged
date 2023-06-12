@@ -6,6 +6,8 @@ import { db } from "../../db/index";
 import { eq } from "drizzle-orm";
 import { members } from "@/db/schema/members";
 import { redirect } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function Page() {
   const { userId } = auth();
@@ -21,7 +23,7 @@ export default async function Page() {
   return (
     <>
       <div className="flex flex-col">
-        <div className="mx-auto">
+        <div className="flex justify-end">
           <UserButton afterSignOutUrl="/" />
         </div>
         <div className="mx-auto">User Id: {userId}</div>
@@ -40,10 +42,10 @@ export default async function Page() {
           />
         </div>
         {user.isAdmin ? (
-          <div className="mx-auto">Admin</div>
-        ) : (
-          <div className="mx-auto">Not Admin</div>
-        )}
+          <Button className="mx-auto">
+            <Link href="/adminHome">Admin</Link>
+          </Button>
+        ) : null}
       </div>
     </>
   );

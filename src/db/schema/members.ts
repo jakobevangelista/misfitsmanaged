@@ -6,6 +6,7 @@ import {
   boolean,
   int,
   datetime,
+  mysqlEnum,
 } from "drizzle-orm/mysql-core";
 
 export const members = mysqlTable("members", {
@@ -17,6 +18,9 @@ export const members = mysqlTable("members", {
   emailAddress: text("email_address").notNull(),
   phoneNumber: text("phone_number"),
   isWaiverSigned: boolean("is_waiver_signed").default(false),
+  contractStatus: mysqlEnum("contract_status", ["active", "expired", "none"])
+    .default("none")
+    .notNull(),
 });
 
 export const memebersRelations = relations(members, ({ many }) => ({

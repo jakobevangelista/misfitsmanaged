@@ -7,28 +7,16 @@ import { db } from "@/db";
 
 async function getData(): Promise<User[]> {
   // Fetch data from your API here.
-  return [
-    {
-      id: "728ed52f",
-      name: "Pedro Duarte",
-      amount: 100,
-      contractStatus: "active",
-      email: "m@example.com",
+  const users: User[] = await db.query.members.findMany({
+    columns: {
+      id: true,
+      userId: true,
+      name: true,
+      contractStatus: true,
+      emailAddress: true,
     },
-    {
-      id: "2341132",
-      name: "Hannah Nguyen",
-      amount: 234,
-      contractStatus: "expired",
-      email: "dn@gmail.com",
-    },
-    // ...
-  ];
-}
+  });
 
-async function getTestData() {
-  // Fetch data from your API here.
-  const users = await db.query.members.findMany();
   return users;
 }
 
@@ -37,12 +25,9 @@ export default async function AdminHome() {
   const user = await currentUser();
   const data = await getData();
 
-  const testData = await getTestData();
-  console.log(testData);
-
   return (
     <>
-      <div>
+      <div className="flex flex-col">
         <UserButton afterSignOutUrl="/" />
         <div>User Id: {userId}</div>
         <div>You are admin gang {user!.firstName}</div>

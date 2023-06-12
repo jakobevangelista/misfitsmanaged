@@ -21,16 +21,6 @@ import {
 } from "@/components/ui/table";
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
-import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -41,9 +31,10 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { MoveDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+
+import { MultiFormatReader } from "@zxing/library";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -55,7 +46,7 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [sortType, setSortType] = React.useState<String>("");
+  const [sortType, setSortType] = React.useState<String>("userId");
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -76,11 +67,12 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  return (
-    <div className="rounded-md border">
-      <div className="flex items-center py-4">
-        {sortType === "email" ? (
+  function sortByFilters(type: String) {
+    switch (type) {
+      case "email":
+        return (
           <Input
+            autoFocus
             placeholder="Filter emails..."
             value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
@@ -88,8 +80,11 @@ export function DataTable<TData, TValue>({
             }
             className="max-w-sm"
           />
-        ) : (
+        );
+      case "name":
+        return (
           <Input
+            autoFocus
             placeholder="Filter names..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
@@ -97,20 +92,65 @@ export function DataTable<TData, TValue>({
             }
             className="max-w-sm"
           />
-        )}
+        );
+      case "userId":
+        return (
+          <Input
+            autoFocus
+            placeholder="Filter ID's..."
+            value={
+              (table.getColumn("userId")?.getFilterValue() as string) ?? ""
+            }
+            onChange={(event) =>
+              table.getColumn("userId")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+        );
+      default:
+        return (
+          <Input
+            autoFocus
+            placeholder="Filter emails..."
+            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("email")?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm"
+          />
+        );
+    }
+  }
+
+  function filterBadge(type: String) {
+    switch (sortType) {
+      case "email":
+        return <Badge className="ml-2">Email</Badge>;
+      case "name":
+        return <Badge className="ml-2">Name</Badge>;
+      case "id":
+        return <Badge className="ml-2">ID</Badge>;
+      default:
+        return <Badge className="ml-2">ID</Badge>;
+    }
+  }
+
+  return (
+    <div className="rounded-md border">
+      <div className="flex items-center py-4">
+        {sortByFilters(sortType)}
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button variant="outline">
               Sort By:
-              {sortType === "email" ? (
-                <Badge className="ml-2">Email</Badge>
-              ) : (
-                <Badge className="ml-2">Name</Badge>
-              )}
+              {filterBadge(sortType)}
               <MoveDown />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
+            <DropdownMenuItem onClick={() => setSortType("userId")}>
+              ID
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setSortType("name")}>
               Name
             </DropdownMenuItem>

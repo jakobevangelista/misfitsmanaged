@@ -1,13 +1,13 @@
 import Image from "next/image";
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs";
-import { currentUser } from "@clerk/nextjs";
 import { db } from "../../db/index";
 import { eq } from "drizzle-orm";
 import { members } from "@/db/schema/members";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import ManageAccountButton from "./ManageAccountButton";
 
 export default async function Page() {
   const { userId } = auth();
@@ -22,12 +22,10 @@ export default async function Page() {
 
   return (
     <>
-      <div className="flex flex-col">
+      <div className="flex flex-col bg:[url('https://misfitsmanaged.vercel.app/croppedMisfitsLogo.png')]">
         <div className="flex justify-end">
           <UserButton afterSignOutUrl="/" />
         </div>
-        <div className="mx-auto">User Id: {userId}</div>
-        <div className="mx-auto">You are member gang {user.name}</div>
         {user == null ? (
           <div className="mx-auto">is null</div>
         ) : (
@@ -41,6 +39,7 @@ export default async function Page() {
             height={300}
           />
         </div>
+        <ManageAccountButton />
         {user.isAdmin ? (
           <Button className="mx-auto">
             <Link href="/adminHome">Admin</Link>

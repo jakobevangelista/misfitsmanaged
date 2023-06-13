@@ -5,14 +5,16 @@ datasource db {
 }
 
 model members {
-  id               BigInt   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
-  name             String   @db.Text
-  user_id          String   @db.Text
-  qr_code          String   @db.Text
-  is_admin         Boolean? @default(false)
-  email_address    String   @db.Text
-  phone_number     String?  @db.Text
-  is_waiver_signed Boolean? @default(false)
+  id               BigInt                  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
+  name             String                  @db.Text
+  user_id          String                  @db.Text
+  qr_code          String                  @db.Text
+  is_admin         Boolean?                @default(false)
+  email_address    String                  @db.Text
+  phone_number     String?                 @db.Text
+  is_waiver_signed Boolean?                @default(false)
+  contract_status  members_contract_status @default(none)
+  customer_id      String?                 @db.Text
 }
 
 model contracts {
@@ -23,4 +25,11 @@ model contracts {
   start_date    DateTime @db.DateTime(0)
   email_address DateTime @db.DateTime(0)
   paid          Boolean? @default(false)
+  owner_id      Int
+}
+
+enum members_contract_status {
+  active
+  expired
+  none
 }

@@ -5,6 +5,7 @@ import { zact } from "zact/server";
 
 import { db } from "../../db/index";
 import { members } from "../../db/schema/members";
+import { createOrRetrieveCustomer } from "../../../utils/dbHelper";
 
 export const validatedAction = zact(
   z.object({
@@ -17,12 +18,27 @@ export const validatedAction = zact(
 )(async (input) => {
   console.log("[SERVER]: Received input", input);
 
-  await db.insert(members).values({
+  await db
+    .insert(members)
+    .values({
+      userId: input.userId,
+      name: input.username,
+      qrCodeUrl: input.qrCode,
+      emailAddress: input.emailAddress,
+      isWaiverSigned: input.waiver,
+    })
+    .catch((err) => {
+      console.log(err);
+      return { message: `error inserting member` };
+    });
+
+  await createOrRetrieveCustomer({
     userId: input.userId,
+    email: input.emailAddress,
     name: input.username,
-    qrCodeUrl: input.qrCode,
-    emailAddress: input.emailAddress,
-    isWaiverSigned: input.waiver,
+  }).catch((err) => {
+    console.log(err);
+    return { message: `error creating customer` };
   });
   return { message: `successfully registered` };
 });

@@ -64,6 +64,13 @@
       "when": 1686551089582,
       "tag": "0008_clean_doctor_doom",
       "breakpoints": false
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1686590627006,
+      "tag": "0009_slow_gauntlet",
+      "breakpoints": false
     }
   ]
 }

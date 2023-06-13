@@ -20,7 +20,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import { validatedAction } from "./action";
 import { useZact } from "zact/client";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 const formSchema = z.object({
   username: z.string().min(2, {
@@ -35,6 +35,7 @@ export default function RegisterForm(props: {
   emailAddress: string;
 }) {
   const { mutate, error } = useZact(validatedAction);
+  const router = useRouter();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,7 +57,7 @@ export default function RegisterForm(props: {
       username: values.username,
       waiver: values.waiver,
     }).then(() => {
-      redirect("/memberHome");
+      router.refresh();
     });
     console.log(values);
   }

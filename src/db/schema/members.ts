@@ -21,6 +21,7 @@ export const members = mysqlTable("members", {
   contractStatus: mysqlEnum("contract_status", ["active", "expired", "none"])
     .default("none")
     .notNull(),
+  customerId: text("customer_id"),
 });
 
 export const memebersRelations = relations(members, ({ many }) => ({

@@ -3,12 +3,14 @@ import { stripe } from "./stripe";
 import { members } from "@/db/schema/members";
 import { eq } from "drizzle-orm";
 
-export const createOrRetreiveCustomer = async ({
+export const createOrRetrieveCustomer = async ({
   email,
   userId,
+  name,
 }: {
   email: string;
   userId: string;
+  name: string;
 }) => {
   const customer = await stripe.customers.list({ email: email });
   if (customer.data.length > 0) {
@@ -19,6 +21,7 @@ export const createOrRetreiveCustomer = async ({
       metadata: {
         clerkUserId: userId,
       },
+      name: name,
     });
 
     await db

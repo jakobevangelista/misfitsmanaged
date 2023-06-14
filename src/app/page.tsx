@@ -18,7 +18,7 @@ export default async function Home() {
           alt="QR Code to check in"
           width={300}
           height={300}
-          className="flex-grow"
+          className="flex grow h-1/2"
         />
 
         <Image
@@ -26,7 +26,7 @@ export default async function Home() {
           alt="QR Code to check in"
           width={300}
           height={300}
-          className="flex-grow hidden md:block"
+          className="flex-grow h-1/2 hidden md:block"
         />
       </div>
       <Link href="/sign-in" className={buttonVariants({ variant: "creme" })}>

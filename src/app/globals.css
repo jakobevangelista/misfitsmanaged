@@ -4,8 +4,10 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 47.4% 11.2%;
+    /* --background: 0 0% 100%; */
+    --background: 0 0 0;
+    /* --foreground: 222.2 47.4% 11.2%; */
+    --foreground: 0 0 0;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
@@ -78,4 +80,28 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+@layer utilities {
+  .mega-title {
+    margin-bottom: 8px;
+    transition: .4s;
+    font-family: dharma-gothic-m, sans-serif;
+    font-weight: 1000;
+    font-style: normal;
+    font-size: 175px;
+    letter-spacing: 8px;
+    color: #EFE1B2;
+    line-height: 1.2em;
+    /* mask-image: url(https://cdn.shopify.com/s/files/1/0570/7631/8390/t/4/assets/grunge5.png); */
+    /* mask-image: url(https://cdn.shopify.com/s/files/1/0570/7631/8390/t/4/assets/grunge5.png); */
+    /* mask-size: 400; */
+    /* mask-position: middle; */
+    /* mask-repeat: no-repeat; */
+
+}
+.coolBackground {
+  background-image: url('https://tecdn.b-cdn.net/img/new/slides/041.webp')
+
+}
 }

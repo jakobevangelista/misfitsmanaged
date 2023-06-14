@@ -19,7 +19,7 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "underline-offset-4 hover:underline text-primary",
         creme:
-          "bg-[#EFE1B2] flex-grow mb-10 mx-10 text-black hover:bg-[#EFE1B2]/90",
+          "bg-[#EFE1B2] flex-grow mb-10 mx-10 text-[#dd5241] hover:bg-[#EFE1B2]/90",
         red: "bg-[#EA0607] flex-grow mx-10 text-black hover:bg-[#EA0607]/90",
       },
       size: {

@@ -47,11 +47,9 @@ export default async function AdminHome() {
         <div className="flex justify-end">
           <UserButton afterSignOutUrl="/" />
         </div>
-        <Button className="mx-auto">
+        <Button className="mx-auto my-4">
           <Link href="/memberHome">Go to Member View</Link>
         </Button>
-        <div>User Id: {userId}</div>
-        <div>You are admin gang {user!.firstName}</div>
         <DataTable columns={columns} data={data} />
       </div>
     </>

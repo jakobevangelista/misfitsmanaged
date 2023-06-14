@@ -26,12 +26,10 @@ export default async function Page() {
         <div className="flex justify-end">
           <UserButton afterSignOutUrl="/" />
         </div>
-        {user == null ? (
-          <div className="mx-auto">is null</div>
-        ) : (
-          <div className="mx-auto">real user</div>
-        )}
-        <div className="mx-auto">
+        <div className="flex text-[#EFE1B2] text-3xl md:text-9xl text-center font-sans font-black mx-auto">
+          Welcome Misfits!
+        </div>
+        <div className="mx-auto mb-4">
           <Image
             src={user.qrCodeUrl}
             alt="QR Code to check in"
@@ -41,7 +39,7 @@ export default async function Page() {
         </div>
         <ManageAccountButton />
         {user.isAdmin ? (
-          <Button className="mx-auto">
+          <Button variant="creme" className="mx-auto">
             <Link href="/adminHome">Admin</Link>
           </Button>
         ) : null}

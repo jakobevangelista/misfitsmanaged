@@ -33,8 +33,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MoveDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
-import { MultiFormatReader } from "@zxing/library";
+import BarcodeReader from "react-barcode-reader";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -75,9 +74,11 @@ export function DataTable<TData, TValue>({
             autoFocus
             placeholder="Filter emails..."
             value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("email")?.setFilterValue(event.target.value)
-            }
+            onChange={(event) => {
+              table.getColumn("name")?.setFilterValue("");
+              table.getColumn("userId")?.setFilterValue("");
+              table.getColumn("email")?.setFilterValue(event.target.value);
+            }}
             className="max-w-sm"
           />
         );
@@ -87,9 +88,11 @@ export function DataTable<TData, TValue>({
             autoFocus
             placeholder="Filter names..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("name")?.setFilterValue(event.target.value)
-            }
+            onChange={(event) => {
+              table.getColumn("email")?.setFilterValue("");
+              table.getColumn("userId")?.setFilterValue("");
+              table.getColumn("name")?.setFilterValue(event.target.value);
+            }}
             className="max-w-sm"
           />
         );
@@ -101,9 +104,11 @@ export function DataTable<TData, TValue>({
             value={
               (table.getColumn("userId")?.getFilterValue() as string) ?? ""
             }
-            onChange={(event) =>
-              table.getColumn("userId")?.setFilterValue(event.target.value)
-            }
+            onChange={(event) => {
+              table.getColumn("email")?.setFilterValue("");
+              table.getColumn("name")?.setFilterValue("");
+              table.getColumn("userId")?.setFilterValue(event.target.value);
+            }}
             className="max-w-sm"
           />
         );
@@ -134,9 +139,18 @@ export function DataTable<TData, TValue>({
         return <Badge className="ml-2">ID</Badge>;
     }
   }
+  function handleScan(data: string) {
+    if (data) {
+      table.getColumn("email")?.setFilterValue("");
+      table.getColumn("name")?.setFilterValue("");
+      table.getColumn("userId")?.setFilterValue(data);
+    }
+  }
 
   return (
     <div className="rounded-md border">
+      <BarcodeReader onScan={handleScan} />
+
       <div className="flex items-center py-4">
         {sortByFilters(sortType)}
         <DropdownMenu>

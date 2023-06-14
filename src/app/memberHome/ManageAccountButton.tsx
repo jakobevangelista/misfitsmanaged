@@ -18,7 +18,11 @@ export default function ManageAccountButton() {
   };
   return (
     <>
-      <Button onClick={redirectToCustomerPortal} className="mx-auto">
+      <Button
+        variant="creme"
+        onClick={redirectToCustomerPortal}
+        className="mx-auto mb-8"
+      >
         Manage Account
       </Button>
     </>

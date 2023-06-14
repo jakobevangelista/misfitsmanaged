@@ -70,27 +70,27 @@ const invoices = [
     category: "Contract",
     paymentMethod: "Credit Card",
   },
-  {
-    invoice: "INV005",
-    paymentStatus: "Paid",
-    totalAmount: "$550.00",
-    category: "Contract",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV006",
-    paymentStatus: "Pending",
-    totalAmount: "$200.00",
-    category: "Merchandise",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV007",
-    paymentStatus: "Paid",
-    totalAmount: "$1.00",
-    category: "Food",
-    paymentMethod: "Cash",
-  },
+  // {
+  //   invoice: "INV005",
+  //   paymentStatus: "Paid",
+  //   totalAmount: "$550.00",
+  //   category: "Contract",
+  //   paymentMethod: "PayPal",
+  // },
+  // {
+  //   invoice: "INV006",
+  //   paymentStatus: "Pending",
+  //   totalAmount: "$200.00",
+  //   category: "Merchandise",
+  //   paymentMethod: "Bank Transfer",
+  // },
+  // {
+  //   invoice: "INV007",
+  //   paymentStatus: "Paid",
+  //   totalAmount: "$1.00",
+  //   category: "Food",
+  //   paymentMethod: "Cash",
+  // },
 ];
 
 const contracts = [

@@ -153,7 +153,7 @@ export const columns: ColumnDef<User>[] = [
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="DialogOverlay sm:max-w-[425px] mx-auto">
             <DialogHeader>
               <DialogTitle>Member profile</DialogTitle>
               <DialogDescription>

@@ -1,7 +1,7 @@
 import { stripe } from "../../../../utils/stripe";
 import { getURL } from "../../../../utils/helpers";
 import { currentUser } from "@clerk/nextjs";
-import { createOrRetreiveCustomer } from "../../../../utils/dbHelper";
+import { createOrRetrieveCustomer } from "../../../../utils/dbHelper";
 
 export async function POST(req: Request) {
   if (req.method === "POST") {
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const customer = await createOrRetreiveCustomer({
+    const customer = await createOrRetrieveCustomer({
       userId: user.id,
       email: user.emailAddresses[0].emailAddress,
       name: `${user.firstName} ${user.lastName}`,

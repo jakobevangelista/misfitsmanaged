@@ -73,11 +73,16 @@ export function DataTable<TData, TValue>({
           <Input
             autoFocus
             placeholder="Filter emails..."
-            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            value={
+              (table.getColumn("emailAddress")?.getFilterValue() as string) ??
+              ""
+            }
             onChange={(event) => {
               table.getColumn("name")?.setFilterValue("");
               table.getColumn("userId")?.setFilterValue("");
-              table.getColumn("email")?.setFilterValue(event.target.value);
+              table
+                .getColumn("emailAddress")
+                ?.setFilterValue(event.target.value);
             }}
             className="max-w-sm"
           />
@@ -89,7 +94,7 @@ export function DataTable<TData, TValue>({
             placeholder="Filter names..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) => {
-              table.getColumn("email")?.setFilterValue("");
+              table.getColumn("emailAddress")?.setFilterValue("");
               table.getColumn("userId")?.setFilterValue("");
               table.getColumn("name")?.setFilterValue(event.target.value);
             }}
@@ -105,25 +110,27 @@ export function DataTable<TData, TValue>({
               (table.getColumn("userId")?.getFilterValue() as string) ?? ""
             }
             onChange={(event) => {
-              table.getColumn("email")?.setFilterValue("");
+              table.getColumn("emailAddress")?.setFilterValue("");
               table.getColumn("name")?.setFilterValue("");
               table.getColumn("userId")?.setFilterValue(event.target.value);
             }}
             className="max-w-sm"
           />
         );
-      default:
-        return (
-          <Input
-            autoFocus
-            placeholder="Filter emails..."
-            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("email")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
-        );
+      // default:
+      //   return (
+      //     <Input
+      //       autoFocus
+      //       placeholder="Filter emails..."
+      //       value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+      //       onChange={(event) => {
+      //         table.getColumn("userId")?.setFilterValue("");
+      //         table.getColumn("name")?.setFilterValue("");
+      //         table.getColumn("email")?.setFilterValue(event.target.value);
+      //       }}
+      //       className="max-w-sm"
+      //     />
+      //   );
     }
   }
 
@@ -141,9 +148,11 @@ export function DataTable<TData, TValue>({
   }
   function handleScan(data: string) {
     if (data) {
-      table.getColumn("email")?.setFilterValue("");
+      table.getColumn("emailAddress")?.setFilterValue("");
       table.getColumn("name")?.setFilterValue("");
+      setSortType("userId");
       table.getColumn("userId")?.setFilterValue(data);
+      table.getColumn("userId")?.getFilterValue() as string;
     }
   }
 

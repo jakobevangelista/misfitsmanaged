@@ -9,16 +9,24 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import ManageAccountButton from "./ManageAccountButton";
 
+async function userExists(userId: string) {
+  const user = await db.query.members.findFirst({
+    where: eq(members.userId, userId),
+  });
+  return !!user;
+}
+
 export default async function Page() {
   const { userId } = auth();
+  const exists = await userExists(userId!);
+
+  if (!exists) {
+    redirect("/register");
+  }
 
   const user = await db.query.members.findFirst({
     where: eq(members.userId, userId!),
   });
-
-  if (!user) {
-    redirect("/register");
-  }
 
   return (
     <>

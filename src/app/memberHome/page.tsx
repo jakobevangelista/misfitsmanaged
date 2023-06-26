@@ -9,24 +9,17 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import ManageAccountButton from "./ManageAccountButton";
 
-async function userExists(userId: string) {
-  const user = await db.query.members.findFirst({
-    where: eq(members.userId, userId),
-  });
-  return !!user;
-}
-
 export default async function Page() {
   const { userId } = auth();
-  const exists = await userExists(userId!);
-
-  if (!exists) {
-    redirect("/register");
-  }
-
   const user = await db.query.members.findFirst({
     where: eq(members.userId, userId!),
   });
+
+  const userExists = !!user;
+
+  if (userExists === false) {
+    redirect("/register");
+  }
 
   return (
     <>
@@ -39,14 +32,14 @@ export default async function Page() {
         </div>
         <div className="mx-auto mb-4">
           <Image
-            src={user.qrCodeUrl}
+            src={user!.qrCodeUrl}
             alt="QR Code to check in"
             width={300}
             height={300}
           />
         </div>
         <ManageAccountButton />
-        {user.isAdmin ? (
+        {user!.isAdmin ? (
           <Button variant="creme" className="mx-auto">
             <Link href="/adminHome">Admin</Link>
           </Button>

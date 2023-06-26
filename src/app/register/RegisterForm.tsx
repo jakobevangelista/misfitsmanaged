@@ -22,11 +22,19 @@ import { validatedAction } from "./action";
 import { useZact } from "zact/client";
 import { redirect, useRouter } from "next/navigation";
 
+// import { SignatureCanvas } from "react-signature-canvas";
+import SignaturePad from "react-signature-canvas";
+import { useRef, useState } from "react";
+import ReactSignatureCanvas from "react-signature-canvas";
+
 const formSchema = z.object({
   username: z.string().min(2, {
     message: "Please enter your name to agree to the waiver",
   }),
-  waiver: z.literal<boolean>(true),
+  waiverAccept: z.literal<boolean>(true),
+  signature: z.string().nonempty({
+    message: "Please provide a signature",
+  }),
 });
 
 export default function RegisterForm(props: {
@@ -36,13 +44,15 @@ export default function RegisterForm(props: {
 }) {
   const { mutate, error } = useZact(validatedAction);
   const router = useRouter();
+  const sigRef = useRef({} as SignaturePad);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
-      waiver: false,
+      waiverAccept: false,
+      signature: "",
     },
   });
 
@@ -50,79 +60,126 @@ export default function RegisterForm(props: {
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+
     mutate({
       qrCode: props.qrCode,
       userId: props.userId,
       emailAddress: props.emailAddress,
       username: values.username,
-      waiver: values.waiver,
+      waiverAccept: values.waiverAccept,
+      waiverSignature: values.signature,
     }).then(() => {
       router.refresh();
     });
     console.log(values);
   }
+
+  // let sigPad: any = {};
+  const clear = () => {
+    sigRef.current.clear();
+  };
+
   return (
     <>
-      <Link
-        className="font-bold text-4xl hover:underline"
-        href="/hccUnofficialTranscript"
-      >
-        Click here to view the waiver
-      </Link>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            control={form.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  By Signing your name and clicking Accept you agree to all the
-                  terms in the{" "}
-                  <Link
-                    className="hover:underline"
-                    href="/hccUnofficialTranscript"
-                  >
-                    waiver
-                  </Link>{" "}
-                  above
-                </FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter Name Here" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="waiver"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Accept Terms of Waiver</FormLabel>
-                  <FormDescription>
-                    View the terms in the{" "}
-                    <Link
-                      className="hover:underline"
-                      href="/hccUnofficialTranscript"
-                    >
-                      waiver
-                    </Link>
-                  </FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
-          <Button type="submit">Register</Button>
-        </form>
-      </Form>
+      <div className="flex flex-col justify-center">
+        <iframe src="/waiver.pdf" className="mx-auto w-1/3 h-1/2" />
+        <div className="mx-auto">
+          <Link
+            className="font-bold text-4xl hover:underline"
+            href="/waiver.pdf"
+          >
+            Click here to view the waiver
+          </Link>
+        </div>
+        <div className="mx-auto">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      By signing your name, clicking Accept you agree to all the
+                      terms in the{" "}
+                      <Link className="hover:underline" href="/waiver.pdf">
+                        waiver and release of liability
+                      </Link>{" "}
+                      , you are signing this agreement electronically.
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter Name Here" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="waiverAccept"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Accept Terms of Waiver</FormLabel>
+                      <FormDescription>
+                        View the terms in the{" "}
+                        <Link className="hover:underline" href="/waiver.pdf">
+                          waiver
+                        </Link>
+                      </FormDescription>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="signature"
+                render={({ field }) => (
+                  <FormItem>
+                    <div>
+                      <SignaturePad
+                        ref={sigRef}
+                        backgroundColor="white"
+                        onEnd={() => {
+                          console.log(
+                            sigRef.current
+                              .getTrimmedCanvas()
+                              .toDataURL("image/png")
+                          );
+                          field.onChange(
+                            sigRef.current
+                              .getTrimmedCanvas()
+                              .toDataURL("image/png")
+                              .toString()
+                          );
+                        }}
+                        penColor="black"
+                        canvasProps={{ width: 500, height: 200 }}
+                      />
+                      <FormMessage />
+                      <Button
+                        variant="destructive"
+                        type="button"
+                        onClick={clear}
+                      >
+                        Clear Signature
+                      </Button>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <div></div>
+              <Button type="submit">Register</Button>
+            </form>
+          </Form>
+        </div>
+      </div>
     </>
   );
 }

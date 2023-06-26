@@ -22,6 +22,7 @@ export const members = mysqlTable("members", {
     .default("none")
     .notNull(),
   customerId: text("customer_id"),
+  waiverSignature: text("waiver_signature"),
 });
 
 export const memebersRelations = relations(members, ({ many }) => ({

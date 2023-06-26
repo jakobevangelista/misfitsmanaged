@@ -25,6 +25,7 @@ export default async function Page() {
   return (
     <>
       <UserButton afterSignOutUrl="/" />
+      <div>{userId}</div>
       <RegisterForm
         qrCode={customCode}
         userId={userId!}

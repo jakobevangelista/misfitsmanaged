@@ -15,6 +15,7 @@ model members {
   is_waiver_signed Boolean?                @default(false)
   contract_status  members_contract_status @default(none)
   customer_id      String?                 @db.Text
+  waiver_signature String?                 @db.Text
 }
 
 model contracts {

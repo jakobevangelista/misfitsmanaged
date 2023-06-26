@@ -22,7 +22,10 @@ export const config = {
      * - public folder
      * - public folder
      */
-    "/((?!static|.*\\..*|_next|favicon.ico).*)",
+    // "/((?!static|.*\\..*|_next|favicon.ico).*)",
+    // "/",
+    "/((?!.*\\..*|_next).*)",
     "/",
+    "/(api|trpc)(.*)",
   ],
 };

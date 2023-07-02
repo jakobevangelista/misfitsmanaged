@@ -116,6 +116,7 @@ export const columns: ColumnDef<User>[] = [
     header: ({ column }) => {
       return (
         <Button
+          className="text-left"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
@@ -124,6 +125,13 @@ export const columns: ColumnDef<User>[] = [
         </Button>
       );
     },
+    // cell: ({ row }) => {
+    //   return (
+    //     <div className="text-center font-medium">
+    //       {row.getValue("contractStatus")}
+    //     </div>
+    //   );
+    // },
   },
   {
     accessorKey: "emailAddress",
@@ -183,6 +191,7 @@ export const columns: ColumnDef<User>[] = [
               >
                 Charge Water
               </Button>
+              <div>dkfjdak</div>
             </div>
             <div className="flex flex-col gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">

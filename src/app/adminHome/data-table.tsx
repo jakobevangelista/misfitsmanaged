@@ -8,6 +8,7 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
+  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -59,13 +60,15 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     state: {
       sorting,
       rowSelection,
       columnFilters,
     },
     initialState: {
-      columnVisibility: { userId: false },
+      columnVisibility: { userId: false, actions: true },
+      pagination: { pageSize: 5 },
     },
   });
 
@@ -167,7 +170,7 @@ export function DataTable<TData, TValue>({
         {sortByFilters(sortType)}
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <Button variant="outline">
+            <Button className="ml-1" variant="outline">
               Sort By:
               {filterBadge(sortType)}
               <MoveDown />
@@ -207,11 +210,20 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
+            {/* <tr
+              {...row.getRowProps()}
+              onClick={() => {
+                console.log("deeznut");
+              }}
+            > */}
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  // onClick={() => {
+                  //   console.log("for later");
+                  // }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -233,8 +245,30 @@ export function DataTable<TData, TValue>({
                 </TableCell>
               </TableRow>
             )}
+            {/* </tr> */}
           </TableBody>
         </Table>
+      </div>
+
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="space-x-2 pr-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </>
   );

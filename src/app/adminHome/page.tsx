@@ -50,7 +50,9 @@ export default async function AdminHome() {
         <Button className="mx-auto my-4">
           <Link href="/memberHome">Go to Member View</Link>
         </Button>
-        <DataTable columns={columns} data={data} />
+        <div className="mx-auto">
+          <DataTable columns={columns} data={data} />
+        </div>
       </div>
     </>
   );

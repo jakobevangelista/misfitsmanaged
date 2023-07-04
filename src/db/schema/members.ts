@@ -23,10 +23,12 @@ export const members = mysqlTable("members", {
     .notNull(),
   customerId: text("customer_id"),
   waiverSignature: text("waiver_signature"),
+  waiverSignDate: text("waiver_date"),
 });
 
 export const memebersRelations = relations(members, ({ many }) => ({
   contracts: many(contracts),
+  transactions: many(transactions),
 }));
 
 export const contracts = mysqlTable("contracts", {
@@ -34,15 +36,30 @@ export const contracts = mysqlTable("contracts", {
   ownerId: int("owner_id").notNull(),
   status: text("status").notNull(),
   type: text("type").notNull(),
-  length: datetime("length").notNull(),
-  startDate: datetime("start_date").notNull(),
-  endDate: datetime("email_address").notNull(),
-  paid: boolean("paid").default(false),
+  length: text("length").notNull(),
+  startDate: text("start_date").notNull(),
+  endDate: text("email_address").notNull(),
 });
 
 export const contractsRelations = relations(contracts, ({ one }) => ({
   ownerId: one(members, {
     fields: [contracts.ownerId],
+    references: [members.id],
+  }),
+}));
+
+export const transactions = mysqlTable("transactions", {
+  id: serial("id").primaryKey(),
+  ownerId: int("owner_id").notNull(),
+  amount: text("amount").notNull(),
+  date: text("date").notNull(),
+  paymentMethod: text("payment_method").notNull(),
+  type: text("type").notNull(),
+});
+
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+  ownerId: one(members, {
+    fields: [transactions.ownerId],
     references: [members.id],
   }),
 }));

@@ -221,9 +221,11 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  // onClick={() => {
-                  //   console.log("for later");
-                  // }}
+                  onClick={() => {
+                    console.log("for later");
+                    const date = new Date();
+                    console.log(date.toLocaleString());
+                  }}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

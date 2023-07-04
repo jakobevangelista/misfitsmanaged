@@ -15,6 +15,7 @@ export const validatedAction = zact(
     qrCode: z.string().min(1),
     userId: z.string().min(1),
     waiverSignature: z.string().min(1),
+    waiverSignDate: z.string().min(1),
   })
 )(async (input) => {
   console.log("[SERVER]: Received input", input);
@@ -28,6 +29,7 @@ export const validatedAction = zact(
       emailAddress: input.emailAddress,
       isWaiverSigned: input.waiverAccept,
       waiverSignature: input.waiverSignature,
+      waiverSignDate: input.waiverSignDate,
     })
     .catch((err) => {
       console.log(err);

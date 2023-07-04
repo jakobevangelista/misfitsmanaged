@@ -45,6 +45,7 @@ export default function RegisterForm(props: {
   const { mutate, error } = useZact(validatedAction);
   const router = useRouter();
   const sigRef = useRef({} as SignaturePad);
+  const date = new Date().toLocaleString();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -68,6 +69,7 @@ export default function RegisterForm(props: {
       username: values.username,
       waiverAccept: values.waiverAccept,
       waiverSignature: values.signature,
+      waiverSignDate: date,
     }).then(() => {
       router.refresh();
     });
@@ -126,7 +128,7 @@ export default function RegisterForm(props: {
                       />
                     </FormControl>
                     <div className="space-y-1 leading-none">
-                      <FormLabel>Accept Terms of Waiver</FormLabel>
+                      <FormLabel>Accept Terms of Waiver on {date}</FormLabel>
                       <FormDescription>
                         View the terms in the{" "}
                         <Link className="hover:underline" href="/waiver.pdf">

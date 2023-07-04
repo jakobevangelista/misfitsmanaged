@@ -20,8 +20,10 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-neutral-50",
         link: "text-neutral-900 underline-offset-4 hover:underline dark:text-neutral-50",
+        // creme:
+        //   "relative bg-[#EFE1B2] flex-grow mb-10 mx-10 text-[#dd5241] hover:bg-[#EFE1B2]/90",
         creme:
-          "relative bg-[#EFE1B2] flex-grow mb-10 mx-10 text-[#dd5241] hover:bg-[#EFE1B2]/90",
+          "bg-[#EFE1B2] text-neutral-50 hover:bg-neutral-900/90 dark:bg-[#EFE1B2] dark:text-neutral-900 dark:hover:bg-[#EFE1B2]/90",
         red: "relative bg-[#EA0607] flex-grow mx-10 text-black hover:bg-[#EA0607]/90",
       },
       size: {

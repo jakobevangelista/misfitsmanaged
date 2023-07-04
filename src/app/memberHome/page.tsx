@@ -5,9 +5,10 @@ import { db } from "../../db/index";
 import { eq } from "drizzle-orm";
 import { members } from "@/db/schema/members";
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import Link from "next/link";
 import ManageAccountButton from "./ManageAccountButton";
+import { cn } from "@/lib/utils";
 
 export default async function Page() {
   const { userId } = auth();
@@ -41,7 +42,12 @@ export default async function Page() {
         <ManageAccountButton />
         {user!.isAdmin ? (
           <Button variant="creme" className="mx-auto">
-            <Link href="/adminHome">Admin</Link>
+            <Link
+              href="/adminHome"
+              className={cn(buttonVariants({ variant: "ghost" }), "mx-auto")}
+            >
+              Admin
+            </Link>
           </Button>
         ) : null}
       </div>

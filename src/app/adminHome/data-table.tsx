@@ -35,6 +35,7 @@ import { Button } from "@/components/ui/button";
 import { MoveDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import BarcodeReader from "react-barcode-reader";
+import { redirect } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,7 +47,7 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [sortType, setSortType] = React.useState<String>("userId");
+  const [sortType, setSortType] = React.useState<String>("scanId");
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -67,7 +68,7 @@ export function DataTable<TData, TValue>({
       columnFilters,
     },
     initialState: {
-      columnVisibility: { userId: false, actions: true },
+      columnVisibility: { scanId: false, actions: true },
       pagination: { pageSize: 5 },
     },
   });
@@ -85,7 +86,7 @@ export function DataTable<TData, TValue>({
             }
             onChange={(event) => {
               table.getColumn("name")?.setFilterValue("");
-              table.getColumn("userId")?.setFilterValue("");
+              table.getColumn("scanId")?.setFilterValue("");
               table
                 .getColumn("emailAddress")
                 ?.setFilterValue(event.target.value);
@@ -101,24 +102,24 @@ export function DataTable<TData, TValue>({
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) => {
               table.getColumn("emailAddress")?.setFilterValue("");
-              table.getColumn("userId")?.setFilterValue("");
+              table.getColumn("scanId")?.setFilterValue("");
               table.getColumn("name")?.setFilterValue(event.target.value);
             }}
             className="max-w-sm"
           />
         );
-      case "userId":
+      case "scanId":
         return (
           <Input
             autoFocus
             placeholder="Filter ID's..."
             value={
-              (table.getColumn("userId")?.getFilterValue() as string) ?? ""
+              (table.getColumn("scanId")?.getFilterValue() as string) ?? ""
             }
             onChange={(event) => {
               table.getColumn("emailAddress")?.setFilterValue("");
               table.getColumn("name")?.setFilterValue("");
-              table.getColumn("userId")?.setFilterValue(event.target.value);
+              table.getColumn("scanId")?.setFilterValue(event.target.value);
             }}
             className="max-w-sm"
           />
@@ -130,7 +131,7 @@ export function DataTable<TData, TValue>({
       //       placeholder="Filter emails..."
       //       value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
       //       onChange={(event) => {
-      //         table.getColumn("userId")?.setFilterValue("");
+      //         table.getColumn("scanId")?.setFilterValue("");
       //         table.getColumn("name")?.setFilterValue("");
       //         table.getColumn("email")?.setFilterValue(event.target.value);
       //       }}
@@ -156,9 +157,9 @@ export function DataTable<TData, TValue>({
     if (data) {
       table.getColumn("emailAddress")?.setFilterValue("");
       table.getColumn("name")?.setFilterValue("");
-      setSortType("userId");
-      table.getColumn("userId")?.setFilterValue(data);
-      table.getColumn("userId")?.getFilterValue() as string;
+      setSortType("scanId");
+      table.getColumn("scanId")?.setFilterValue(data);
+      table.getColumn("scanId")?.getFilterValue() as string;
     }
   }
 
@@ -177,7 +178,7 @@ export function DataTable<TData, TValue>({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setSortType("userId")}>
+            <DropdownMenuItem onClick={() => setSortType("scanId")}>
               ID
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setSortType("name")}>
@@ -210,21 +211,15 @@ export function DataTable<TData, TValue>({
             ))}
           </TableHeader>
           <TableBody>
-            {/* <tr
-              {...row.getRowProps()}
-              onClick={() => {
-                console.log("deeznut");
-              }}
-            > */}
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   onClick={() => {
-                    console.log("for later");
-                    const date = new Date();
-                    console.log(date.toLocaleString());
+                    // console.log("for later");
+                    // const date = new Date();
+                    // console.log(date.toLocaleString());
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (

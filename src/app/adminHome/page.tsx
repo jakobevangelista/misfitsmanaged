@@ -15,7 +15,7 @@ async function getData(): Promise<User[]> {
   const users: User[] = await db.query.members.findMany({
     columns: {
       id: true,
-      userId: true,
+      scanId: true,
       name: true,
       contractStatus: true,
       emailAddress: true,

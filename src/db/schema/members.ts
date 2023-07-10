@@ -24,6 +24,7 @@ export const members = mysqlTable("members", {
   customerId: text("customer_id"),
   waiverSignature: text("waiver_signature"),
   waiverSignDate: text("waiver_date"),
+  scanId: text("scan_id").notNull(), // make not null
 });
 
 export const memebersRelations = relations(members, ({ many }) => ({

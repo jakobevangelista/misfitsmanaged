@@ -30,6 +30,7 @@ export const validatedAction = zact(
       isWaiverSigned: input.waiverAccept,
       waiverSignature: input.waiverSignature,
       waiverSignDate: input.waiverSignDate,
+      scanId: input.userId,
     })
     .catch((err) => {
       console.log(err);

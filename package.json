@@ -9,7 +9,9 @@
     "lint": "next lint",
     "generate": "drizzle-kit generate:mysql",
     "push": "drizzle-kit push:mysql",
-    "drop": "drizzle-kit drop --config=drizzle.config.ts"
+    "drop": "drizzle-kit drop --config=drizzle.config.ts",
+    "ngrok": "ngrok http 3000",
+    "ngrokauth": "ngrok config add-authtoken 2SMI5QLicPRvhsJyOZMr47jSTvt_ABKtogRZtz23k8vF2HnV"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.21.10",
@@ -56,6 +58,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.19.3"
+    "drizzle-kit": "^0.19.3",
+    "ngrok": "^5.0.0-beta.2"
   }
 }

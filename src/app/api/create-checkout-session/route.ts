@@ -2,11 +2,21 @@ import { stripe } from "../../../../utils/stripe";
 import { getURL } from "../../../../utils/helpers";
 import { currentUser } from "@clerk/nextjs";
 import { createOrRetrieveCustomer } from "../../../../utils/dbHelper";
+import { members } from "@/db/schema/members";
+import { eq } from "drizzle-orm";
+import { db } from "@/db";
 
 export async function POST(req: Request) {
   if (req.method === "POST") {
-    const { data } = await req.json();
+    const data = await req.json();
+    console.log(data);
     const user = await currentUser();
+    const memberEmail = await db.query.members.findFirst({
+      columns: {
+        emailAddress: true,
+      },
+      where: eq(members.id, Number(data.id)),
+    });
     if (!user) {
       return new Response(
         JSON.stringify({
@@ -17,12 +27,12 @@ export async function POST(req: Request) {
     }
 
     const customer = await createOrRetrieveCustomer({
-      userId: user.id,
-      email: user.emailAddresses[0].emailAddress,
-      name: `${user.firstName} ${user.lastName}`,
+      userId: data.id,
+      email: memberEmail!.emailAddress,
+      // name: `${user.firstName} ${user.lastName}`,
     });
     try {
-      if (data === "month") {
+      if (data.data === "month") {
         let session;
         session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
@@ -33,7 +43,7 @@ export async function POST(req: Request) {
           },
           line_items: [
             {
-              price: "price_1NB9e8JfUfWpyMyySn584xXA",
+              price: "price_1MshQyJfUfWpyMyy5kjkvXHt",
               quantity: 1,
             },
           ],
@@ -56,7 +66,7 @@ export async function POST(req: Request) {
             { status: 500 }
           );
         }
-      } else if (data === "water") {
+      } else if (data.data === "water") {
         let session;
         session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
@@ -68,7 +78,7 @@ export async function POST(req: Request) {
           line_items: [
             {
               // price: "price_1NB9geJfUfWpyMyy9FOo7rbp",
-              price: "price_1NIEbYJfUfWpyMyyPh0WqUTM",
+              price: "price_1NIEbYJfUfWpyMyyPh0WqUTM", // test mode
               quantity: 1,
             },
           ],
@@ -91,7 +101,7 @@ export async function POST(req: Request) {
             { status: 500 }
           );
         }
-      } else if (data === "daypass") {
+      } else if (data.data === "daypass") {
         let session;
         session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
@@ -102,13 +112,13 @@ export async function POST(req: Request) {
           },
           line_items: [
             {
-              price: "price_1NB9dfJfUfWpyMyy5QkdLiyP",
+              price: "price_1NT0pVJfUfWpyMyy7x2bQrcV",
               quantity: 1,
             },
           ],
 
           mode: "payment",
-          allow_promotion_codes: true,
+          allow_promotion_codes: false,
           success_url: `${getURL()}/adminHome`,
           cancel_url: `${getURL()}/adminHome`,
         });

@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { stripe } from "./stripe";
 import { members } from "@/db/schema/members";
 import { eq } from "drizzle-orm";
+import { StringDecoder } from "string_decoder";
 
 export const createOrRetrieveCustomer = async ({
   email,
@@ -9,25 +10,29 @@ export const createOrRetrieveCustomer = async ({
   name,
 }: {
   email: string;
-  userId: string;
-  name: string;
+  userId?: string;
+  name?: string;
 }) => {
-  const customer = await stripe.customers.list({ email: email });
-  if (customer.data.length > 0) {
-    return customer.data[0].id;
+  // const customer = await stripe.customers.list({ email: email });
+  const customer = await db.query.members.findFirst({
+    where: eq(members.emailAddress, email),
+  });
+  if (customer?.customerId !== null) {
+    return customer?.customerId;
   } else {
     const customer = await stripe!.customers.create({
       email: email,
-      metadata: {
-        clerkUserId: userId,
-      },
-      name: name,
+      // metadata: {
+      //   clerkUserId: userId,
+      // },
+      // name: name,
     });
 
     await db
       .update(members)
       .set({ customerId: customer.id })
-      .where(eq(members.userId, userId));
+      .where(eq(members.id, Number(userId)));
     return customer.id;
   }
+  return "idk how we got here";
 };

@@ -2,7 +2,7 @@ import Image from "next/image";
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs";
 import { db } from "../../db/index";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { members } from "@/db/schema/members";
 import { redirect } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -12,13 +12,19 @@ import { cn } from "@/lib/utils";
 
 export default async function Page() {
   const { userId } = auth();
+
   const user = await db.query.members.findFirst({
     where: eq(members.userId, userId!),
+    columns: {
+      isWaiverSigned: true,
+      qrCodeUrl: true,
+      isAdmin: true,
+    },
   });
 
-  const userExists = !!user;
+  console.log(user?.isWaiverSigned);
 
-  if (userExists === false) {
+  if (user?.isWaiverSigned === false) {
     redirect("/register");
   }
 

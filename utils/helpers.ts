@@ -15,7 +15,7 @@ export const postData = async ({
   data,
 }: {
   url: string;
-  data?: { data: string };
+  data?: { data: string; id: number };
 }) => {
   console.log("posting,", url);
 

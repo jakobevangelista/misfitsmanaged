@@ -14,7 +14,7 @@ export const members = mysqlTable("members", {
   userId: text("user_id").notNull(),
   name: text("name").notNull(),
   qrCodeUrl: text("qr_code").notNull(),
-  isAdmin: boolean("is_admin").default(false),
+  isAdmin: boolean("is_admin").default(false).notNull(),
   emailAddress: text("email_address").notNull(),
   phoneNumber: text("phone_number"),
   isWaiverSigned: boolean("is_waiver_signed").default(false),
@@ -24,43 +24,44 @@ export const members = mysqlTable("members", {
   customerId: text("customer_id"),
   waiverSignature: text("waiver_signature"),
   waiverSignDate: text("waiver_date"),
-  scanId: text("scan_id").notNull(), // make not null
+  realScanId: text("real_scan_id").notNull().default("0"),
 });
 
-export const memebersRelations = relations(members, ({ many }) => ({
-  contracts: many(contracts),
-  transactions: many(transactions),
-}));
+// export const memebersRelations = relations(members, ({ many }) => ({
+//   contracts: many(contracts),
+//   transactions: many(transactions),
+// }));
 
 export const contracts = mysqlTable("contracts", {
   id: serial("id").primaryKey(),
-  ownerId: int("owner_id").notNull(),
+  ownerId: text("owner_id").notNull(),
   status: text("status").notNull(),
   type: text("type").notNull(),
   length: text("length").notNull(),
-  startDate: text("start_date").notNull(),
-  endDate: text("email_address").notNull(),
+  startDate: datetime("start_date").notNull(),
+  endDate: datetime("end_date").notNull(),
 });
 
-export const contractsRelations = relations(contracts, ({ one }) => ({
-  ownerId: one(members, {
-    fields: [contracts.ownerId],
-    references: [members.id],
-  }),
-}));
+// export const contractsRelations = relations(contracts, ({ one }) => ({
+//   ownerId: one(members, {
+//     fields: [contracts.ownerId],
+//     references: [members.emailAddress],
+//   }),
+// }));
 
 export const transactions = mysqlTable("transactions", {
   id: serial("id").primaryKey(),
-  ownerId: int("owner_id").notNull(),
-  amount: text("amount").notNull(),
+  ownerId: text("owner_id").notNull(),
+  amount: int("amount").notNull(),
   date: text("date").notNull(),
   paymentMethod: text("payment_method").notNull(),
   type: text("type").notNull(),
+  createdAt: datetime("created_at").notNull(),
 });
 
-export const transactionsRelations = relations(transactions, ({ one }) => ({
-  ownerId: one(members, {
-    fields: [transactions.ownerId],
-    references: [members.id],
-  }),
-}));
+// export const transactionsRelations = relations(transactions, ({ one }) => ({
+//   ownerId: one(members, {
+//     fields: [transactions.ownerId],
+//     references: [members.emailAddress],
+//   }),
+// }));

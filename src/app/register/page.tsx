@@ -14,9 +14,9 @@ export default async function Page() {
     where: eq(members.userId, userId!),
   });
 
-  // if (isRegistered) {
-  //   redirect("/memberHome");
-  // }
+  if (isRegistered) {
+    redirect("/memberHome");
+  }
 
   const customCode: string | null = await QRCode.toDataURL(userId!, {
     errorCorrectionLevel: "H",

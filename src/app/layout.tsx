@@ -2,6 +2,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({
       <html lang="en" className="dark">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <body>{children}</body>
+          <Toaster />
         </ThemeProvider>
       </html>
     </ClerkProvider>

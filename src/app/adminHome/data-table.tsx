@@ -36,6 +36,10 @@ import { MoveDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import BarcodeReader from "react-barcode-reader";
 import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { db } from "@/db";
+import { contracts, members } from "@/db/schema/members";
+import { eq } from "drizzle-orm";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,8 +50,9 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [sortType, setSortType] = React.useState<String>("scanId");
+  const [sortType, setSortType] = React.useState<String>("realScanId");
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -68,7 +73,7 @@ export function DataTable<TData, TValue>({
       columnFilters,
     },
     initialState: {
-      columnVisibility: { scanId: false, actions: true },
+      columnVisibility: { realScanId: false, actions: true },
       pagination: { pageSize: 5 },
     },
   });
@@ -86,7 +91,7 @@ export function DataTable<TData, TValue>({
             }
             onChange={(event) => {
               table.getColumn("name")?.setFilterValue("");
-              table.getColumn("scanId")?.setFilterValue("");
+              table.getColumn("realScanId")?.setFilterValue("");
               table
                 .getColumn("emailAddress")
                 ?.setFilterValue(event.target.value);
@@ -102,24 +107,24 @@ export function DataTable<TData, TValue>({
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) => {
               table.getColumn("emailAddress")?.setFilterValue("");
-              table.getColumn("scanId")?.setFilterValue("");
+              table.getColumn("realScanId")?.setFilterValue("");
               table.getColumn("name")?.setFilterValue(event.target.value);
             }}
             className="max-w-sm"
           />
         );
-      case "scanId":
+      case "realScanId":
         return (
           <Input
             autoFocus
             placeholder="Filter ID's..."
             value={
-              (table.getColumn("scanId")?.getFilterValue() as string) ?? ""
+              (table.getColumn("realScanId")?.getFilterValue() as string) ?? ""
             }
             onChange={(event) => {
               table.getColumn("emailAddress")?.setFilterValue("");
               table.getColumn("name")?.setFilterValue("");
-              table.getColumn("scanId")?.setFilterValue(event.target.value);
+              table.getColumn("realScanId")?.setFilterValue(event.target.value);
             }}
             className="max-w-sm"
           />
@@ -131,7 +136,7 @@ export function DataTable<TData, TValue>({
       //       placeholder="Filter emails..."
       //       value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
       //       onChange={(event) => {
-      //         table.getColumn("scanId")?.setFilterValue("");
+      //         table.getColumn("realScanId")?.setFilterValue("");
       //         table.getColumn("name")?.setFilterValue("");
       //         table.getColumn("email")?.setFilterValue(event.target.value);
       //       }}
@@ -154,12 +159,13 @@ export function DataTable<TData, TValue>({
     }
   }
   function handleScan(data: string) {
+    router.refresh();
     if (data) {
       table.getColumn("emailAddress")?.setFilterValue("");
       table.getColumn("name")?.setFilterValue("");
-      setSortType("scanId");
-      table.getColumn("scanId")?.setFilterValue(data);
-      table.getColumn("scanId")?.getFilterValue() as string;
+      setSortType("realScanId");
+      table.getColumn("realScanId")?.setFilterValue(data);
+      table.getColumn("realScanId")?.getFilterValue() as string;
     }
   }
 
@@ -178,7 +184,7 @@ export function DataTable<TData, TValue>({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setSortType("scanId")}>
+            <DropdownMenuItem onClick={() => setSortType("realScanId")}>
               ID
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setSortType("name")}>
@@ -220,6 +226,7 @@ export function DataTable<TData, TValue>({
                     // console.log("for later");
                     // const date = new Date();
                     // console.log(date.toLocaleString());
+                    // router.push(`/${row.id}`);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (

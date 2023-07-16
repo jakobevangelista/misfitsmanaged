@@ -84,7 +84,10 @@ export default function RegisterForm(props: {
   return (
     <>
       <div className="flex flex-col justify-center">
-        <iframe src="/waiver.pdf" className="mx-auto w-1/3 h-1/2" />
+        <iframe
+          src="/waiver.pdf"
+          className="mx-auto w-full md:h-[50vh] lg:w-1/3"
+        />
         <div className="mx-auto">
           <Link
             className="font-bold text-4xl hover:underline"
@@ -102,12 +105,12 @@ export default function RegisterForm(props: {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      By signing your name, clicking Accept you agree to all the
-                      terms in the{" "}
+                      By signing your name and clicking Accept, you agree to all
+                      the terms in the{" "}
                       <Link className="hover:underline" href="/waiver.pdf">
-                        waiver and release of liability
+                        waiver and release of liability,
                       </Link>{" "}
-                      , you are signing this agreement electronically.
+                      you are signing this agreement electronically.
                     </FormLabel>
                     <FormControl>
                       <Input placeholder="Enter Name Here" {...field} />
@@ -144,7 +147,8 @@ export default function RegisterForm(props: {
                 name="signature"
                 render={({ field }) => (
                   <FormItem>
-                    <div>
+                    <div>Sign here:</div>
+                    <div className="w-full">
                       <SignaturePad
                         ref={sigRef}
                         backgroundColor="white"
@@ -162,7 +166,11 @@ export default function RegisterForm(props: {
                           );
                         }}
                         penColor="black"
-                        canvasProps={{ width: 500, height: 200 }}
+                        canvasProps={{
+                          width: 520,
+                          height: 200,
+                          // className: "w-full md:w-500px md:h-200px",
+                        }}
                       />
                       <FormMessage />
                       <Button

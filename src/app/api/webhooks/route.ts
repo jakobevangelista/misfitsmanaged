@@ -107,6 +107,7 @@ export async function POST(req: Request) {
         }
         const now = new Date();
         const date = new Date(now);
+        date.setHours(date.getHours() - 5);
         // date.setHours(now.getHours() - 5);
         await db.insert(transactions).values({
           ownerId: memberEmail,
@@ -114,7 +115,7 @@ export async function POST(req: Request) {
           date: date.toLocaleString(),
           paymentMethod: "card",
           type: "water",
-          createdAt: now,
+          createdAt: date,
         });
       } catch (error) {
         // Handle any errors that occur during the API call

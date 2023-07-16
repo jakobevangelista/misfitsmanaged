@@ -85,7 +85,7 @@ export async function POST(req: Request) {
 
           mode: "payment",
           allow_promotion_codes: true,
-          success_url: `https://misfitsmanaged.vercel.app/adminHome`,
+          success_url: `${getURL()}/adminHome`,
           cancel_url: `${getURL()}/adminHome`,
         });
 

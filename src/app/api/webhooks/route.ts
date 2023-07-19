@@ -24,7 +24,8 @@ export async function POST(req: Request) {
   const body = await req.text();
   //   let event: Stripe.Event;
   const sig = headers().get("Stripe-Signature") as string;
-  const secret = "whsec_1GELcqsBjQT3lighVRSc0e7PerHopo2s";
+  // const secret = "whsec_1GELcqsBjQT3lighVRSc0e7PerHopo2s"; // personal test mode
+  const secret = "whsec_Xjcs5cS81VExzwEIsVF12d2ePx0Kp8KL"; // personal live
   const event = stripe.webhooks.constructEvent(
     body,
     sig,
@@ -130,76 +131,13 @@ export async function POST(req: Request) {
       const customerSubscriptionUpdated = event.data.object;
       // Then define and call a function to handle the event customer.subscription.updated
       break;
-  }
-  // if (event.type === "checkout.session.completed") {
-  //   const sessionId = event.data.object.id;
-  //   console.log(event.id);
-  //   console.log(new Date().toISOString().slice(0, 19).replace("T", " "));
-  //   try {
-  //     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-  //       expand: ["customer"],
-  //     });
-  //     // console.log("we fuckin did it");
-  //     // console.log(event.data.object.customer_details.email);
-  //     const memberEmail = session.customer_email || " ";
-  //     const transactionAmount = session.amount_total || 0;
-  //     const subscription = session.subscription?.toString() || " ";
-  //     // const now: string = new Date()
-  //     //   .toISOString()
-  //     //   .slice(0, 19)
-  //     //   .replace("T", " ");
-  //     const now = new Date();
-  //     console.log(memberEmail);
-  //     console.log(transactionAmount);
-  //     await db.insert(transactions).values({
-  //       ownerId: memberEmail,
-  //       amount: transactionAmount,
-  //       date: now.toISOString().slice(0, 19).replace("T", " "),
-  //       paymentMethod: "card",
-  //       type: subscription,
-  //       createdAt: now,
-  //     });
-  //   } catch (error) {
-  //     // Handle any errors that occur during the API call
-  //     console.error(error);
-  //   }
-  // } else if (event.type === 'subscription_schedule.created') {
+    case "charge.succeeded":
+      const chargeSucceeded = event.data.object;
+      console.log(chargeSucceeded.metadata.line_items);
+      console.log(chargeSucceeded.customer);
 
-  // }
-  //   switch (event.type) {
-  //     case "checkout.session.completed":
-  //       const sessionId = event.data.object.id;
-  //       console.log(event.id);
-  //       try {
-  //         const session = await stripe.checkout.sessions.retrieve(sessionId, {
-  //           expand: ["customer"],
-  //         });
-  //         // console.log("we fuckin did it");
-  //         // console.log(event.data.object.customer_details.email);
-  //         const memberEmail = session.customer_email;
-  //         const transactionAmount = session.amount_total;
-  //         console.log(memberEmail);
-  //         console.log(transactionAmount);
-  //         const now: String = new Date()
-  //           .toISOString()
-  //           .slice(0, 19)
-  //           .replace("T", " ");
-  //         await db.insert(transactions).values({
-  //           ownerId: Number(1),
-  //           amount: transactionAmount,
-  //           createdAt: "323",
-  //           type: "dkfjd",
-  //           paymentMethod: "card",
-  //           date: String(new Date().toISOString().slice(0, 19).replace("T", " ")),
-  //         });
-  //       } catch (error) {
-  //         // Handle any errors that occur during the API call
-  //         console.error(error);
-  //       }
-  //       break;
-  //     default:
-  //       console.log(`Unhandled event type ${event.type}`);
-  //   }
+      break;
+  }
 
   // Return a response to acknowledge receipt of the event
   return NextResponse.json({ received: true });

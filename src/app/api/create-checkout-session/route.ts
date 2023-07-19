@@ -5,6 +5,8 @@ import { createOrRetrieveCustomer } from "../../../../utils/dbHelper";
 import { members } from "@/db/schema/members";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
+import { revalidatePath } from "next/cache";
+import { SYSTEM_ENTRYPOINTS } from "next/dist/shared/lib/constants";
 
 export async function POST(req: Request) {
   if (req.method === "POST") {
@@ -55,6 +57,8 @@ export async function POST(req: Request) {
         });
 
         if (session) {
+          revalidatePath("/adminHome");
+          revalidatePath("/transactions");
           return new Response(JSON.stringify({ sessionId: session.id }), {
             status: 200,
           });
@@ -78,18 +82,25 @@ export async function POST(req: Request) {
           line_items: [
             {
               // price: "price_1NB9geJfUfWpyMyy9FOo7rbp",
-              price: "price_1NIEbYJfUfWpyMyyPh0WqUTM", // test mode
+              price: "price_1NVIr6D5u1cDehOfJUA0JI6k",
+              // price: "price_1NIEbYJfUfWpyMyyPh0WqUTM", // personal test mode
               quantity: 1,
             },
           ],
 
           mode: "payment",
-          allow_promotion_codes: true,
+          payment_intent_data: {
+            setup_future_usage: "off_session",
+          },
+          allow_promotion_codes: false,
           success_url: `${getURL()}/adminHome`,
           cancel_url: `${getURL()}/adminHome`,
         });
 
         if (session) {
+          revalidatePath("/adminHome");
+          revalidatePath("/transactions");
+          console.log(session.id);
           return new Response(JSON.stringify({ sessionId: session.id }), {
             status: 200,
           });
@@ -112,7 +123,7 @@ export async function POST(req: Request) {
           },
           line_items: [
             {
-              price: "price_1NT0pVJfUfWpyMyy7x2bQrcV",
+              price: "price_1NVIrSD5u1cDehOfFuW9FHIO",
               quantity: 1,
             },
           ],
@@ -124,6 +135,8 @@ export async function POST(req: Request) {
         });
 
         if (session) {
+          revalidatePath("/adminHome");
+          revalidatePath("/transactions");
           return new Response(JSON.stringify({ sessionId: session.id }), {
             status: 200,
           });

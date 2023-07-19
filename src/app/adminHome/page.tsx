@@ -9,7 +9,8 @@ import { members, contracts } from "@/db/schema/members";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-export const revalidate = 15; // revalidate this page every 15 seconds
+import { RefreshPage } from "./refresh-page";
+export const revalidate = 0; // revalidate this page every 15 seconds
 
 async function getData(): Promise<User[]> {
   // Fetch data from your API here.
@@ -127,6 +128,7 @@ export default async function AdminHome() {
 
   return (
     <>
+      <RefreshPage />
       <div className="flex flex-col">
         <div className="flex justify-end">
           <UserButton afterSignOutUrl="/" />

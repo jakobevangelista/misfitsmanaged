@@ -56,6 +56,11 @@ import { members, transactions } from "@/db/schema/members";
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { InputForm } from "./inputForm";
+import {
+  cashTransactionWater,
+  cashTransactionDayPass,
+} from "./cashTransaction";
+import { useTransition } from "react";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -66,71 +71,6 @@ export type User = {
   contractStatus: "active" | "expired" | "none";
   emailAddress: string | null;
 };
-
-const invoices = [
-  {
-    invoice: "INV001",
-    paymentStatus: "Paid",
-    totalAmount: "$250.00",
-    category: "Contract",
-    paymentMethod: "Credit Card",
-  },
-  {
-    invoice: "INV002",
-    paymentStatus: "Pending",
-    totalAmount: "$150.00",
-    category: "Merchandise",
-    paymentMethod: "PayPal",
-  },
-  {
-    invoice: "INV003",
-    paymentStatus: "Unpaid",
-    totalAmount: "$350.00",
-    category: "Food",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    invoice: "INV004",
-    paymentStatus: "Paid",
-    totalAmount: "$450.00",
-    category: "Contract",
-    paymentMethod: "Credit Card",
-  },
-  // {
-  //   invoice: "INV005",
-  //   paymentStatus: "Paid",
-  //   totalAmount: "$550.00",
-  //   category: "Contract",
-  //   paymentMethod: "PayPal",
-  // },
-  // {
-  //   invoice: "INV006",
-  //   paymentStatus: "Pending",
-  //   totalAmount: "$200.00",
-  //   category: "Merchandise",
-  //   paymentMethod: "Bank Transfer",
-  // },
-  // {
-  //   invoice: "INV007",
-  //   paymentStatus: "Paid",
-  //   totalAmount: "$1.00",
-  //   category: "Food",
-  //   paymentMethod: "Cash",
-  // },
-];
-
-const contracts = [
-  {
-    type: "Month to Month",
-    contractStatus: "Active",
-    endDate: "December 31, 2023",
-  },
-  {
-    type: "Day Pass",
-    contractStatus: "Expired",
-    endDate: "May 31, 2023 3:23pm",
-  },
-];
 
 export const columns: ColumnDef<User>[] = [
   {
@@ -176,32 +116,9 @@ export const columns: ColumnDef<User>[] = [
       //     </Button>
       //   </>
       // );
+      let [isPending, startTransition] = useTransition();
       const handleCheckout = async (data: string) => {
-        if (cash) {
-          console.log(data);
-
-          const now = new Date();
-          if (data == "daypass") {
-            console.log("made it");
-            await db
-              .insert(transactions)
-              .values({
-                ownerId: row.original.emailAddress!,
-                amount: 15,
-                date: now.toLocaleString(),
-                paymentMethod: "cash",
-                type: "day pass",
-                createdAt: new Date(),
-              })
-              .then((res) => {
-                console.log(res);
-                return;
-              });
-          }
-          return;
-        }
         try {
-          // console.log(row.original.id);
           const { sessionId } = await postData({
             url: "/api/create-checkout-session",
             data: { data: data, id: row.original.id },
@@ -214,7 +131,6 @@ export const columns: ColumnDef<User>[] = [
       };
       const rowId = row.original.id;
       const [tagId, setTagId] = useState("");
-      const [cash, setCash] = useState(false);
 
       return (
         <Dialog>
@@ -224,7 +140,7 @@ export const columns: ColumnDef<User>[] = [
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DialogTrigger>
-          <DialogContent className="DialogOverlay sm:max-w-[425px] mx-auto">
+          <DialogContent className="w-full mx-auto">
             <DialogHeader>
               <DialogTitle>Member profile</DialogTitle>
               <DialogDescription>
@@ -241,13 +157,6 @@ export const columns: ColumnDef<User>[] = [
                 Charge Day Pass
               </Button>
               <Button
-                variant="secondary"
-                onClick={() => handleCheckout("month")}
-                className="flex-grow"
-              >
-                Charge Month to Month
-              </Button>
-              <Button
                 variant="outline"
                 onClick={() => handleCheckout("water")}
                 className="flex-grow"
@@ -255,7 +164,38 @@ export const columns: ColumnDef<User>[] = [
                 Charge Water
               </Button>
             </div>
-            <div className="items-top flex space-x-2">
+            <Label>Cash Transactions:</Label>
+            <div className="flex w-full max-w-sm items-center space-x-2">
+              <form action={cashTransactionWater}>
+                <Button
+                  variant="secondary"
+                  className="flex flex-grow"
+                  type="submit"
+                >
+                  Cash Water
+                </Button>
+                <Input
+                  type="hidden"
+                  name="email"
+                  value={String(row.original.emailAddress!)}
+                />
+              </form>
+              <form action={cashTransactionDayPass}>
+                <Button
+                  variant="secondary"
+                  className="flex flex-grow"
+                  type="submit"
+                >
+                  Cash Day Pass
+                </Button>
+                <Input
+                  type="hidden"
+                  name="email"
+                  value={String(row.original.emailAddress!)}
+                />
+              </form>
+            </div>
+            {/* <div className="items-top flex space-x-2">
               <Checkbox
                 id="terms1"
                 checked={cash}
@@ -271,49 +211,10 @@ export const columns: ColumnDef<User>[] = [
                   Pay with cash {cash ? "✅" : "❌"}
                 </label>
               </div>
-              {/* <label>
-                <input
-                  type="checkbox"
-                  checked={cash}
-                  onChange={(e) => {
-                    setCash(e.target.checked);
-                  }}
-                />
-                Pay with Cash
-              </label> */}
-            </div>
+            </div> */}
             <div className="flex flex-col gap-4 py-4">
-              {/* <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="tag" className="text-right">
-                  Update Tag
-                </Label>
-                <Input
-                  id="tag"
-                  value="Click here then scan tag"
-                  className="col-span-3"
-                />
-              </div> */}
               <div className="flex w-full max-w-sm items-center space-x-2">
-                <form
-                  // onSubmit={async (event) => {
-                  //   event.preventDefault();
-                  //   const form = event.target as HTMLFormElement;
-                  //   const formData = new FormData(form);
-                  //   await db
-                  //     .execute(
-                  //       sql`UPDATE ${members} SET ${
-                  //         members.realScanId
-                  //       } = CONCAT(${members.realScanId}, ${formData.get(
-                  //         "newTag"
-                  //       )}) WHERE ${members.userId} = ${String(rowId)};`
-                  //     )
-                  //     .then(() => {
-                  //       console.log("updated");
-                  //     });
-                  //   console.log("submitting");
-                  // }}
-                  action={validatedAction}
-                >
+                <form action={validatedAction}>
                   <Input
                     type="text"
                     placeholder="Click here and scan tag"
@@ -332,16 +233,7 @@ export const columns: ColumnDef<User>[] = [
                   </Button>
                 </form>
               </div>
-              {/* <InputForm userId={String(rowId)} /> */}
-              {/* <div className="flex flex-col items-center gap-4">
-                <Label htmlFor="Transaction History" className="text-right">
-                  Transaction History
-                </Label>
-              </div> */}
             </div>
-            {/* <DialogFooter>
-              <Button type="submit">Save changes</Button>
-            </DialogFooter> */}
           </DialogContent>
         </Dialog>
       );

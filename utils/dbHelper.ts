@@ -1,8 +1,9 @@
 import { db } from "@/db";
 import { stripe } from "./stripe";
-import { members } from "@/db/schema/members";
+import { members, transactions } from "@/db/schema/members";
 import { eq } from "drizzle-orm";
-import { StringDecoder } from "string_decoder";
+import { User } from "../src/app/adminHome/columns";
+import { Row } from "@tanstack/table-core/build/lib/types";
 
 export const createOrRetrieveCustomer = async ({
   email,
@@ -22,17 +23,28 @@ export const createOrRetrieveCustomer = async ({
   } else {
     const customer = await stripe!.customers.create({
       email: email,
-      // metadata: {
-      //   clerkUserId: userId,
-      // },
-      // name: name,
     });
 
     await db
       .update(members)
       .set({ customerId: customer.id })
       .where(eq(members.id, Number(userId)));
+
     return customer.id;
   }
   return "idk how we got here";
 };
+
+export async function cashTransaction(data: string, row: Row<User>) {
+  console.log(row.original.emailAddress);
+  await db.query.transactions
+    .findFirst()
+    .then((res) => {
+      return { message: `successfully updated transactions` };
+    })
+    .catch((err) => {
+      console.log(err);
+      return { message: `failed` };
+    });
+  return { message: `successfully updated transactions` };
+}

@@ -116,7 +116,8 @@ export const columns: ColumnDef<User>[] = [
       //     </Button>
       //   </>
       // );
-      let [isPending, startTransition] = useTransition();
+      const { toast } = useToast();
+      const [isPending, startTransition] = useTransition();
       const handleCheckout = async (data: string) => {
         try {
           const { sessionId } = await postData({
@@ -131,6 +132,7 @@ export const columns: ColumnDef<User>[] = [
       };
       const rowId = row.original.id;
       const [tagId, setTagId] = useState("");
+      const [realTagId, setRealTagId] = useState("");
 
       return (
         <Dialog>
@@ -148,54 +150,77 @@ export const columns: ColumnDef<User>[] = [
                 done.
               </DialogDescription>
             </DialogHeader>
-            <div className="flex flex-row">
-              <Button
-                variant="outline"
-                onClick={() => handleCheckout("daypass")}
-                className="flex-grow"
-              >
-                Charge Day Pass
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => handleCheckout("water")}
-                className="flex-grow"
-              >
-                Charge Water
-              </Button>
-            </div>
-            <Label>Cash Transactions:</Label>
-            <div className="flex w-full max-w-sm items-center space-x-2">
-              <form action={cashTransactionWater}>
+            <div className="flex flex-col space-y-4">
+              <div className="flex flex-row">
                 <Button
-                  variant="secondary"
-                  className="flex flex-grow"
-                  type="submit"
+                  variant="outline"
+                  onClick={() => handleCheckout("daypass")}
+                  className="flex-grow"
                 >
-                  Cash Water
+                  Charge Day Pass
                 </Button>
-                <Input
-                  type="hidden"
-                  name="email"
-                  value={String(row.original.emailAddress!)}
-                />
-              </form>
-              <form action={cashTransactionDayPass}>
                 <Button
-                  variant="secondary"
-                  className="flex flex-grow"
-                  type="submit"
+                  variant="outline"
+                  onClick={() => handleCheckout("water")}
+                  className="flex-grow"
                 >
-                  Cash Day Pass
+                  Charge Water
                 </Button>
-                <Input
-                  type="hidden"
-                  name="email"
-                  value={String(row.original.emailAddress!)}
-                />
-              </form>
-            </div>
-            {/* <div className="items-top flex space-x-2">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    toast({
+                      title: "Scheduled: Catch up",
+                      description: "Friday, February 10, 2023 at 5:57 PM",
+                    })
+                  }
+                  className="flex-grow"
+                >
+                  Toast
+                </Button>
+              </div>
+              <Label>Cash Transactions:</Label>
+              <div className="flex w-full max-w-sm items-center space-x-2">
+                <form action={cashTransactionWater}>
+                  <Button
+                    variant="secondary"
+                    className="flex flex-grow"
+                    type="submit"
+                    onClick={() => {
+                      toast({
+                        title: "Water Cash Transaction Recorded",
+                      });
+                    }}
+                  >
+                    Cash Water
+                  </Button>
+                  <Input
+                    type="hidden"
+                    name="email"
+                    value={String(row.original.emailAddress!)}
+                  />
+                </form>
+                <form action={cashTransactionDayPass}>
+                  <Button
+                    variant="secondary"
+                    className="flex flex-grow"
+                    type="submit"
+                    onClick={() => {
+                      toast({
+                        title: "Day Pass Cash Transaction Recorded",
+                      });
+                    }}
+                  >
+                    Cash Day Pass
+                  </Button>
+                  <Input
+                    type="hidden"
+                    name="email"
+                    value={String(row.original.emailAddress!)}
+                  />
+                </form>
+              </div>
+              {/* <div className="items-top flex space-x-2">
               <Checkbox
                 id="terms1"
                 checked={cash}
@@ -212,26 +237,42 @@ export const columns: ColumnDef<User>[] = [
                 </label>
               </div>
             </div> */}
-            <div className="flex flex-col gap-4 py-4">
-              <div className="flex w-full max-w-sm items-center space-x-2">
-                <form action={validatedAction}>
-                  <Input
+              <div className="flex flex-col gap-4 py-4">
+                <div className="flex w-full max-w-sm items-center space-x-2">
+                  <form action={validatedAction}>
+                    <Input
+                      type="text"
+                      placeholder="Click here and scan tag"
+                      name="newTagCode"
+                      value={tagId}
+                      onChange={(e) => {
+                        setTagId(e.target.value);
+                      }}
+                    />
+                    {/* <Input
                     type="text"
                     placeholder="Click here and scan tag"
-                    name="newTagCode"
-                    value={tagId}
-                    onChange={(e) => setTagId(e.target.value)}
-                  />
-                  <Input type="hidden" name="userId" value={String(rowId)} />
-                  <Button
-                    type="submit"
-                    onSubmit={() => {
-                      setTagId("");
-                    }}
-                  >
-                    Update Tag
-                  </Button>
-                </form>
+                    name="realTagCode"
+                    value={realTagId}
+                  /> */}
+                    <Input type="hidden" name="userId" value={String(rowId)} />
+                    <Button
+                      type="submit"
+                      onSubmit={() => {}}
+                      onClick={() => {
+                        // setTagId("");
+                        setTimeout(() => {
+                          setTagId("");
+                        }, 10);
+                        toast({
+                          title: "✅ Tag Updated",
+                        });
+                      }}
+                    >
+                      Update Tag
+                    </Button>
+                  </form>
+                </div>
               </div>
             </div>
           </DialogContent>

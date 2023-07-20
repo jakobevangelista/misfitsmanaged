@@ -11,7 +11,6 @@ if (env == "NULL") {
 
 export default {
   schema: "./src/db/schema/*",
-  //   out: "./drizzle",
   driver: "mysql2",
   dbCredentials: {
     connectionString: env,

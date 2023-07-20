@@ -27,11 +27,6 @@ export const members = mysqlTable("members", {
   realScanId: text("real_scan_id").notNull().default("0"),
 });
 
-// export const memebersRelations = relations(members, ({ many }) => ({
-//   contracts: many(contracts),
-//   transactions: many(transactions),
-// }));
-
 export const contracts = mysqlTable("contracts", {
   id: serial("id").primaryKey(),
   ownerId: text("owner_id").notNull(),
@@ -41,13 +36,6 @@ export const contracts = mysqlTable("contracts", {
   startDate: datetime("start_date").notNull(),
   endDate: datetime("end_date").notNull(),
 });
-
-// export const contractsRelations = relations(contracts, ({ one }) => ({
-//   ownerId: one(members, {
-//     fields: [contracts.ownerId],
-//     references: [members.emailAddress],
-//   }),
-// }));
 
 export const transactions = mysqlTable("transactions", {
   id: serial("id").primaryKey(),
@@ -59,9 +47,10 @@ export const transactions = mysqlTable("transactions", {
   createdAt: datetime("created_at").notNull(),
 });
 
-// export const transactionsRelations = relations(transactions, ({ one }) => ({
-//   ownerId: one(members, {
-//     fields: [transactions.ownerId],
-//     references: [members.emailAddress],
-//   }),
-// }));
+export const products = mysqlTable("products", {
+  id: serial("id").primaryKey(),
+  priceId: text("price_id").notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  price: int("price").notNull(),
+});

@@ -4,7 +4,7 @@ import { currentUser } from "@clerk/nextjs";
 import { User, columns } from "./columns";
 import { DataTable } from "./data-table";
 import { db } from "@/db";
-import { eq } from "drizzle-orm";
+import { eq, lt, sql } from "drizzle-orm";
 import { members, contracts } from "@/db/schema/members";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -28,84 +28,24 @@ async function getData(): Promise<User[]> {
 }
 
 async function checkContracts() {
-  const listOfContracts = await db.query.contracts.findMany({
-    where: eq(contracts.status, "active"),
-    columns: {
-      id: true,
-      endDate: true,
-    },
-  });
-
   const today = new Date();
-  for (let i = 0; i < listOfContracts.length; i++) {
-    if (listOfContracts[i].endDate < today) {
-      await db
-        .update(contracts)
-        .set({ status: "inactive" })
-        .where(eq(contracts.id, listOfContracts[i].id));
-    }
-  }
+  await db
+    .update(contracts)
+    .set({ status: "inactive" })
+    .where(lt(contracts.endDate, today));
 
-  const listOfUpdatedContracts = await db.query.contracts.findMany({
-    columns: {
-      ownerId: true,
-      endDate: true,
-      status: true,
-    },
-  });
-  const listOfMembers = await db.query.members.findMany({
-    columns: {
-      id: true,
-      contractStatus: true,
-      emailAddress: true,
-    },
-  });
-
-  // inefficient as hell
-  for (let i = 0; i < listOfMembers.length; i++) {
-    const listOfContracts = await db.query.contracts.findMany({
-      where: eq(contracts.ownerId, listOfMembers[i].emailAddress),
-    });
-
-    if (listOfContracts.length === 0) {
-      await db
-        .update(members)
-        .set({ contractStatus: "none" })
-        .where(eq(members.id, listOfMembers[i].id));
-    } else {
-      for (let j = 0; j < listOfContracts.length; j++) {
-        if (listOfContracts[j].status === "active") {
-          await db
-            .update(members)
-            .set({ contractStatus: "active" })
-            .where(eq(members.id, listOfMembers[i].id));
-          break;
-        } else {
-          await db
-            .update(members)
-            .set({ contractStatus: "none" })
-            .where(eq(members.id, listOfMembers[i].id));
-        }
-      }
-    }
-    // instead of doing this, use sql, query contracts, if contracts null, then set to none, else process
-    // for (let j = 0; j < listOfUpdatedContracts.length; j++) {
-    //   if (listOfUpdatedContracts[j].ownerId == listOfMembers[i].emailAddress) {
-    //     if (listOfUpdatedContracts[j].status === "active") {
-    //       await db
-    //         .update(members)
-    //         .set({ contractStatus: "active" })
-    //         .where(eq(members.id, listOfMembers[i].id));
-    //       break;
-    //     } else {
-    //       await db
-    //         .update(members)
-    //         .set({ contractStatus: "none" })
-    //         .where(eq(members.id, listOfMembers[i].id));
-    //     }
-    //   }
-    // }
-  }
+  await db.execute(sql`update ${members}
+  set ${members.contractStatus} = (
+    case
+      when (
+        select ${contracts.status}
+        from ${contracts}
+        where ${contracts.ownerId} = ${members.emailAddress} AND ${contracts.status} = 'active'
+        limit 1
+      ) is not null then 'active'
+      else 'none'
+    END
+  )`);
 }
 
 export default async function AdminHome() {

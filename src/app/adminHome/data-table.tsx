@@ -226,7 +226,8 @@ export function DataTable<TData, TValue>({
                     // console.log("for later");
                     // const date = new Date();
                     // console.log(date.toLocaleString());
-                    // router.push(`/${row.id}`);
+                    // router.push(`/adminHome/${row.original}`);
+                    // console.log(row.original.id);
                   }}
                 >
                   {row.getVisibleCells().map((cell) => (

@@ -96,13 +96,13 @@ export type User = {
   realScanId: string;
   name: string;
   contractStatus:
-    | "active"
-    | "incomplete"
-    | "incomplete_expired"
-    | "past_due"
-    | "canceled"
-    | "unpaid"
-    | "none";
+  | "active"
+  | "incomplete"
+  | "incomplete_expired"
+  | "past_due"
+  | "canceled"
+  | "unpaid"
+  | "none";
   emailAddress: string;
 };
 
@@ -226,10 +226,9 @@ export const columns: ColumnDef<User>[] = [
             <div className="flex flex-row space-x-4 mx-auto">
               <div className="flex flex-col space-y-4 mx-auto">
                 <DialogHeader className="mx-auto">
-                  <DialogTitle>Member profile</DialogTitle>
+                  <DialogTitle>Member quick actions</DialogTitle>
                   <DialogDescription>
-                    Make changes to your profile here. Click save when
-                    you&apos;re done.
+                    Use these for quick checkouts.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="flex space-x-1">
@@ -316,7 +315,7 @@ export const columns: ColumnDef<User>[] = [
                       />
                       <Button
                         type="submit"
-                        onSubmit={() => {}}
+                        onSubmit={() => { }}
                         onClick={() => {
                           // setTagId("");
                           setTimeout(() => {
@@ -338,6 +337,12 @@ export const columns: ColumnDef<User>[] = [
                   onSubmit={form.handleSubmit(checkoutSubmit)}
                   className="space-y-8"
                 >
+                  <DialogHeader className="mx-auto">
+                    <DialogTitle>Multi-item Checkout</DialogTitle>
+                    <DialogDescription>
+                      Add the multiple items to the cart then press "checkout"
+                    </DialogDescription>
+                  </DialogHeader>
                   {fields.map((field, index) => {
                     return (
                       <FormField
@@ -359,9 +364,9 @@ export const columns: ColumnDef<User>[] = [
                                   >
                                     {field.value
                                       ? items.find(
-                                          (item) =>
-                                            item.value === field.value
-                                        )?.label
+                                        (item) =>
+                                          item.value === field.value
+                                      )?.label
                                       : "Select item"}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                   </Button>

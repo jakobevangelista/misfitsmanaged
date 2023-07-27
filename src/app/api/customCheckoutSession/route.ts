@@ -41,7 +41,7 @@ export async function POST(req: Request) {
 
     try {
       for (let i = 0; i < data.arg.cartItems.length; i++) {
-        if (data.arg.cartItems[i] === "price_1NYRbKD5u1cDehOfapzIEhrJ" || data.arg.cartItems[i] === "price_1NYRcWD5u1cDehOfiPRDAB3v" || data.arg.cartItems[i] === "price_1NYU4xD5u1cDehOfzRdl9hRN" || data.arg.cartItems[i] === "price_1NYRbrD5u1cDehOfLWSsrUWc") {
+        if (data.arg.cartItems[i].price === "price_1NYRbKD5u1cDehOfapzIEhrJ" || data.arg.cartItems[i].price === "price_1NYRcWD5u1cDehOfiPRDAB3v" || data.arg.cartItems[i].price === "price_1NYU4xD5u1cDehOfzRdl9hRN" || data.arg.cartItems[i].price === "price_1NYRbrD5u1cDehOfLWSsrUWc") {
           let session;
           session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
             line_items: data.arg.cartItems,
 
             mode: "subscription",
-            allow_promotion_codes: false,
+            allow_promotion_codes: true,
             success_url: `${getURL()}/adminHome`,
             cancel_url: `${getURL()}/adminHome`,
           });

@@ -79,7 +79,7 @@ export default async function AdminHome() {
           </Button>
 
           <Button variant="creme" className="mx-auto my-4" asChild>
-            <Link href="/transactions">Go to Transactions</Link>
+            <a href="/transactions">Go to Transactions</a>
           </Button>
         </div>
         <div className="mx-auto py-10">

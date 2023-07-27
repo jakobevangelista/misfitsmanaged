@@ -31,7 +31,7 @@ export default async function Page() {
   const { userId } = auth();
   const user = await currentUser();
   const data = await getData();
-  console.log(typeof data[0].date);
+  // console.log(typeof data[0].date);
 
   const checkAdmin = await db.query.members.findFirst({
     where: eq(members.userId, userId!),

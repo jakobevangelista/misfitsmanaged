@@ -50,8 +50,7 @@ export async function POST(req: Request) {
           },
           line_items: [
             {
-              // price: "price_1NVLLCD5u1cDehOfchFtQrz6", // month-to-month
-              price: "price_1NVLLzD5u1cDehOfDPCQ0SGN", // montly membership
+              price: "price_1NYRbrD5u1cDehOfLWSsrUWc", // month to month membership
               quantity: 1,
             },
           ],
@@ -87,9 +86,7 @@ export async function POST(req: Request) {
           },
           line_items: [
             {
-              // price: "price_1NB9geJfUfWpyMyy9FOo7rbp",
-              // price: "price_1NVIr6D5u1cDehOfJUA0JI6k",
-              price: "price_1NIEbYJfUfWpyMyyPh0WqUTM", // personal test mode
+              price: "price_1NYRaXD5u1cDehOfi3XqF0jV", // personal test mode
               quantity: 1,
             },
           ],
@@ -129,7 +126,7 @@ export async function POST(req: Request) {
           },
           line_items: [
             {
-              price: "price_1NXFYAD5u1cDehOfSgf9D1AQ",
+              price: "price_1NYRbKD5u1cDehOfapzIEhrJ",
               quantity: 1,
             },
           ],

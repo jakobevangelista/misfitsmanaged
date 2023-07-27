@@ -81,8 +81,12 @@ import {
 } from "@/components/ui/command";
 
 const languages = [
-  { label: "Day Pass", value: "price_1NXFYAD5u1cDehOfSgf9D1AQ" },
-  { label: "Water", value: "price_1NVIr6D5u1cDehOfJUA0JI6k" },
+  { label: "Day Pass", value: "price_1NYRbKD5u1cDehOfapzIEhrJ" },
+  { label: "Small Water Bottle", value: "price_1NYRaXD5u1cDehOfi3XqF0jV" },
+  { label: "Large Water Bottle", value: "price_1NYReSD5u1cDehOfo1oxyhvs" },
+  { label: "Monthly Membership", value: "price_1NYRcWD5u1cDehOfiPRDAB3v" },
+  { label: "Montly Membership Initiation Fee", value: "price_1NYRd5D5u1cDehOfRmEeuH4m" },
+  { label: "Month-to-Month Membership", value: "price_1NYRbrD5u1cDehOfLWSsrUWc" },
 ] as const;
 
 // This type is used to define the shape of our data.
@@ -374,7 +378,7 @@ export const columns: ColumnDef<User>[] = [
                                       <CommandItem // need to close on select ---------------------------------------------------------------
                                         value={language.value}
                                         key={language.value}
-                                        onSelect={(value) => {
+                                        onSelect={() => {
                                           form.setValue(
                                             `cartItems.${index}.price`,
                                             language.value

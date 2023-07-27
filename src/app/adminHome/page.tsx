@@ -10,6 +10,8 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { RefreshPage } from "./refresh-page";
+import { customCheckoutPost, postData } from "../../../utils/helpers";
+import CustomButton from "./customButton";
 export const revalidate = 0; // revalidate this page every 15 seconds
 
 async function getData(): Promise<User[]> {
@@ -81,6 +83,9 @@ export default async function AdminHome() {
           <Button variant="creme" className="mx-auto my-4" asChild>
             <a href="/transactions">Go to Transactions</a>
           </Button>
+
+          <CustomButton />
+
         </div>
         <div className="mx-auto py-10">
           <DataTable columns={columns} data={data} />

@@ -24,6 +24,7 @@ export const postData = async ({
   const res = await fetch(url, {
     method: "POST",
     headers: new Headers({ "Content-Type": "application/json" }),
+    mode: "no-cors",
     credentials: "same-origin",
     body: JSON.stringify(data),
   });

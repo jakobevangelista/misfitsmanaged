@@ -7,11 +7,13 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { revalidatePath } from "next/cache";
 import { SYSTEM_ENTRYPOINTS } from "next/dist/shared/lib/constants";
+import { redirect, useRouter } from "next/navigation";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   if (req.method === "POST") {
     const data = await req.json();
-    console.log(data);
+    // console.log(data);
     const user = await currentUser();
     const memberEmail = await db.query.members.findFirst({
       columns: {
@@ -34,7 +36,7 @@ export async function POST(req: Request) {
       email: memberEmail!.emailAddress,
       // name: `${user.firstName} ${user.lastName}`,
     });
-    console.log(data);
+    // console.log(data);
 
     try {
       if (data.data === "month") {
@@ -104,6 +106,7 @@ export async function POST(req: Request) {
           revalidatePath("/adminHome");
           revalidatePath("/transactions");
           console.log(session.id);
+          // redirect(session.url!)
           return new Response(JSON.stringify({ sessionId: session.id }), {
             status: 200,
           });
@@ -124,6 +127,39 @@ export async function POST(req: Request) {
           customer_update: {
             address: "auto",
           },
+          line_items: [
+            {
+              price: "price_1NYRbKD5u1cDehOfapzIEhrJ",
+              quantity: 1,
+            },
+          ],
+
+          mode: "subscription",
+          allow_promotion_codes: false,
+          success_url: `${getURL()}/adminHome`,
+          cancel_url: `${getURL()}/adminHome`,
+        });
+
+        if (session) {
+          revalidatePath("/adminHome");
+          revalidatePath("/transactions");
+          return new Response(JSON.stringify({ sessionId: session.id }), {
+            status: 200,
+          });
+        } else {
+          return new Response(
+            JSON.stringify({
+              error: { statusCode: 500, message: "Session is not defined" },
+            }),
+            { status: 500 }
+          );
+        }
+      } else {
+
+        let session;
+        session = await stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+
           line_items: [
             {
               price: "price_1NYRbKD5u1cDehOfapzIEhrJ",

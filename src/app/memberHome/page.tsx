@@ -22,7 +22,7 @@ export default async function Page() {
     },
   });
 
-  if (user?.isWaiverSigned !== true) {
+  if (!user || user.isWaiverSigned !== true) {
     redirect("/register");
   }
 

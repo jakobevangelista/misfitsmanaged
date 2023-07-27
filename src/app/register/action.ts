@@ -6,6 +6,7 @@ import { zact } from "zact/server";
 import { db } from "../../db/index";
 import { members } from "../../db/schema/members";
 import { createOrRetrieveCustomer } from "../../../utils/dbHelper";
+import { revalidateTag } from "next/cache";
 
 export const validatedAction = zact(
   z.object({
@@ -51,5 +52,6 @@ export const validatedAction = zact(
     console.log(err);
     return { message: `error creating customer` };
   });
+  revalidateTag('/adminHome')
   return { message: `successfully registered` };
 });

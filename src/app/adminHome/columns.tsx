@@ -80,12 +80,12 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 
-const languages = [
+const items = [
   { label: "Day Pass", value: "price_1NYRbKD5u1cDehOfapzIEhrJ" },
   { label: "Small Water Bottle", value: "price_1NYRaXD5u1cDehOfi3XqF0jV" },
   { label: "Large Water Bottle", value: "price_1NYReSD5u1cDehOfo1oxyhvs" },
   { label: "Monthly Membership", value: "price_1NYRcWD5u1cDehOfiPRDAB3v" },
-  { label: "Montly Membership Initiation Fee", value: "price_1NYRd5D5u1cDehOfRmEeuH4m" },
+  { label: "Monthly Membership Initiation Fee", value: "price_1NYU4xD5u1cDehOfzRdl9hRN" },
   { label: "Month-to-Month Membership", value: "price_1NYRbrD5u1cDehOfLWSsrUWc" },
 ] as const;
 
@@ -358,42 +358,42 @@ export const columns: ColumnDef<User>[] = [
                                     )}
                                   >
                                     {field.value
-                                      ? languages.find(
-                                          (language) =>
-                                            language.value === field.value
+                                      ? items.find(
+                                          (item) =>
+                                            item.value === field.value
                                         )?.label
-                                      : "Select language"}
+                                      : "Select item"}
                                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                                   </Button>
                                 </FormControl>
                               </PopoverTrigger>
                               <PopoverContent className="w-[200px] p-0">
                                 <Command>
-                                  <CommandInput placeholder="Search language..." />
+                                  <CommandInput placeholder="Search item..." />
                                   <CommandEmpty>
-                                    No language found.
+                                    No item found.
                                   </CommandEmpty>
                                   <CommandGroup>
-                                    {languages.map((language) => (
+                                    {items.map((item) => (
                                       <CommandItem // need to close on select ---------------------------------------------------------------
-                                        value={language.value}
-                                        key={language.value}
+                                        value={item.value}
+                                        key={item.value}
                                         onSelect={() => {
                                           form.setValue(
                                             `cartItems.${index}.price`,
-                                            language.value
+                                            item.value
                                           );
                                         }}
                                       >
                                         <CheckIcon
                                           className={cn(
                                             "mr-2 h-4 w-4",
-                                            language.value === field.value
+                                            item.value === field.value
                                               ? "opacity-100"
                                               : "opacity-0"
                                           )}
                                         />
-                                        {language.label}
+                                        {item.label}
                                       </CommandItem>
                                     ))}
                                   </CommandGroup>

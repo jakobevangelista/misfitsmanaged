@@ -8,6 +8,7 @@ import {
   datetime,
   mysqlEnum,
   varchar,
+  date,
 } from "drizzle-orm/mysql-core";
 
 export const members = mysqlTable("members", {
@@ -37,6 +38,7 @@ export const members = mysqlTable("members", {
   parentName: text("parent_name"),
   parentSignature: text("parent_signature"),
   minorDOB: text("minor_dob"),
+  DOB: date("DOB"),
 });
 
 export const contracts = mysqlTable("contracts", {

@@ -38,7 +38,8 @@ export default async function Home() {
           </div>
           <div className="flex mx-auto mb-auto md:m-auto">
             <SignIn
-              afterSignInUrl="/memberHome"
+              // afterSignInUrl="/memberHome"
+              // afterSignUpUrl='/memberHome'
               appearance={{
                 elements: {
                   formButtonPrimary: "bg-[#EA0606] hover:bg-[#EA0606]/50",

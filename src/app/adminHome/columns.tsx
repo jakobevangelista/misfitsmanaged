@@ -158,6 +158,8 @@ export const columns: ColumnDef<User>[] = [
       // );
       const { toast } = useToast();
       const [isPending, startTransition] = useTransition();
+      const [dayPassCashAmount, setDayPassCashAmount] = useState<number>(0);
+      const [waterCashAmount, setWaterCashAmount] = useState<number>(0);
       const handleCheckout = async (data: string) => {
         try {
           const { sessionId } = await postData({
@@ -257,6 +259,8 @@ export const columns: ColumnDef<User>[] = [
                 <Label>Cash Transactions:</Label>
                 <div className="flex w-full max-w-sm items-center space-x-2">
                   <form action={cashTransactionWater}>
+                    <Label>Enter cash given for water here:</Label>
+                    <Input name="cashAmount" placeholder="Enter amount for Day Pass Here" type="number" value={waterCashAmount} onChange={(e) => { setWaterCashAmount(parseFloat(e.target.value)) }} />
                     <Button
                       variant="secondary"
                       className="flex flex-grow"
@@ -264,6 +268,8 @@ export const columns: ColumnDef<User>[] = [
                       onClick={() => {
                         toast({
                           title: "Water Cash Transaction Recorded",
+                          description: `Change: ${waterCashAmount! - 15}`
+
                         });
                       }}
                     >
@@ -276,6 +282,8 @@ export const columns: ColumnDef<User>[] = [
                     />
                   </form>
                   <form action={cashTransactionDayPass}>
+                    <Label>Enter cash given for day pass Here:</Label>
+                    <Input name="cashAmount" placeholder="Enter amount for Day Pass Here" type="number" value={dayPassCashAmount} onChange={(e) => { setDayPassCashAmount(parseFloat(e.target.value)) }} />
                     <Button
                       variant="secondary"
                       className="flex flex-grow"
@@ -283,6 +291,7 @@ export const columns: ColumnDef<User>[] = [
                       onClick={() => {
                         toast({
                           title: "Day Pass Cash Transaction Recorded",
+                          description: `Change: ${dayPassCashAmount! - 15}`
                         });
                       }}
                     >

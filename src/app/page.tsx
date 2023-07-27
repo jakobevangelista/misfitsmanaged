@@ -1,5 +1,5 @@
 import { buttonVariants } from "@/components/ui/button";
-import { auth, SignIn } from "@clerk/nextjs";
+import { auth, SignIn, SignUp } from "@clerk/nextjs";
 import { Command } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -37,7 +37,7 @@ export default async function Home() {
             Welcome to Misfits Managed!
           </div>
           <div className="flex mx-auto mb-auto md:m-auto">
-            <SignIn
+            <SignUp
               // afterSignInUrl="/memberHome"
               // afterSignUpUrl='/memberHome'
               appearance={{

@@ -19,6 +19,7 @@ export async function POST(req: Request) {
       },
       where: eq(members.id, Number(data.id)),
     });
+
     if (!user) {
       return new Response(
         JSON.stringify({
@@ -33,8 +34,12 @@ export async function POST(req: Request) {
       email: memberEmail!.emailAddress,
       // name: `${user.firstName} ${user.lastName}`,
     });
+    console.log(data);
+
     try {
       if (data.data === "month") {
+        console.log("here");
+
         let session;
         session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
@@ -45,7 +50,8 @@ export async function POST(req: Request) {
           },
           line_items: [
             {
-              price: "price_1MshQyJfUfWpyMyy5kjkvXHt",
+              // price: "price_1NVLLCD5u1cDehOfchFtQrz6", // month-to-month
+              price: "price_1NVLLzD5u1cDehOfDPCQ0SGN", // montly membership
               quantity: 1,
             },
           ],
@@ -70,7 +76,7 @@ export async function POST(req: Request) {
             { status: 500 }
           );
         }
-      } else if (data.data === "water") {
+      } else if (data.data === "Water") {
         let session;
         session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
@@ -82,8 +88,8 @@ export async function POST(req: Request) {
           line_items: [
             {
               // price: "price_1NB9geJfUfWpyMyy9FOo7rbp",
-              price: "price_1NVIr6D5u1cDehOfJUA0JI6k",
-              // price: "price_1NIEbYJfUfWpyMyyPh0WqUTM", // personal test mode
+              // price: "price_1NVIr6D5u1cDehOfJUA0JI6k",
+              price: "price_1NIEbYJfUfWpyMyyPh0WqUTM", // personal test mode
               quantity: 1,
             },
           ],
@@ -112,7 +118,7 @@ export async function POST(req: Request) {
             { status: 500 }
           );
         }
-      } else if (data.data === "daypass") {
+      } else if (data.data === "Day Pass") {
         let session;
         session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
@@ -123,12 +129,12 @@ export async function POST(req: Request) {
           },
           line_items: [
             {
-              price: "price_1NVIrSD5u1cDehOfFuW9FHIO",
+              price: "price_1NXFYAD5u1cDehOfSgf9D1AQ",
               quantity: 1,
             },
           ],
 
-          mode: "payment",
+          mode: "subscription",
           allow_promotion_codes: false,
           success_url: `${getURL()}/adminHome`,
           cancel_url: `${getURL()}/adminHome`,

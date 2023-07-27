@@ -6,7 +6,11 @@ import { db } from "@/db";
 import { members, transactions, contracts } from "@/db/schema/members";
 import { eq } from "drizzle-orm";
 import { string } from "zod";
-import { createOrRetrieveCustomer } from "../../../../utils/dbHelper";
+import {
+  createOrRetrieveCustomer,
+  manageSubscription,
+} from "../../../../utils/dbHelper";
+import { check } from "drizzle-orm/mysql-core";
 /// <reference types="stripe-event-types" />
 
 const relevantEvents = new Set([
@@ -25,7 +29,7 @@ export async function POST(req: Request) {
   //   let event: Stripe.Event;
   const sig = headers().get("Stripe-Signature") as string;
   // const secret = "whsec_1GELcqsBjQT3lighVRSc0e7PerHopo2s"; // personal test mode
-  const secret = "whsec_Xjcs5cS81VExzwEIsVF12d2ePx0Kp8KL"; // personal live
+  const secret = "whsec_GmTLlRKwQ5Xh1XLm9ezQFhsJihueNeqb"; // personal live
   const event = stripe.webhooks.constructEvent(
     body,
     sig,
@@ -35,102 +39,73 @@ export async function POST(req: Request) {
   // Handle the event
   switch (event.type) {
     case "checkout.session.completed":
-      console.log(event.id);
-      console.log(new Date().toISOString().slice(0, 19).replace("T", " "));
-      try {
-        // const session = await stripe.checkout.sessions.retrieve(sessionId, {
-        //   expand: ["customer"],
-        // });
-        // if (event.data.object.subscription != " ") {
-        //   const subscriptionId = event.data.object.subscription?.toString();
-        //   const subscription = await stripe.subscriptions.retrieve(
-        //     subscriptionId!
-        //   );
+      const checkoutSession = event.data.object as Stripe.Checkout.Session;
 
-        //   //implement subscription logic here
-        // }
+      const now = new Date();
+      const date = new Date(now);
+      // date.setHours(date.getHours() - 5);
 
-        const memberEmail = event.data.object.customer_details?.email || " ";
-        const transactionAmount = event.data.object.amount_total || 0;
-        if (event.data.object.amount_total === 1500) {
-          const now = new Date();
-          const tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
-          const date = new Date(now);
-          date.setHours(date.getHours() - 5);
-
-          await db.insert(contracts).values({
-            ownerId: memberEmail!,
-            status: "active",
-            type: "day pass",
-            length: "1 day",
-            startDate: now,
-            endDate: tomorrow,
-          });
-          await db.insert(transactions).values({
-            ownerId: memberEmail,
-            amount: transactionAmount,
-            date: date.toLocaleString(), //.toISOString().slice(0, 19).replace("T", " "),
-            paymentMethod: "card",
-            type: "day pass",
-            createdAt: now,
-          });
-          break;
-          // const customerId =
-          //   (await createOrRetrieveCustomer({ email: memberEmail })) || " ";
-          // const subscription = await stripe.subscriptions.create({
-          //   customer: customerId,
-          //   items: [
-          //     { price: "price_1NSzYjJfUfWpyMyyifDl1LCB" },
-          //     {
-          //       price_data: {
-          //         currency: "usd",
-          //         product: "prod_OFUXzirHxR26ou",
-          //         recurring: {
-          //           interval: "day",
-          //           interval_count: 1,
-          //         },
-          //         unit_amount: 1500,
-          //       },
-          //     },
-          //   ],
-          //   cancel_at_period_end: true,
-          // });
-          // const startDate = new Date(subscription.current_period_start);
-          // const endDate = new Date(subscription.current_period_end);
-          // await db.insert(contracts).values({
-          //   ownerId: memberEmail!,
-          //   status: "active",
-          //   type: "day pass",
-          //   length: "1 day",
-          //   startDate: startDate,
-          //   endDate: endDate,
-          // });
+      const itemsPurchased = await stripe.checkout.sessions.listLineItems(
+        checkoutSession.id,
+        {
+          limit: 100,
         }
-        const now = new Date();
-        const date = new Date(now);
-        date.setHours(date.getHours() - 5);
-        // date.setHours(now.getHours() - 5);
+      );
+
+      for (var i = 0; i < itemsPurchased.data.length; i++) {
+        const itemName = await stripe.products.retrieve(
+          itemsPurchased.data[i].price!.product as string
+        );
         await db.insert(transactions).values({
-          ownerId: memberEmail,
-          amount: transactionAmount,
+          ownerId: event.data.object.customer_details?.email || " ",
+          amount: itemsPurchased.data[i].amount_total,
           date: date.toLocaleString(),
           paymentMethod: "card",
-          type: "water",
+          type: itemName.name,
           createdAt: date,
         });
-      } catch (error) {
-        // Handle any errors that occur during the API call
-        console.error(error);
       }
+
+      if (checkoutSession.mode === "subscription") {
+        const subscriptionId = checkoutSession.subscription as string;
+        const customer = checkoutSession.customer as string;
+        manageSubscription(subscriptionId!, customer!);
+        break;
+      }
+
       break;
     case "customer.subscription.created":
-      const customerSubscriptionCreated = event.data.object;
+      const customerSubscriptionCreated = event.data
+        .object as Stripe.Subscription;
       // Then define and call a function to handle the event customer.subscription.created
+      if (
+        customerSubscriptionCreated.items.data[0].price.recurring?.interval ===
+        "day"
+      ) {
+        await stripe.subscriptions.update(customerSubscriptionCreated.id, {
+          cancel_at_period_end: true,
+        });
+      }
       break;
     case "customer.subscription.updated":
       const customerSubscriptionUpdated = event.data.object;
       // Then define and call a function to handle the event customer.subscription.updated
+      const subscriptionUpdate = event.data.object as Stripe.Subscription;
+
+      const subscriptionId = subscriptionUpdate.id as string;
+      const customer = subscriptionUpdate.customer as string;
+      manageSubscription(subscriptionId!, customer!);
       break;
+
+    case "customer.subscription.deleted":
+      // Then define and call a function to handle the event customer.subscription.updated
+      const subscriptionDelete = event.data.object as Stripe.Subscription;
+
+      const subscriptionIdDelete = subscriptionDelete.id as string;
+      const customerDelete = subscriptionDelete.customer as string;
+      manageSubscription(subscriptionIdDelete!, customerDelete!);
+      break;
+
     case "charge.succeeded":
       const chargeSucceeded = event.data.object;
       console.log(chargeSucceeded.metadata.line_items);

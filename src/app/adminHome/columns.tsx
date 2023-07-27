@@ -3,7 +3,12 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import {
+  ArrowUpDown,
+  CheckIcon,
+  ChevronsUpDown,
+  MoreHorizontal,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -29,7 +34,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { postData } from "../../../utils/helpers";
+import { postData, customCheckoutPost } from "../../../utils/helpers";
 import { getStripe } from "../../../utils/stripe-client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -39,7 +44,7 @@ import { useZact } from "zact/client";
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { set, useForm } from "react-hook-form";
+import { set, useFieldArray, useForm } from "react-hook-form";
 import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -61,6 +66,24 @@ import {
   cashTransactionDayPass,
 } from "./cashTransaction";
 import { useTransition } from "react";
+import { stripe } from "../../../utils/stripe";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+
+const languages = [
+  { label: "Day Pass", value: "price_1NXFYAD5u1cDehOfSgf9D1AQ" },
+  { label: "Water", value: "price_1NVIr6D5u1cDehOfJUA0JI6k" },
+] as const;
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -68,8 +91,15 @@ export type User = {
   id: number;
   realScanId: string;
   name: string;
-  contractStatus: "active" | "expired" | "none";
-  emailAddress: string | null;
+  contractStatus:
+    | "active"
+    | "incomplete"
+    | "incomplete_expired"
+    | "past_due"
+    | "canceled"
+    | "unpaid"
+    | "none";
+  emailAddress: string;
 };
 
 export const columns: ColumnDef<User>[] = [
@@ -91,13 +121,19 @@ export const columns: ColumnDef<User>[] = [
         </Button>
       );
     },
-    // cell: ({ row }) => {
-    //   return (
-    //     <div className="text-center font-medium">
-    //       {row.getValue("contractStatus")}
-    //     </div>
-    //   );
-    // },
+    cell: ({ row }) => {
+      return (
+        <>
+          {row.getValue("contractStatus") === "active" ? (
+            <div className="text-emerald-400">
+              {row.getValue("contractStatus")}
+            </div>
+          ) : (
+            <div className="text-red-600">{row.getValue("contractStatus")}</div>
+          )}
+        </>
+      );
+    },
   },
   {
     accessorKey: "emailAddress",
@@ -134,6 +170,46 @@ export const columns: ColumnDef<User>[] = [
       const [tagId, setTagId] = useState("");
       const [realTagId, setRealTagId] = useState("");
 
+      const checkoutCartFormSchema = z.object({
+        cartItems: z
+          .array(
+            z.object({
+              price: z.string().min(1, {
+                message: "Please select a product",
+              }),
+              quantity: z.literal(1),
+            })
+          )
+          .nonempty(),
+      });
+      const form = useForm<z.infer<typeof checkoutCartFormSchema>>({
+        resolver: zodResolver(checkoutCartFormSchema),
+        defaultValues: {
+          cartItems: [{ price: "", quantity: 1 }],
+        },
+      });
+      const { fields, append, remove } = useFieldArray({
+        name: "cartItems",
+        control: form.control,
+      });
+
+      const checkoutSubmit = async (
+        values: z.infer<typeof checkoutCartFormSchema>
+      ) => {
+        try {
+          const { sessionId } = await customCheckoutPost(
+            values,
+            row.original.emailAddress,
+            "/api/customCheckoutSession"
+          );
+          console.log(sessionId);
+          const stripe = await getStripe();
+          stripe?.redirectToCheckout({ sessionId });
+        } catch (error) {
+          return alert((error as Error)?.message);
+        }
+      };
+
       return (
         <Dialog>
           <DialogTrigger>
@@ -143,137 +219,210 @@ export const columns: ColumnDef<User>[] = [
             </Button>
           </DialogTrigger>
           <DialogContent className="w-full mx-auto">
-            <DialogHeader>
-              <DialogTitle>Member profile</DialogTitle>
-              <DialogDescription>
-                Make changes to your profile here. Click save when you&apos;re
-                done.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex flex-col space-y-4">
-              <div className="flex flex-row">
-                <Button
-                  variant="outline"
-                  onClick={() => handleCheckout("daypass")}
-                  className="flex-grow"
-                >
-                  Charge Day Pass
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleCheckout("water")}
-                  className="flex-grow"
-                >
-                  Charge Water
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    toast({
-                      title: "Scheduled: Catch up",
-                      description: "Friday, February 10, 2023 at 5:57 PM",
-                    })
-                  }
-                  className="flex-grow"
-                >
-                  Toast
-                </Button>
-              </div>
-              <Label>Cash Transactions:</Label>
-              <div className="flex w-full max-w-sm items-center space-x-2">
-                <form action={cashTransactionWater}>
+            <div className="flex flex-row space-x-4 mx-auto">
+              <div className="flex flex-col space-y-4 mx-auto">
+                <DialogHeader className="mx-auto">
+                  <DialogTitle>Member profile</DialogTitle>
+                  <DialogDescription>
+                    Make changes to your profile here. Click save when
+                    you&apos;re done.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="flex space-x-1">
                   <Button
-                    variant="secondary"
-                    className="flex flex-grow"
-                    type="submit"
-                    onClick={() => {
-                      toast({
-                        title: "Water Cash Transaction Recorded",
-                      });
-                    }}
+                    variant="outline"
+                    onClick={() => handleCheckout("Day Pass")}
+                    className="flex"
                   >
-                    Cash Water
+                    Charge Day Pass
                   </Button>
-                  <Input
-                    type="hidden"
-                    name="email"
-                    value={String(row.original.emailAddress!)}
-                  />
-                </form>
-                <form action={cashTransactionDayPass}>
                   <Button
-                    variant="secondary"
-                    className="flex flex-grow"
-                    type="submit"
-                    onClick={() => {
-                      toast({
-                        title: "Day Pass Cash Transaction Recorded",
-                      });
-                    }}
+                    variant="outline"
+                    onClick={() => handleCheckout("Water")}
+                    className="flex"
                   >
-                    Cash Day Pass
+                    Charge Water
                   </Button>
-                  <Input
-                    type="hidden"
-                    name="email"
-                    value={String(row.original.emailAddress!)}
-                  />
-                </form>
-              </div>
-              {/* <div className="items-top flex space-x-2">
-              <Checkbox
-                id="terms1"
-                checked={cash}
-                onCheckedChange={(e) => {
-                  e.valueOf() ? setCash(true) : setCash(false);
-                }}
-              />
-              <div className="grid gap-1.5 leading-none">
-                <label
-                  htmlFor="terms1"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Pay with cash {cash ? "✅" : "❌"}
-                </label>
-              </div>
-            </div> */}
-              <div className="flex flex-col gap-4 py-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleCheckout("month")}
+                    className="flex"
+                  >
+                    Charge Month
+                  </Button>
+                </div>
+                <Label>Cash Transactions:</Label>
                 <div className="flex w-full max-w-sm items-center space-x-2">
-                  <form action={validatedAction}>
-                    <Input
-                      type="text"
-                      placeholder="Click here and scan tag"
-                      name="newTagCode"
-                      value={tagId}
-                      onChange={(e) => {
-                        setTagId(e.target.value);
-                      }}
-                    />
-                    {/* <Input
-                    type="text"
-                    placeholder="Click here and scan tag"
-                    name="realTagCode"
-                    value={realTagId}
-                  /> */}
-                    <Input type="hidden" name="userId" value={String(rowId)} />
+                  <form action={cashTransactionWater}>
                     <Button
+                      variant="secondary"
+                      className="flex flex-grow"
                       type="submit"
-                      onSubmit={() => {}}
                       onClick={() => {
-                        // setTagId("");
-                        setTimeout(() => {
-                          setTagId("");
-                        }, 10);
                         toast({
-                          title: "✅ Tag Updated",
+                          title: "Water Cash Transaction Recorded",
                         });
                       }}
                     >
-                      Update Tag
+                      Cash Water
                     </Button>
+                    <Input
+                      type="hidden"
+                      name="email"
+                      value={String(row.original.emailAddress!)}
+                    />
+                  </form>
+                  <form action={cashTransactionDayPass}>
+                    <Button
+                      variant="secondary"
+                      className="flex flex-grow"
+                      type="submit"
+                      onClick={() => {
+                        toast({
+                          title: "Day Pass Cash Transaction Recorded",
+                        });
+                      }}
+                    >
+                      Cash Day Pass
+                    </Button>
+                    <Input
+                      type="hidden"
+                      name="email"
+                      value={String(row.original.emailAddress!)}
+                    />
                   </form>
                 </div>
+                <div className="flex flex-col gap-4 py-4">
+                  <div className="flex w-full max-w-sm items-center space-x-2">
+                    <form action={validatedAction}>
+                      <Input
+                        type="text"
+                        placeholder="Click here and scan tag"
+                        name="newTagCode"
+                        value={tagId}
+                        onChange={(e) => {
+                          setTagId(e.target.value);
+                        }}
+                      />
+
+                      <Input
+                        type="hidden"
+                        name="userId"
+                        value={String(rowId)}
+                      />
+                      <Button
+                        type="submit"
+                        onSubmit={() => {}}
+                        onClick={() => {
+                          // setTagId("");
+                          setTimeout(() => {
+                            setTagId("");
+                          }, 10);
+                          toast({
+                            title: "✅ Tag Updated",
+                          });
+                        }}
+                      >
+                        Update Tag
+                      </Button>
+                    </form>
+                  </div>
+                </div>
               </div>
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(checkoutSubmit)}
+                  className="space-y-8"
+                >
+                  {fields.map((field, index) => {
+                    return (
+                      <FormField
+                        control={form.control}
+                        key={field.id}
+                        name={`cartItems.${index}.price`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant="outline"
+                                    role="combobox"
+                                    className={cn(
+                                      "w-[200px] justify-between",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value
+                                      ? languages.find(
+                                          (language) =>
+                                            language.value === field.value
+                                        )?.label
+                                      : "Select language"}
+                                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-[200px] p-0">
+                                <Command>
+                                  <CommandInput placeholder="Search language..." />
+                                  <CommandEmpty>
+                                    No language found.
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {languages.map((language) => (
+                                      <CommandItem // need to close on select ---------------------------------------------------------------
+                                        value={language.value}
+                                        key={language.value}
+                                        onSelect={(value) => {
+                                          form.setValue(
+                                            `cartItems.${index}.price`,
+                                            language.value
+                                          );
+                                        }}
+                                      >
+                                        <CheckIcon
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            language.value === field.value
+                                              ? "opacity-100"
+                                              : "opacity-0"
+                                          )}
+                                        />
+                                        {language.label}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              onClick={() => remove(index)}
+                            >
+                              DELETE ITEM
+                            </Button>
+                          </FormItem>
+                        )}
+                      />
+                    );
+                  })}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => append({ price: "", quantity: 1 })}
+                  >
+                    Add Item
+                  </Button>
+                  <div>
+                    <Button type="submit">Checkout</Button>
+                  </div>
+                </form>
+              </Form>
             </div>
           </DialogContent>
         </Dialog>

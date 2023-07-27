@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { stripe } from "./stripe";
-import { members, transactions } from "@/db/schema/members";
+import { contracts, members, transactions } from "@/db/schema/members";
 import { eq } from "drizzle-orm";
 import { User } from "../src/app/adminHome/columns";
 import { Row } from "@tanstack/table-core/build/lib/types";
@@ -47,4 +47,35 @@ export async function cashTransaction(data: string, row: Row<User>) {
       return { message: `failed` };
     });
   return { message: `successfully updated transactions` };
+}
+
+export async function manageSubscription(
+  subscriptionId: string,
+  customerId: string
+) {
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+    expand: ["default_payment_method"],
+  });
+
+  const product = await stripe.products.retrieve(
+    subscription.items.data[0].price.product as string
+  );
+
+  await db
+    .insert(contracts)
+    .values({
+      ownerId: customerId,
+      status: subscription.status,
+      type: product.name,
+      startDate: new Date(subscription.current_period_start * 1000),
+      endDate: new Date(subscription.current_period_end * 1000),
+      stripeId: subscription.id,
+    })
+    .onDuplicateKeyUpdate({
+      set: {
+        status: subscription.status,
+        startDate: new Date(subscription.current_period_start * 1000),
+        endDate: new Date(subscription.current_period_end * 1000),
+      },
+    });
 }

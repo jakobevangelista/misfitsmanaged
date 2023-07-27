@@ -40,7 +40,7 @@ async function checkContracts() {
       when (
         select ${contracts.status}
         from ${contracts}
-        where ${contracts.ownerId} = ${members.emailAddress} AND ${contracts.status} = 'active'
+        where ${contracts.ownerId} = ${members.customerId} AND ${contracts.status} = 'active'
         limit 1
       ) is not null then 'active'
       else 'none'

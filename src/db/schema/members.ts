@@ -7,6 +7,7 @@ import {
   int,
   datetime,
   mysqlEnum,
+  varchar,
 } from "drizzle-orm/mysql-core";
 
 export const members = mysqlTable("members", {
@@ -18,21 +19,31 @@ export const members = mysqlTable("members", {
   emailAddress: text("email_address").notNull(),
   phoneNumber: text("phone_number"),
   isWaiverSigned: boolean("is_waiver_signed").default(false),
-  contractStatus: mysqlEnum("contract_status", ["active", "expired", "none"])
+  contractStatus: mysqlEnum("contract_status", [
+    "active",
+    "incomplete",
+    "incomplete_expired",
+    "past_due",
+    "canceled",
+    "unpaid",
+    "none",
+  ])
     .default("none")
     .notNull(),
   customerId: text("customer_id"),
   waiverSignature: text("waiver_signature"),
   waiverSignDate: text("waiver_date"),
   realScanId: text("real_scan_id").notNull().default("0"),
+  parentName: text("parent_name"),
+  parentSignature: text("parent_signature"),
+  minorDOB: text("minor_dob"),
 });
 
 export const contracts = mysqlTable("contracts", {
-  id: serial("id").primaryKey(),
+  stripeId: varchar("stripe_id", { length: 60 }).primaryKey(),
   ownerId: text("owner_id").notNull(),
   status: text("status").notNull(),
   type: text("type").notNull(),
-  length: text("length").notNull(),
   startDate: datetime("start_date").notNull(),
   endDate: datetime("end_date").notNull(),
 });

@@ -13,7 +13,7 @@ export async function cashTransactionWater(formdata: FormData) {
     .insert(transactions)
     .values({
       ownerId: formdata.get("email")!.toString(),
-      amount: 1,
+      amount: 100,
       date: now.toLocaleString(),
       paymentMethod: "cash",
       type: "water",
@@ -36,7 +36,7 @@ export async function cashTransactionDayPass(formdata: FormData) {
     .insert(transactions)
     .values({
       ownerId: formdata.get("email")!.toString(),
-      amount: 1,
+      amount: 1500,
       date: now.toLocaleString(),
       paymentMethod: "cash",
       type: "day pass",

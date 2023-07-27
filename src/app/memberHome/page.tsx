@@ -22,8 +22,6 @@ export default async function Page() {
     },
   });
 
-  console.log(user?.isWaiverSigned);
-
   if (user?.isWaiverSigned !== true) {
     redirect("/register");
   }

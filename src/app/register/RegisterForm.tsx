@@ -15,7 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import { validatedAction } from "./action";
@@ -26,16 +26,39 @@ import { redirect, useRouter } from "next/navigation";
 import SignaturePad from "react-signature-canvas";
 import { useRef, useState } from "react";
 import ReactSignatureCanvas from "react-signature-canvas";
+import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
-  username: z.string().min(2, {
-    message: "Please enter your name to agree to the waiver",
+  memberName: z.string().min(2, {
+    message: "Your name must be at least 2 characters long",
   }),
+  parentName: z
+    .array(
+      z.object({
+        name: z.string().min(2, {
+          message: "Your name must be at least 2 characters long",
+        }),
+        parentSignature: z.string().nonempty({
+          message: "Please provide a signature",
+        }),
+        DOB: z.string().nonempty({
+          message: "Please provide a date of birth of your child", // need to validate
+        }),
+        // DOB: z.preprocess((arg) => {
+        //   if (typeof arg == "string" || arg instanceof Date)
+        //     return new Date(arg);
+        // }, z.coerce.date().optional()),
+        // DOB: z.coerce.date().optional(),
+      })
+    )
+    .optional(),
   waiverAccept: z.literal<boolean>(true),
   signature: z.string().nonempty({
     message: "Please provide a signature",
   }),
 });
+
+type ProfileFormValues = z.infer<typeof formSchema>;
 
 export default function RegisterForm(props: {
   qrCode: string;
@@ -45,16 +68,22 @@ export default function RegisterForm(props: {
   const { mutate, error } = useZact(validatedAction);
   const router = useRouter();
   const sigRef = useRef({} as SignaturePad);
+  const sigRef2 = useRef({} as SignaturePad);
   const date = new Date().toLocaleString();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      memberName: "",
       waiverAccept: false,
       signature: "",
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    name: "parentName",
+    control: form.control,
   });
 
   // 2. Define a submit handler.
@@ -62,18 +91,54 @@ export default function RegisterForm(props: {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 
-    mutate({
-      qrCode: props.qrCode,
-      userId: props.userId,
-      emailAddress: props.emailAddress,
-      username: values.username,
-      waiverAccept: values.waiverAccept,
-      waiverSignature: values.signature,
-      waiverSignDate: date,
-    }).then(() => {
-      router.refresh();
-    });
-    console.log(values);
+    // mutate({
+    //   qrCode: props.qrCode,
+    //   userId: props.userId,
+    //   emailAddress: props.emailAddress,
+    //   username: values.username[0].value,
+    //   waiverAccept: values.waiverAccept,
+    //   waiverSignature: values.signature,
+    //   waiverSignDate: date,
+    //   parentName: values.username[1].value,
+    // }).then(() => {
+    //   router.refresh();
+    // });
+    console.log("??????");
+
+    if (values.parentName == undefined || values.parentName.length == 0) {
+      console.log("right place");
+
+      mutate({
+        qrCode: props.qrCode,
+        userId: props.userId,
+        emailAddress: props.emailAddress,
+        username: values.memberName,
+        waiverAccept: values.waiverAccept,
+        waiverSignature: values.signature,
+        waiverSignDate: date,
+        parentName: undefined,
+        parentSignature: undefined,
+        minorDOB: undefined,
+      }).then(() => {
+        router.refresh();
+      });
+    } else {
+      console.log("wronge place");
+      mutate({
+        qrCode: props.qrCode,
+        userId: props.userId,
+        emailAddress: props.emailAddress,
+        username: values.memberName,
+        waiverAccept: values.waiverAccept,
+        waiverSignature: values.signature,
+        waiverSignDate: date,
+        parentName: values.parentName[0].name,
+        parentSignature: values.parentName[0].parentSignature,
+        minorDOB: values.parentName[0].DOB,
+      }).then(() => {
+        router.refresh();
+      });
+    }
   }
 
   // let sigPad: any = {};
@@ -81,11 +146,15 @@ export default function RegisterForm(props: {
     sigRef.current.clear();
   };
 
+  const clear2 = () => {
+    sigRef2.current.clear();
+  };
+
   return (
     <>
       <div className="flex flex-col justify-center">
         <iframe
-          src="/waiver.pdf"
+          src="/corruptedStrengthWaiver.pdf"
           className="mx-auto w-full md:h-[50vh] lg:w-1/3"
         />
         <div className="mx-auto">
@@ -101,7 +170,7 @@ export default function RegisterForm(props: {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="username"
+                name="memberName"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
@@ -113,33 +182,147 @@ export default function RegisterForm(props: {
                       you are signing this agreement electronically.
                     </FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter Name Here" {...field} />
+                      <Input placeholder="Enter member name here" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              {fields.length >= 1
+                ? fields?.map((field, index) => (
+                    <>
+                      <FormField
+                        control={form.control}
+                        key={field.id}
+                        name={`parentName.${index}.name`}
+                        render={({ field }) => (
+                          <>
+                            <FormItem>
+                              <FormLabel>Parent Name</FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  placeholder="Enter Parent name"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          </>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        key={field.id}
+                        name={`parentName.${index}.DOB`}
+                        render={({ field }) => (
+                          <>
+                            <FormItem>
+                              <FormLabel>
+                                Minor DOB: Enter date of birth of your child
+                              </FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  placeholder="MM/DD/YYYY"
+                                  type="text"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          </>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        key={field.id}
+                        name={`parentName.${index}.parentSignature`}
+                        render={({ field }) => (
+                          <>
+                            <FormItem>
+                              <div>Parent sign here:</div>
+                              <div className="w-full mx-auto md:w-500px md:h-200px border-gray-300">
+                                <SignaturePad
+                                  ref={sigRef2}
+                                  backgroundColor="white"
+                                  onEnd={() => {
+                                    // console.log(
+                                    //   sigRef.current
+                                    //     .getTrimmedCanvas()
+                                    //     .toDataURL("image/png")
+                                    // );
+                                    field.onChange(
+                                      sigRef2.current
+                                        .getTrimmedCanvas()
+                                        .toDataURL("image/png")
+                                        .toString()
+                                    );
+                                  }}
+                                  penColor="black"
+                                  canvasProps={{
+                                    width: 520,
+                                    height: 200,
+                                    // className: "w-full md:w-500px md:h-200px",
+                                  }}
+                                />
+                                <FormMessage />
+                                <Button
+                                  variant="destructive"
+                                  type="button"
+                                  onClick={clear2}
+                                >
+                                  Clear Parent Signature
+                                </Button>
+                              </div>
+                            </FormItem>
+                          </>
+                        )}
+                      />
+
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        onClick={() => remove(index)}
+                      >
+                        DELETE PARENT
+                      </Button>
+                    </>
+                  ))
+                : null}
+              <Button
+                type="button"
+                variant="creme"
+                size="sm"
+                className="mt-2"
+                onClick={() =>
+                  append({ name: "", parentSignature: "", DOB: "" })
+                }
+              >
+                IF YOU ARE A MINOR YOU NEED TO ADD A PARENT, CLICK THIS BUTTON:
+                Add Parent
+              </Button>
               <FormField
                 control={form.control}
                 name="waiverAccept"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                      <FormLabel>Accept Terms of Waiver on {date}</FormLabel>
-                      <FormDescription>
-                        View the terms in the{" "}
-                        <Link className="hover:underline" href="/waiver.pdf">
-                          waiver
-                        </Link>
-                      </FormDescription>
-                    </div>
-                  </FormItem>
+                  <>
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Accept Terms of Waiver on {date}</FormLabel>
+                        <FormDescription>
+                          View the terms in the{" "}
+                          <Link className="hover:underline" href="/waiver.pdf">
+                            waiver
+                          </Link>
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  </>
                 )}
               />
               <FormField
@@ -147,17 +330,17 @@ export default function RegisterForm(props: {
                 name="signature"
                 render={({ field }) => (
                   <FormItem>
-                    <div>Sign here:</div>
-                    <div className="w-full">
+                    <div>Member sign here:</div>
+                    <div className="w-full mx-auto md:w-500px md:h-200px border-gray-300">
                       <SignaturePad
                         ref={sigRef}
                         backgroundColor="white"
                         onEnd={() => {
-                          console.log(
-                            sigRef.current
-                              .getTrimmedCanvas()
-                              .toDataURL("image/png")
-                          );
+                          // console.log(
+                          //   sigRef.current
+                          //     .getTrimmedCanvas()
+                          //     .toDataURL("image/png")
+                          // );
                           field.onChange(
                             sigRef.current
                               .getTrimmedCanvas()

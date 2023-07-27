@@ -16,6 +16,9 @@ export const validatedAction = zact(
     userId: z.string().min(1),
     waiverSignature: z.string().min(1),
     waiverSignDate: z.string().min(1),
+    parentName: z.string().min(1).optional(),
+    parentSignature: z.string().min(1).optional(),
+    minorDOB: z.string().optional(),
   })
 )(async (input) => {
   console.log("[SERVER]: Received input", input);
@@ -31,6 +34,9 @@ export const validatedAction = zact(
       waiverSignature: input.waiverSignature,
       waiverSignDate: input.waiverSignDate,
       realScanId: input.userId,
+      parentName: input.parentName,
+      parentSignature: input.parentSignature,
+      minorDOB: input.minorDOB,
     })
     .catch((err) => {
       console.log(err);

@@ -244,7 +244,7 @@ export const columns: ColumnDef<User>[] = [
                     onClick={() => handleCheckout("Water")}
                     className="flex"
                   >
-                    Charge Water
+                    Charge Small Water Bottle
                   </Button>
                   <Button
                     variant="outline"
@@ -267,7 +267,7 @@ export const columns: ColumnDef<User>[] = [
                         });
                       }}
                     >
-                      Cash Water
+                      Small Water Bottle: $1
                     </Button>
                     <Input
                       type="hidden"
@@ -286,7 +286,7 @@ export const columns: ColumnDef<User>[] = [
                         });
                       }}
                     >
-                      Cash Day Pass
+                      Day Pass: $15
                     </Button>
                     <Input
                       type="hidden"

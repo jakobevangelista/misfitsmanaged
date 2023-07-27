@@ -340,7 +340,7 @@ export const columns: ColumnDef<User>[] = [
                   <DialogHeader className="mx-auto">
                     <DialogTitle>Multi-item Checkout</DialogTitle>
                     <DialogDescription>
-                      Add the multiple items to the cart then press "checkout"
+                      Add the multiple items to the cart then press the checkout button.
                     </DialogDescription>
                   </DialogHeader>
                   {fields.map((field, index) => {
@@ -428,7 +428,7 @@ export const columns: ColumnDef<User>[] = [
                     Add Item
                   </Button>
                   <div>
-                    <Button type="submit">Checkout</Button>
+                    <Button type="submit" variant="green">Checkout</Button>
                   </div>
                 </form>
               </Form>

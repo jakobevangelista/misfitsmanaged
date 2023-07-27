@@ -7,6 +7,6 @@ export function RefreshPage() {
   const router = useRouter();
   useEffect(() => {
     router.refresh();
-  }, []);
+  }, [router]);
   return null;
 }

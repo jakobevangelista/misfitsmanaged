@@ -9,7 +9,7 @@ import { members, transactions } from "@/db/schema/members";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { string } from "zod";
-export const revalidate = 15; // revalidate this page every 15 seconds
+export const revalidate = 0; // revalidate this page every 15 seconds
 
 async function getData(): Promise<Transaction[]> {
   const listOfTransactions: Transaction[] =

@@ -8,7 +8,6 @@ import RegisterForm from "./RegisterForm";
 
 export default async function Page() {
   const { userId } = auth();
-  const user = await currentUser();
 
   const isRegistered = await db.query.members.findFirst({
     where: eq(members.userId, userId!),
@@ -25,11 +24,7 @@ export default async function Page() {
   return (
     <>
       <UserButton afterSignOutUrl="/" />
-      <RegisterForm
-        qrCode={customCode}
-        userId={userId!}
-        emailAddress={user!.emailAddresses[0].emailAddress}
-      />
+      <RegisterForm qrCode={customCode} userId={userId!} />
     </>
   );
 }

@@ -52,6 +52,6 @@ export const validatedAction = zact(
     console.log(err);
     return { message: `error creating customer` };
   });
-  revalidateTag('/adminHome')
+  revalidateTag("/adminHome");
   return { message: `successfully registered` };
 });

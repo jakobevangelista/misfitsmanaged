@@ -32,6 +32,7 @@ const formSchema = z.object({
   memberName: z.string().min(2, {
     message: "Your name must be at least 2 characters long",
   }),
+  emailAddress: z.string().email({ message: "Please provide a valid email" }),
   parentName: z
     .array(
       z.object({
@@ -63,7 +64,6 @@ type ProfileFormValues = z.infer<typeof formSchema>;
 export default function RegisterForm(props: {
   qrCode: string;
   userId: string;
-  emailAddress: string;
 }) {
   const { mutate, error } = useZact(validatedAction);
   const router = useRouter();
@@ -111,7 +111,7 @@ export default function RegisterForm(props: {
       mutate({
         qrCode: props.qrCode,
         userId: props.userId,
-        emailAddress: props.emailAddress,
+        emailAddress: values.emailAddress,
         username: values.memberName,
         waiverAccept: values.waiverAccept,
         waiverSignature: values.signature,
@@ -127,7 +127,7 @@ export default function RegisterForm(props: {
       mutate({
         qrCode: props.qrCode,
         userId: props.userId,
-        emailAddress: props.emailAddress,
+        emailAddress: values.emailAddress,
         username: values.memberName,
         waiverAccept: values.waiverAccept,
         waiverSignature: values.signature,
@@ -183,6 +183,22 @@ export default function RegisterForm(props: {
                     </FormLabel>
                     <FormControl>
                       <Input placeholder="Enter member name here" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="emailAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter member email address here"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

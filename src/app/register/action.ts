@@ -39,19 +39,22 @@ export const validatedAction = zact(
       parentSignature: input.parentSignature,
       minorDOB: input.minorDOB,
     })
+    .then(async () => {
+      await createOrRetrieveCustomer({
+        userId: input.userId,
+        email: input.emailAddress,
+        name: input.username,
+      }).catch((err) => {
+        console.log(err);
+        return { message: `error creating customer` };
+      });
+      return { message: `successfully inserted member` };
+    })
     .catch((err) => {
       console.log(err);
       return { message: `error inserting member` };
     });
 
-  await createOrRetrieveCustomer({
-    userId: input.userId,
-    email: input.emailAddress,
-    name: input.username,
-  }).catch((err) => {
-    console.log(err);
-    return { message: `error creating customer` };
-  });
   revalidateTag("/adminHome");
   return { message: `successfully registered` };
 });

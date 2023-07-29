@@ -12,7 +12,7 @@ export const validatedAction = zact(
   z.object({
     username: z.string().min(2),
     waiverAccept: z.literal<boolean>(true),
-    emailAddress: z.string().min(1),
+    emailAddress: z.string().email(),
     qrCode: z.string().min(1),
     userId: z.string().min(1),
     waiverSignature: z.string().min(1),

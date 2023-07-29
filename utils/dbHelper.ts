@@ -14,23 +14,23 @@ export const createOrRetrieveCustomer = async ({
   userId?: string;
   name?: string;
 }) => {
-  const stripeCustomer = await stripe.customers.list({ email: email });
-  const dbCustomer = await db.query.members.findFirst({
-    where: eq(members.emailAddress, email),
+  const stripeCustomer = await stripe.customers.list({
+    email: email,
   });
-  if (stripeCustomer !== null) {
+  if (stripeCustomer.data.length > 0) {
     return stripeCustomer.data[0].id;
   } else {
-    const customer = await stripe!.customers.create({
-      email: email,
-    });
-
-    await db
-      .update(members)
-      .set({ customerId: customer.id })
-      .where(eq(members.emailAddress, email));
-
-    return customer.id;
+    const customer = await stripe.customers
+      .create({
+        email: email,
+      })
+      .then((res) => {
+        await db
+          .update(members)
+          .set({ customerId: customer.id })
+          .where(eq(members.emailAddress, email));
+        return customer.id;
+      });
   }
   return "idk how we got here";
 };

@@ -3,7 +3,12 @@ import { stripe } from "../../../../utils/stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { members, transactions, contracts } from "@/db/schema/members";
+import {
+  members,
+  transactions,
+  contracts,
+  products,
+} from "@/db/schema/members";
 import { eq } from "drizzle-orm";
 import { string } from "zod";
 import {
@@ -29,7 +34,8 @@ export async function POST(req: Request) {
   //   let event: Stripe.Event;
   const sig = headers().get("Stripe-Signature") as string;
   // const secret = "whsec_1GELcqsBjQT3lighVRSc0e7PerHopo2s"; // personal test mode
-  const secret = "whsec_GmTLlRKwQ5Xh1XLm9ezQFhsJihueNeqb"; // personal live
+  // const secret = "whsec_GmTLlRKwQ5Xh1XLm9ezQFhsJihueNeqb"; // personal live
+  const secret = process.env.STRIPE_WEBHOOK_SECRET as string;
   const event = stripe.webhooks.constructEvent(
     body,
     sig,
@@ -111,6 +117,31 @@ export async function POST(req: Request) {
       console.log(chargeSucceeded.metadata.line_items);
       console.log(chargeSucceeded.customer);
 
+      break;
+    case "price.created":
+    case "price.updated":
+      const updatePrice = event.data.object as Stripe.Price;
+      const productName = await stripe.products.retrieve(
+        updatePrice.product as string
+      );
+      console.log(updatePrice);
+      await db
+        .insert(products)
+        .values({
+          priceId: updatePrice.id,
+          name: productName.name,
+          price: updatePrice.unit_amount!,
+        })
+        .onDuplicateKeyUpdate({
+          set: {
+            price: updatePrice.unit_amount!,
+          },
+        });
+      break;
+    case "price.deleted":
+      const deletePrice = event.data.object as Stripe.Price;
+
+      await db.delete(products).where(eq(products.priceId, deletePrice.id));
       break;
   }
 

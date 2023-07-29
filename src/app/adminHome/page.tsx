@@ -53,34 +53,31 @@ async function checkContracts() {
 }
 
 async function getProducts() {
-  const stripeProductList = await stripe.products.list({
-    active: true,
-    limit: 100,
-  });
-  console.log(stripeProductList.data);
-  for (const product of stripeProductList.data) {
-    await db
-      .insert(products)
-      .values({
-        priceId: product.default_price!.toString(),
-        name: product.name,
-        price: Number(
-          (
-            await stripe.prices.retrieve(product.default_price as string)
-          ).unit_amount
-        ),
-      })
-      .onDuplicateKeyUpdate({
-        set: {
-          name: product.name,
-          price: Number(
-            (
-              await stripe.prices.retrieve(product.default_price as string)
-            ).unit_amount
-          ),
-        },
-      });
-  }
+  // LOL THIS CRASHES PROD
+
+  // const stripeProductList = await stripe.products.list({
+  //   active: true,
+  //   limit: 100,
+  // });
+  // // console.log(stripeProductList.data);
+  // for (const product of stripeProductList.data) {
+  //   const stripePrice = await stripe.prices.retrieve(
+  //     product.default_price as string
+  //   );
+  //   await db
+  //     .insert(products)
+  //     .values({
+  //       priceId: product.default_price!.toString(),
+  //       name: product.name,
+  //       price: stripePrice!.unit_amount!,
+  //     })
+  //     .onDuplicateKeyUpdate({
+  //       set: {
+  //         name: product.name,
+  //         price: stripePrice!.unit_amount!,
+  //       },
+  //     });
+  // }
 
   const dbProducts = await db.query.products.findMany({
     columns: {

@@ -122,8 +122,6 @@ export const DataTableWithColumns = (props: {
   }[];
 }) => {
   const fetchProducts = props.products;
-  // console.log(fetchProducts[0].name);
-  console.log(props.data[0]);
   let items: { label: string; value: string }[];
 
   if (props.products[0] !== undefined) {

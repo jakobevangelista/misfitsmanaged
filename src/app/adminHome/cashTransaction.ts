@@ -1,7 +1,12 @@
 "use server";
 
 import { db } from "@/db";
-import { contracts, members, transactions } from "@/db/schema/members";
+import {
+  contracts,
+  members,
+  products,
+  transactions,
+} from "@/db/schema/members";
 import { User } from "./columns";
 import { Row } from "@tanstack/table-core/build/lib/types";
 import { eq } from "drizzle-orm";
@@ -32,8 +37,7 @@ export async function cashTransactionWater(formdata: FormData) {
 export async function cashTransactionDayPass(formdata: FormData) {
   //   console.log(row.original.emailAddress);
   const now = new Date();
-  console.log(now.toString());
-  console.log(formdata.get("email")?.toString());
+
   const tomorrow = new Date();
   tomorrow.setHours(tomorrow.getHours() + 24);
   const localNow = new Date(now.toLocaleString());
@@ -70,4 +74,48 @@ export async function cashTransactionDayPass(formdata: FormData) {
       return { message: `failed` };
     });
   return { message: `successfully updated transactions` };
+}
+
+export async function cashTransactionCustom(
+  id: number,
+  total: number,
+  cartItems: [
+    {
+      price: string;
+      quantity: 1;
+    },
+    ...{
+      price: string;
+      quantity: 1;
+    }[]
+  ]
+) {
+  console.log(id);
+  console.log(total);
+  const customer = await db.query.members.findFirst({
+    where: eq(members.id, id),
+    columns: {
+      customerId: true,
+    },
+  });
+  const now = new Date();
+  console.log(cartItems);
+
+  for (let i = 0; i < cartItems.length; i++) {
+    const amount = await db.query.products.findFirst({
+      where: eq(products.priceId, cartItems[i].price),
+      columns: {
+        price: true,
+        name: true,
+      },
+    });
+    await db.insert(transactions).values({
+      ownerId: customer!.customerId!,
+      amount: amount!.price,
+      date: now.toLocaleString(),
+      paymentMethod: "cash",
+      type: amount!.name,
+      createdAt: now,
+    });
+  }
 }

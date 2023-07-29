@@ -6,7 +6,9 @@ export default function Page() {
       {/* <div className="flex flex-row w-screen h-screen justify-center">
         <div>kdlsajfks</div>
       </div> */}
-      <SignIn />
+      <div className="m-auto">
+        <SignIn />
+      </div>
     </>
   );
 }

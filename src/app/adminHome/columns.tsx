@@ -64,6 +64,7 @@ import { InputForm } from "./inputForm";
 import {
   cashTransactionWater,
   cashTransactionDayPass,
+  cashTransactionCustom,
 } from "./cashTransaction";
 import { useTransition } from "react";
 import { stripe } from "../../../utils/stripe";
@@ -186,6 +187,7 @@ export const DataTableWithColumns = (props: {
         const [isPending, startTransition] = useTransition();
         const [dayPassCashAmount, setDayPassCashAmount] = useState<number>(0);
         const [waterCashAmount, setWaterCashAmount] = useState<number>(0);
+        const [multiCashAmount, setMultiCashAmount] = useState<number>(0);
         const handleCheckout = async (data: string) => {
           try {
             const { sessionId } = await postData({
@@ -213,6 +215,7 @@ export const DataTableWithColumns = (props: {
               })
             )
             .nonempty(),
+          isCash: z.boolean().default(false).optional(),
         });
         const form = useForm<z.infer<typeof checkoutCartFormSchema>>({
           resolver: zodResolver(checkoutCartFormSchema),
@@ -232,17 +235,46 @@ export const DataTableWithColumns = (props: {
         const checkoutSubmit = async (
           values: z.infer<typeof checkoutCartFormSchema>
         ) => {
-          try {
-            const { sessionId } = await customCheckoutPost(
-              values,
-              row.original.emailAddress,
-              "/api/customCheckoutSession"
-            );
-            console.log(sessionId);
-            const stripe = await getStripe();
-            stripe?.redirectToCheckout({ sessionId });
-          } catch (error) {
-            return alert((error as Error)?.message);
+          if (values.isCash) {
+            // match items in cart to prices in products array and subtract from total cash amount
+            // if cash amount is less than 0, return error else query transaction table and add transaction and return change
+            let total = 0;
+            console.log(values.cartItems);
+            for (const item of values.cartItems) {
+              const price = fetchProducts.find(
+                (product) => product.priceId === item.price
+              )?.price;
+              total += price!;
+            }
+            if (multiCashAmount! * 100 - total < 0) {
+              toast({
+                title: "❌ Not enough cash given",
+              });
+            } else {
+              cashTransactionCustom(
+                Number(row.original.id),
+                total,
+                values.cartItems
+              );
+              toast({
+                title: `Change: $${(multiCashAmount! - total / 100.0).toFixed(
+                  2
+                )}`,
+              });
+            }
+          } else {
+            try {
+              const { sessionId } = await customCheckoutPost(
+                values,
+                row.original.emailAddress,
+                "/api/customCheckoutSession"
+              );
+              console.log(sessionId);
+              const stripe = await getStripe();
+              stripe?.redirectToCheckout({ sessionId });
+            } catch (error) {
+              return alert((error as Error)?.message);
+            }
           }
         };
 
@@ -288,7 +320,7 @@ export const DataTableWithColumns = (props: {
                   </div>
                   <Label>Cash Transactions:</Label>
                   <div className="flex w-full max-w-sm items-center space-x-2">
-                    <form action={cashTransactionWater}>
+                    {/* <form action={cashTransactionWater}>
                       <Label>Enter cash given for water here:</Label>
                       <Input
                         name="cashAmount"
@@ -317,7 +349,7 @@ export const DataTableWithColumns = (props: {
                         name="email"
                         value={String(row.original.emailAddress!)}
                       />
-                    </form>
+                    </form> */}
                     <form action={cashTransactionDayPass}>
                       <Label>Enter cash given for day pass Here:</Label>
                       <Input
@@ -479,7 +511,46 @@ export const DataTableWithColumns = (props: {
                     >
                       Add Item
                     </Button>
-                    <div>
+                    <div className="flex flex-col">
+                      <div className="flex flex-row">
+                        <FormField
+                          control={form.control}
+                          name="isCash"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md  p-4 shadow">
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                              <div className="flex-row space-y-1 leading-none">
+                                <FormLabel>Cash Payment?</FormLabel>
+                                <FormDescription>
+                                  NO MEMBERSHIPS
+                                </FormDescription>
+                              </div>
+                            </FormItem>
+                          )}
+                        />
+                        <Label className="ml-4 my-auto">Cash Given:</Label>
+                        <Input
+                          disabled={!form.watch("isCash")}
+                          className="w-1/5"
+                          placeholder="Input Cash Paid Here"
+                          value={multiCashAmount}
+                          type="number"
+                          onChange={(e) => {
+                            e.target.value === ""
+                              ? setMultiCashAmount(0)
+                              : setMultiCashAmount(parseFloat(e.target.value));
+                          }}
+                          onSubmit={() => {
+                            console.log("submit");
+                          }}
+                        />
+                      </div>
+
                       <Button type="submit" variant="green">
                         Checkout
                       </Button>

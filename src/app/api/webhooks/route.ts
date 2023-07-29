@@ -143,6 +143,18 @@ export async function POST(req: Request) {
 
       await db.delete(products).where(eq(products.priceId, deletePrice.id));
       break;
+    case "product.created":
+      break;
+    case "customer.created":
+    case "customer.updated":
+      const customerCreated = event.data.object as Stripe.Customer;
+      await db
+        .update(members)
+        .set({
+          customerId: customerCreated.id,
+        })
+        .where(eq(members.emailAddress, customerCreated.email!));
+      break;
   }
 
   // Return a response to acknowledge receipt of the event

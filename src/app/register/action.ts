@@ -7,6 +7,7 @@ import { db } from "../../db/index";
 import { members } from "../../db/schema/members";
 import { createOrRetrieveCustomer } from "../../../utils/dbHelper";
 import { revalidateTag } from "next/cache";
+import { eq } from "drizzle-orm";
 
 export const validatedAction = zact(
   z.object({
@@ -23,6 +24,38 @@ export const validatedAction = zact(
   })
 )(async (input) => {
   console.log("[SERVER]: Received input", input);
+  const customer = await db.query.members.findFirst({
+    where: eq(members.emailAddress, input.emailAddress),
+  });
+  if (customer) {
+    await db
+      .update(members)
+      .set({
+        userId: input.userId,
+        name: input.username,
+        qrCodeUrl: input.qrCode,
+        isWaiverSigned: input.waiverAccept,
+        waiverSignature: input.waiverSignature,
+        waiverSignDate: input.waiverSignDate,
+        realScanId: input.userId,
+        parentName: input.parentName,
+        parentSignature: input.parentSignature,
+        minorDOB: input.minorDOB,
+      })
+      .where(eq(members.emailAddress, input.emailAddress))
+      .then(async () => {
+        await createOrRetrieveCustomer({
+          userId: input.userId,
+          email: input.emailAddress,
+          name: input.username,
+        }).catch((err) => {
+          console.log(err);
+          return { message: `error creating customer` };
+        });
+        return { message: `successfully inserted member` };
+      });
+    return { message: `email already exists` };
+  }
 
   await db
     .insert(members)

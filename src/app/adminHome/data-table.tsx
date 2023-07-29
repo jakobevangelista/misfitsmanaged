@@ -74,7 +74,7 @@ export function DataTable<TData, TValue>({
     },
     initialState: {
       columnVisibility: { realScanId: false, actions: true },
-      pagination: { pageSize: 5 },
+      pagination: { pageSize: 15 },
     },
   });
 
@@ -257,6 +257,13 @@ export function DataTable<TData, TValue>({
       </div>
 
       <div className="flex items-center justify-end space-x-2 py-4">
+        <span className="flex items-center gap-1">
+          <div>Page</div>
+          <strong>
+            {table.getState().pagination.pageIndex + 1} of{" "}
+            {table.getPageCount()}
+          </strong>
+        </span>
         <div className="space-x-2 pr-3">
           <Button
             variant="outline"

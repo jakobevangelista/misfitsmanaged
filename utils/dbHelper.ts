@@ -14,12 +14,12 @@ export const createOrRetrieveCustomer = async ({
   userId?: string;
   name?: string;
 }) => {
-  // const customer = await stripe.customers.list({ email: email });
-  const customer = await db.query.members.findFirst({
+  const stripeCustomer = await stripe.customers.list({ email: email });
+  const dbCustomer = await db.query.members.findFirst({
     where: eq(members.emailAddress, email),
   });
-  if (customer?.customerId !== null) {
-    return customer?.customerId;
+  if (stripeCustomer !== null) {
+    return stripeCustomer.data[0].id;
   } else {
     const customer = await stripe!.customers.create({
       email: email,
@@ -28,7 +28,7 @@ export const createOrRetrieveCustomer = async ({
     await db
       .update(members)
       .set({ customerId: customer.id })
-      .where(eq(members.id, Number(userId)));
+      .where(eq(members.emailAddress, email));
 
     return customer.id;
   }

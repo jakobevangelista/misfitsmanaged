@@ -536,7 +536,7 @@ export const DataTableWithColumns = (props: {
                         <Label className="ml-4 my-auto">Cash Given:</Label>
                         <Input
                           disabled={!form.watch("isCash")}
-                          className="w-1/5"
+                          className="w-1/5 my-auto"
                           placeholder="Input Cash Paid Here"
                           value={multiCashAmount}
                           type="number"

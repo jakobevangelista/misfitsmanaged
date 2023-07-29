@@ -17,7 +17,7 @@ export default async function Page() {
     redirect("/memberHome");
   }
 
-  const customCode: string | null = await QRCode.toDataURL(userId!, {
+  const customCode: string = await QRCode.toDataURL(userId!, {
     errorCorrectionLevel: "H",
   });
 

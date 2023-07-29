@@ -1,18 +1,20 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs";
-import { User, columns } from "./columns";
+import { User } from "./columns";
 import { DataTable } from "./data-table";
 import { db } from "@/db";
 import { eq, lt, sql } from "drizzle-orm";
-import { members, contracts } from "@/db/schema/members";
+import { members, contracts, products } from "@/db/schema/members";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { RefreshPage } from "./refresh-page";
 import { customCheckoutPost, postData } from "../../../utils/helpers";
 import CustomButton from "./customButton";
-export const revalidate = 0; // revalidate this page every 15 seconds
+import { DataTableWithColumns } from "./columns";
+import { stripe } from "../../../utils/stripe";
+// export const revalidate = 0; // revalidate this page every 15 seconds
 
 async function getData(): Promise<User[]> {
   // Fetch data from your API here.
@@ -50,10 +52,53 @@ async function checkContracts() {
   )`);
 }
 
+async function getProducts() {
+  const stripeProductList = await stripe.products.list({
+    active: true,
+    limit: 100,
+  });
+  console.log(stripeProductList.data);
+  for (const product of stripeProductList.data) {
+    await db
+      .insert(products)
+      .values({
+        priceId: product.default_price!.toString(),
+        name: product.name,
+        price: Number(
+          (
+            await stripe.prices.retrieve(product.default_price as string)
+          ).unit_amount
+        ),
+      })
+      .onDuplicateKeyUpdate({
+        set: {
+          name: product.name,
+          price: Number(
+            (
+              await stripe.prices.retrieve(product.default_price as string)
+            ).unit_amount
+          ),
+        },
+      });
+  }
+
+  const dbProducts = await db.query.products.findMany({
+    columns: {
+      name: true,
+      priceId: true,
+      price: true,
+    },
+  });
+
+  return dbProducts;
+}
+
 export default async function AdminHome() {
   const { userId } = auth();
   const user = await currentUser();
   const data = await getData();
+  const products = await getProducts();
+  // console.log(products);
 
   const checkAdmin = await db.query.members.findFirst({
     where: eq(members.userId, userId!),
@@ -85,10 +130,10 @@ export default async function AdminHome() {
           </Button>
 
           <CustomButton />
-
         </div>
         <div className="mx-auto py-10">
-          <DataTable columns={columns} data={data} />
+          {/* <DataTable columns={columns} data={data} /> */}
+          <DataTableWithColumns data={data} products={products} />
         </div>
       </div>
     </>

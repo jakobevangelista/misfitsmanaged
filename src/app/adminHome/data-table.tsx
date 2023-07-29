@@ -114,6 +114,7 @@ export function DataTable<TData, TValue>({
           />
         );
       case "realScanId":
+        console.log(table.getColumn("realScanId")?.getFilterValue() as string);
         return (
           <Input
             autoFocus

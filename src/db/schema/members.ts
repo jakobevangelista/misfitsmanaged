@@ -61,8 +61,7 @@ export const transactions = mysqlTable("transactions", {
 });
 
 export const products = mysqlTable("products", {
-  id: serial("id").primaryKey(),
-  priceId: text("price_id").notNull(),
+  priceId: varchar("price_id", { length: 60 }).primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
   price: int("price").notNull(),

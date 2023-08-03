@@ -339,13 +339,13 @@ export const DataTableWithColumns = (props: {
                   <div className="flex w-full max-w-sm items-center space-x-2">
                     <Form {...form}>
                       <form
-                        onSubmit={form.handleSubmit(
+                        onSubmit={quickDayPassCashTransactionForm.handleSubmit(
                           quickDayPassCashTransactionOnSubmit
                         )}
                         className="space-y-8"
                       >
                         <FormField
-                          control={form.control}
+                          control={quickDayPassCashTransactionForm.control}
                           name="cashAmount"
                           render={({ field }) => (
                             <FormItem>

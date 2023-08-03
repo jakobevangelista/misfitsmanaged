@@ -8,6 +8,7 @@ import { members } from "../../db/schema/members";
 import { createOrRetrieveCustomer } from "../../../utils/dbHelper";
 import { revalidateTag } from "next/cache";
 import { eq } from "drizzle-orm";
+import { stripe } from "../../../utils/stripe";
 
 export const validatedAction = zact(
   z.object({
@@ -73,14 +74,15 @@ export const validatedAction = zact(
       minorDOB: input.minorDOB,
     })
     .then(async () => {
-      await createOrRetrieveCustomer({
-        userId: input.userId,
-        email: input.emailAddress,
-        name: input.username,
-      }).catch((err) => {
-        console.log(err);
-        return { message: `error creating customer` };
-      });
+      await stripe.customers.create({ email: input.emailAddress });
+      // await createOrRetrieveCustomer({
+      //   userId: input.userId,
+      //   email: input.emailAddress,
+      //   name: input.username,
+      // }).catch((err) => {
+      //   console.log(err);
+      //   return { message: `error creating customer` };
+      // });
       return { message: `successfully inserted member` };
     })
     .catch((err) => {

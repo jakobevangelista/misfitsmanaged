@@ -228,9 +228,26 @@ export const DataTableWithColumns = (props: {
           control: form.control,
         });
 
-        // const shopItems = use(getProducts());
-
-        // console.log(shopItems);
+        const quickDayPassCashTransactionSchema = z.object({
+          cashAmount: z
+            .number()
+            .gte(15, { message: "Please enter an amount greater than 15" }),
+        });
+        const quickDayPassCashTransactionForm = useForm<
+          z.infer<typeof quickDayPassCashTransactionSchema>
+        >({
+          resolver: zodResolver(quickDayPassCashTransactionSchema),
+          defaultValues: {
+            cashAmount: 0,
+          },
+        });
+        function quickDayPassCashTransactionOnSubmit(
+          values: z.infer<typeof quickDayPassCashTransactionSchema>
+        ) {
+          // Do something with the form values.
+          // ✅ This will be type-safe and validated.
+          console.log(values);
+        }
 
         const checkoutSubmit = async (
           values: z.infer<typeof checkoutCartFormSchema>
@@ -320,37 +337,35 @@ export const DataTableWithColumns = (props: {
                   </div>
                   <Label>Cash Transactions:</Label>
                   <div className="flex w-full max-w-sm items-center space-x-2">
-                    {/* <form action={cashTransactionWater}>
-                      <Label>Enter cash given for water here:</Label>
-                      <Input
-                        name="cashAmount"
-                        placeholder="Enter amount for Day Pass Here"
-                        type="number"
-                        value={waterCashAmount}
-                        onChange={(e) => {
-                          setWaterCashAmount(parseFloat(e.target.value));
-                        }}
-                      />
-                      <Button
-                        variant="secondary"
-                        className="flex flex-grow"
-                        type="submit"
-                        onClick={() => {
-                          toast({
-                            title: "Water Cash Transaction Recorded",
-                            description: `Change: ${waterCashAmount! - 15}`,
-                          });
-                        }}
+                    <Form {...form}>
+                      <form
+                        onSubmit={form.handleSubmit(
+                          quickDayPassCashTransactionOnSubmit
+                        )}
+                        className="space-y-8"
                       >
-                        Small Water Bottle: $1
-                      </Button>
-                      <Input
-                        type="hidden"
-                        name="email"
-                        value={String(row.original.emailAddress!)}
-                      />
-                    </form> */}
-                    <form action={cashTransactionDayPass}>
+                        <FormField
+                          control={form.control}
+                          name="cashAmount"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Cash Amount</FormLabel>
+                              <FormControl>
+                                <Input
+                                  placeholder="shadcn"
+                                  type="number"
+                                  {...field}
+                                />
+                              </FormControl>
+
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button type="submit">Submit</Button>
+                      </form>
+                    </Form>
+                    {/* <form action={cashTransactionDayPass}>
                       <Label>Enter cash given for day pass Here:</Label>
                       <Input
                         name="cashAmount"
@@ -379,7 +394,7 @@ export const DataTableWithColumns = (props: {
                         name="email"
                         value={String(row.original.emailAddress!)}
                       />
-                    </form>
+                    </form> */}
                   </div>
                   <div className="flex flex-col gap-4 py-4">
                     <div className="flex w-full max-w-sm items-center space-x-2">

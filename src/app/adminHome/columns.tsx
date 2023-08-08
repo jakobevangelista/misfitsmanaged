@@ -353,7 +353,11 @@ export const DataTableWithColumns = (props: {
                                 Quick $15 Day Pass Cash Transaction
                               </FormLabel>
                               <FormControl>
-                                <Input placeholder="Cash Amount" {...field} />
+                                <Input
+                                  placeholder="Cash Amount"
+                                  type="number"
+                                  {...field}
+                                />
                               </FormControl>
                               <FormMessage />
                             </FormItem>

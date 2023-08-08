@@ -184,9 +184,6 @@ export const DataTableWithColumns = (props: {
         //   </>
         // );
         const { toast } = useToast();
-        const [isPending, startTransition] = useTransition();
-        const [dayPassCashAmount, setDayPassCashAmount] = useState<number>(0);
-        const [waterCashAmount, setWaterCashAmount] = useState<number>(0);
         const [multiCashAmount, setMultiCashAmount] = useState<number>(0);
         const handleCheckout = async (data: string) => {
           try {
@@ -231,9 +228,9 @@ export const DataTableWithColumns = (props: {
         });
 
         const quickDayPassCashTransactionSchema = z.object({
-          cashAmount: z.coerce
-            .number()
-            .gte(15, { message: "Please enter an amount greater than 15" }),
+          cashAmount: z.coerce.number().gte(15, {
+            message: "Please collect more than 15 dollars for day pass",
+          }),
         });
         const quickDayPassCashTransactionForm = useForm<
           z.infer<typeof quickDayPassCashTransactionSchema>
@@ -249,7 +246,7 @@ export const DataTableWithColumns = (props: {
           // Do something with the form values.
           // ✅ This will be type-safe and validated.
           console.log("hwer");
-          console.log(values.cashAmount);
+          console.log(values);
         };
 
         const checkoutSubmit = async (
@@ -306,7 +303,7 @@ export const DataTableWithColumns = (props: {
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="w-full mx-auto">
+            <DialogContent className="DialogOverlay w-full mx-auto">
               <div className="flex flex-row space-x-4 mx-auto">
                 <div className="flex flex-col space-y-4 mx-auto">
                   <DialogHeader className="mx-auto">
@@ -340,7 +337,7 @@ export const DataTableWithColumns = (props: {
                   </div>
                   {/* <Label>Cash Transactions:</Label> */}
                   <div className="flex w-full max-w-sm items-center space-x-2">
-                    <Form {...form}>
+                    <Form {...quickDayPassCashTransactionForm}>
                       <form
                         onSubmit={quickDayPassCashTransactionForm.handleSubmit(
                           quickDayPassCashTransactionOnSubmit
@@ -356,11 +353,7 @@ export const DataTableWithColumns = (props: {
                                 Quick $15 Day Pass Cash Transaction
                               </FormLabel>
                               <FormControl>
-                                <Input
-                                  placeholder="Cash Amount"
-                                  type="number"
-                                  {...field}
-                                />
+                                <Input placeholder="Cash Amount" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -555,7 +548,9 @@ export const DataTableWithColumns = (props: {
                       variant="creme"
                       size="sm"
                       className="mt-2"
-                      onClick={() => append({ price: "", quantity: 1 })}
+                      onClick={() => {
+                        append({ price: "", quantity: 1 });
+                      }}
                     >
                       Add Item
                     </Button>

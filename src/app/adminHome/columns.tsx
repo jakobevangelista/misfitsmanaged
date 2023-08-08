@@ -79,6 +79,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import { DataTable } from "./data-table";
 
@@ -486,31 +487,37 @@ export const DataTableWithColumns = (props: {
                                 <PopoverContent className="w-[200px] p-0">
                                   <Command>
                                     <CommandInput placeholder="Search item..." />
-                                    <CommandEmpty>No item found.</CommandEmpty>
-                                    <CommandGroup>
-                                      {items.map((item) => (
-                                        <CommandItem // need to close on select ---------------------------------------------------------------
-                                          value={item.label}
-                                          key={item.label}
-                                          onSelect={() => {
-                                            form.setValue(
-                                              `cartItems.${index}.price`,
-                                              item.value
-                                            );
-                                          }}
-                                        >
-                                          <CheckIcon
-                                            className={cn(
-                                              "mr-2 h-4 w-4",
-                                              item.value === field.value
-                                                ? "opacity-100"
-                                                : "opacity-0"
-                                            )}
-                                          />
-                                          {item.label}
-                                        </CommandItem>
-                                      ))}
-                                    </CommandGroup>
+                                    <CommandList>
+                                      <CommandEmpty>
+                                        No item found.
+                                      </CommandEmpty>
+                                      <CommandGroup>
+                                        <ScrollArea>
+                                          {items.map((item) => (
+                                            <CommandItem // need to close on select ---------------------------------------------------------------
+                                              value={item.label}
+                                              key={item.label}
+                                              onSelect={() => {
+                                                form.setValue(
+                                                  `cartItems.${index}.price`,
+                                                  item.value
+                                                );
+                                              }}
+                                            >
+                                              <CheckIcon
+                                                className={cn(
+                                                  "mr-2 h-4 w-4",
+                                                  item.value === field.value
+                                                    ? "opacity-100"
+                                                    : "opacity-0"
+                                                )}
+                                              />
+                                              {item.label}
+                                            </CommandItem>
+                                          ))}
+                                        </ScrollArea>
+                                      </CommandGroup>
+                                    </CommandList>
                                   </Command>
                                 </PopoverContent>
                               </Popover>

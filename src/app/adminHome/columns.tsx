@@ -211,7 +211,9 @@ export const DataTableWithColumns = (props: {
                 price: z.string().min(1, {
                   message: "Please select a product",
                 }),
-                quantity: z.literal(1),
+                quantity: z.coerce.number().gt(0, {
+                  message: "Please enter a quantity greater than 0",
+                }),
               })
             )
             .nonempty(),
@@ -229,7 +231,7 @@ export const DataTableWithColumns = (props: {
         });
 
         const quickDayPassCashTransactionSchema = z.object({
-          cashAmount: z
+          cashAmount: z.coerce
             .number()
             .gte(15, { message: "Please enter an amount greater than 15" }),
         });
@@ -241,13 +243,14 @@ export const DataTableWithColumns = (props: {
             cashAmount: 0,
           },
         });
-        function quickDayPassCashTransactionOnSubmit(
+        const quickDayPassCashTransactionOnSubmit = (
           values: z.infer<typeof quickDayPassCashTransactionSchema>
-        ) {
+        ) => {
           // Do something with the form values.
           // ✅ This will be type-safe and validated.
-          console.log(values);
-        }
+          console.log("hwer");
+          console.log(values.cashAmount);
+        };
 
         const checkoutSubmit = async (
           values: z.infer<typeof checkoutCartFormSchema>
@@ -335,7 +338,7 @@ export const DataTableWithColumns = (props: {
                       Charge Month
                     </Button>
                   </div>
-                  <Label>Cash Transactions:</Label>
+                  {/* <Label>Cash Transactions:</Label> */}
                   <div className="flex w-full max-w-sm items-center space-x-2">
                     <Form {...form}>
                       <form
@@ -349,20 +352,29 @@ export const DataTableWithColumns = (props: {
                           name="cashAmount"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Cash Amount</FormLabel>
+                              <FormLabel>
+                                Quick $15 Day Pass Cash Transaction
+                              </FormLabel>
                               <FormControl>
                                 <Input
-                                  placeholder="shadcn"
+                                  placeholder="Cash Amount"
                                   type="number"
                                   {...field}
                                 />
                               </FormControl>
-
                               <FormMessage />
                             </FormItem>
                           )}
                         />
-                        <Button type="submit">Submit</Button>
+                        <Button
+                          variant="green"
+                          onSubmit={() => {
+                            console.log("clicked");
+                          }}
+                          type="submit"
+                        >
+                          Transact Cash Day Pass
+                        </Button>
                       </form>
                     </Form>
                     {/* <form action={cashTransactionDayPass}>
@@ -453,6 +465,7 @@ export const DataTableWithColumns = (props: {
                           name={`cartItems.${index}.price`}
                           render={({ field }) => (
                             <FormItem>
+                              <Label>Select Item:</Label>
                               <Popover>
                                 <PopoverTrigger asChild>
                                   <FormControl>
@@ -505,6 +518,26 @@ export const DataTableWithColumns = (props: {
                                 </PopoverContent>
                               </Popover>
                               <FormMessage />
+                              <FormField
+                                control={form.control}
+                                name={`cartItems.${index}.quantity`}
+                                render={({ field }) => (
+                                  <FormItem className="flex flex-row">
+                                    <FormLabel className="my-auto">
+                                      Quantity:
+                                    </FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        className="w-1/6"
+                                        placeholder="Quantity"
+                                        type="number"
+                                        {...field}
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
                               <Button
                                 type="button"
                                 variant="destructive"
@@ -519,7 +552,7 @@ export const DataTableWithColumns = (props: {
                     })}
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="creme"
                       size="sm"
                       className="mt-2"
                       onClick={() => append({ price: "", quantity: 1 })}

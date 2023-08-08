@@ -52,7 +52,7 @@ export async function cashTransactionDayPass(formdata: FormData) {
   await db.insert(contracts).values({
     ownerId: customerId!.customerId!,
     status: "active",
-    type: "day pass",
+    type: "Day Pass",
     startDate: localNow,
     endDate: localTomorrow,
     stripeId: Math.random().toString(),
@@ -64,7 +64,7 @@ export async function cashTransactionDayPass(formdata: FormData) {
       amount: 1500,
       date: now.toLocaleString(),
       paymentMethod: "cash",
-      type: "day pass",
+      type: "Day Pass",
       createdAt: now,
     })
     .then((res) => {
@@ -82,11 +82,11 @@ export async function cashTransactionCustom(
   cartItems: [
     {
       price: string;
-      quantity: 1;
+      quantity: number;
     },
     ...{
       price: string;
-      quantity: 1;
+      quantity: number;
     }[]
   ]
 ) {

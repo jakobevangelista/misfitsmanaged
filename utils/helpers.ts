@@ -76,7 +76,7 @@ export const customCheckoutPost = z
         .array(
           z.object({
             price: z.string().min(1),
-            quantity: z.literal(1),
+            quantity: z.number().positive(),
           })
         )
         .nonempty(),

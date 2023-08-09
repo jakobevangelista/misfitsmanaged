@@ -49,14 +49,18 @@ export const columns: ColumnDef<Contract>[] = [
     accessorKey: "startDate",
     header: "Start Date",
     cell: ({ row }) => {
-      return new Date(row.original.startDate).toLocaleString();
+      const localDate = new Date(row.original.endDate);
+      //   localDate.setHours(localDate.getHours() + 7);
+      return localDate.toLocaleString();
     },
   },
   {
     accessorKey: "endDate",
     header: "End Date",
     cell: ({ row }) => {
-      return new Date(row.original.startDate).toLocaleString();
+      const localDate = new Date(row.original.endDate);
+      //   localDate.setHours(localDate.getHours() + 7);
+      return localDate.toLocaleString();
     },
   },
 ];

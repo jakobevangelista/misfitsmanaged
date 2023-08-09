@@ -35,21 +35,24 @@ async function checkContracts() {
   const today = new Date();
   await db
     .update(contracts)
-    .set({ status: "inactive" })
+    .set({ status: "Inactive" })
     .where(lt(contracts.endDate, today));
 
-  await db.execute(sql`update ${members}
-  set ${members.contractStatus} = (
-    case
-      when (
-        select ${contracts.status}
-        from ${contracts}
-        where ${contracts.ownerId} = ${members.customerId} AND ${contracts.status} = 'active'
-        limit 1
-      ) is not null then 'active'
-      else 'none'
-    END
-  )`);
+  // await db.execute(sql`update ${members}
+  // set ${members.contractStatus} = (
+  //   case
+  //     when (
+  //       select ${contracts.status}
+  //       from ${contracts}
+  //       where ${contracts.ownerId} = ${members.customerId} AND ${contracts.status} = 'active' OR ${contracts.status} = 'limited'
+  //       limit 1
+  //     ) is not null then 'active'
+  //     else 'none'
+  //   END
+  // )`);
+  await db.execute(sql`UPDATE ${members}
+  JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
+  SET ${members.contractStatus} = ${contracts.status};`);
 }
 
 async function getProducts() {

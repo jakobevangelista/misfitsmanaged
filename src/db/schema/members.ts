@@ -20,17 +20,6 @@ export const members = mysqlTable("members", {
   emailAddress: text("email_address").notNull(),
   phoneNumber: text("phone_number"),
   isWaiverSigned: boolean("is_waiver_signed").default(false),
-  contractStatus: mysqlEnum("contract_status", [
-    "active",
-    "incomplete",
-    "incomplete_expired",
-    "past_due",
-    "canceled",
-    "unpaid",
-    "none",
-  ])
-    .default("none")
-    .notNull(),
   customerId: text("customer_id"),
   waiverSignature: text("waiver_signature"),
   waiverSignDate: text("waiver_date"),
@@ -39,6 +28,7 @@ export const members = mysqlTable("members", {
   parentSignature: text("parent_signature"),
   minorDOB: text("minor_dob"),
   DOB: date("DOB"),
+  contractStatus: text("contract_status").default("none").notNull(), //"active","incomplete","incomplete_expired","past_due","canceled","unpaid","none",
 });
 
 export const contracts = mysqlTable("contracts", {

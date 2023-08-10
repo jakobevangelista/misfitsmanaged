@@ -6,6 +6,24 @@ import { useTransition } from "react";
 import { decrementLimitedContractDay } from "./decrementLimitedContract";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal } from "lucide-react";
+import { cancelActiveSubscription } from "./cancelActiveSubscription";
 
 export type Contract = {
   stripeId: string;
@@ -39,6 +57,8 @@ export const columns: ColumnDef<Contract>[] = [
             return <Badge variant="inactive">Inactive</Badge>;
           case "Limited":
             return <Badge variant="limited">Limited</Badge>;
+          case "canceled":
+            return <Badge variant="canceled">Canceled</Badge>;
           default:
             return <Badge>None</Badge>;
         }
@@ -70,15 +90,20 @@ export const columns: ColumnDef<Contract>[] = [
   },
   {
     accessorKey: "remainingDays",
-    header: "Remaining Days (For Limited Contracts)",
+    header: "Actions",
     cell: function Cell({ row }) {
       const [isPending, startTransition] = useTransition();
+      let isDaysLeft = true;
 
-      if (row.original.remainingDays === null) return <></>;
+      if (
+        row.original.remainingDays === null ||
+        row.original.remainingDays === 0
+      )
+        isDaysLeft = false;
 
       return (
         <>
-          {row.original.remainingDays > 0 ? (
+          {/* {row.original.remainingDays > 0 ? (
             <Button
               onClick={() =>
                 startTransition(() =>
@@ -93,7 +118,47 @@ export const columns: ColumnDef<Contract>[] = [
             </Button>
           ) : (
             <Label>Expired</Label>
-          )}
+          )} */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {row.original.status === "active" ? (
+                <DropdownMenuItem
+                  onClick={() =>
+                    startTransition(() =>
+                      cancelActiveSubscription(row.original.stripeId)
+                    )
+                  }
+                >
+                  Cancel Membership
+                </DropdownMenuItem>
+              ) : null}
+
+              {isDaysLeft ? (
+                <DropdownMenuItem
+                  onClick={() =>
+                    startTransition(() =>
+                      decrementLimitedContractDay(
+                        row.original.stripeId,
+                        row.original.remainingDays!
+                      )
+                    )
+                  }
+                >
+                  Click to Decrement: {row.original.remainingDays}
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem>Expired</DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </>
       );
     },

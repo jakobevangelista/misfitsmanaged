@@ -75,7 +75,7 @@ export default async function Page({ params }: { params: { userId: string } }) {
             <DataTable columns={columns} data={userTransactions} />
           </div>
           <div className="flex flex-col items-center p-4">
-            <Label className="p-4">Contracts</Label>
+            <Label className="p-4 mb-10">Contracts</Label>
             <DataTable2 columns={columns2} data={userContracts} />
           </div>
         </div>

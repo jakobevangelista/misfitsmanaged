@@ -132,16 +132,17 @@ export async function POST(req: Request) {
           },
           line_items: [
             {
-              price: "price_1NYRbKD5u1cDehOfapzIEhrJ",
+              price: "price_1NYRbKD5u1cDehOfapzIEhrJ", //live mode price id for day pass
+              // price: "price_1NXFYAD5u1cDehOfSgf9D1AQ", // test mode price id for day pass
               quantity: 1,
             },
           ],
 
           mode: "subscription",
           allow_promotion_codes: false,
-          payment_intent_data: {
-            setup_future_usage: "off_session",
-          },
+          // payment_intent_data: {
+          //   setup_future_usage: "off_session",
+          // },
           success_url: `${getURL()}/adminHome`,
           cancel_url: `${getURL()}/adminHome`,
         });

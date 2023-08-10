@@ -15,5 +15,7 @@ export async function decrementLimitedContractDay(
       remainingDays: numberOfDaysLeft - 1,
     })
     .where(eq(contracts.stripeId, subscription));
+  revalidatePath(`/adminHome`);
+
   revalidatePath(`/adminHome/[userId]`);
 }

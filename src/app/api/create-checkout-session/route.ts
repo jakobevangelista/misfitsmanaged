@@ -59,9 +59,9 @@ export async function POST(req: Request) {
 
           mode: "subscription",
           allow_promotion_codes: true,
-          payment_intent_data: {
-            setup_future_usage: "off_session",
-          },
+          // payment_intent_data: {
+          //   setup_future_usage: "off_session",
+          // },
           success_url: `${getURL()}/adminHome`,
           cancel_url: `${getURL()}/adminHome`,
         });

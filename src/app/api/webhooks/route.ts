@@ -83,6 +83,13 @@ export async function POST(req: Request) {
     case "customer.subscription.created":
       const customerSubscriptionCreated = event.data
         .object as Stripe.Subscription;
+      console.log(customerSubscriptionCreated);
+      const subscriptionCreated = await db.query.products.findFirst({
+        where: eq(
+          products.priceId,
+          customerSubscriptionCreated.items.data[0].price.id
+        ),
+      });
       // Then define and call a function to handle the event customer.subscription.created
       if (
         customerSubscriptionCreated.items.data[0].price.recurring?.interval ===
@@ -91,6 +98,36 @@ export async function POST(req: Request) {
         await stripe.subscriptions.update(customerSubscriptionCreated.id, {
           cancel_at_period_end: true,
         });
+      }
+
+      if (subscriptionCreated?.name === "5 Day Pass") {
+        console.log("WE MADE IT HERE WOOOOOO");
+        const futureDate = new Date();
+        futureDate.setFullYear(futureDate.getFullYear() + 10);
+        await db.insert(contracts).values({
+          ownerId: customerSubscriptionCreated.customer as string,
+          stripeId: customerSubscriptionCreated.id,
+          status: "Limited",
+          type: "5 Day Pass",
+          startDate: new Date(),
+          endDate: futureDate,
+          remainingDays: 5,
+        });
+        // await db
+        //   .update(contracts)
+        //   .set({
+        //     status: "Limited",
+        //     type: "5 Day Pass",
+        //     startDate: new Date(),
+        //     endDate: futureDate,
+        //     remainingDays: 5,
+        //   })
+        //   .where(
+        //     eq(
+        //       contracts.ownerId,
+        //       customerSubscriptionCreated.customer as string
+        //     )
+        //   );
       }
       break;
     case "customer.subscription.updated":

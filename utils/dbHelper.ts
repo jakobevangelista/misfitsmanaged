@@ -59,6 +59,10 @@ export async function manageSubscription(
     subscription.items.data[0].price.product as string
   );
 
+  if (product.name === "5 Day Pass") {
+    return;
+  }
+
   await db
     .insert(contracts)
     .values({

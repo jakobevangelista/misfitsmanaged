@@ -38,6 +38,7 @@ export const contracts = mysqlTable("contracts", {
   type: text("type").notNull(),
   startDate: datetime("start_date").notNull(),
   endDate: datetime("end_date").notNull(),
+  remainingDays: int("remaining_days"),
 });
 
 export const transactions = mysqlTable("transactions", {

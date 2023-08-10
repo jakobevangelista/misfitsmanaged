@@ -28,6 +28,7 @@ async function getUserContracts(customerId: string) {
       type: true,
       startDate: true,
       endDate: true,
+      remainingDays: true,
     },
   });
   return userContracts;

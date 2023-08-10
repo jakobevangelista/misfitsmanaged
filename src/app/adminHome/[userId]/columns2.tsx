@@ -2,6 +2,10 @@
 
 import { Badge } from "@/components/ui/badge";
 import { ColumnDef } from "@tanstack/react-table";
+import { useTransition } from "react";
+import { decrementLimitedContractDay } from "./decrementLimitedContract";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 export type Contract = {
   stripeId: string;
@@ -10,6 +14,7 @@ export type Contract = {
   type: string;
   startDate: Date;
   endDate: Date;
+  remainingDays: number | null;
 };
 
 export const columns: ColumnDef<Contract>[] = [
@@ -61,6 +66,36 @@ export const columns: ColumnDef<Contract>[] = [
       const localDate = new Date(row.original.endDate);
       //   localDate.setHours(localDate.getHours() + 7);
       return localDate.toLocaleString();
+    },
+  },
+  {
+    accessorKey: "remainingDays",
+    header: "Remaining Days (For Limited Contracts)",
+    cell: function Cell({ row }) {
+      const [isPending, startTransition] = useTransition();
+
+      if (row.original.remainingDays === null) return <></>;
+
+      return (
+        <>
+          {row.original.remainingDays > 0 ? (
+            <Button
+              onClick={() =>
+                startTransition(() =>
+                  decrementLimitedContractDay(
+                    row.original.stripeId,
+                    row.original.remainingDays!
+                  )
+                )
+              }
+            >
+              Click to Decrement: {row.original.remainingDays}
+            </Button>
+          ) : (
+            <Label>Expired</Label>
+          )}
+        </>
+      );
     },
   },
 ];

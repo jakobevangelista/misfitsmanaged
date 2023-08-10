@@ -45,7 +45,8 @@ export async function POST(req: Request) {
           data.arg.cartItems[i].price === "price_1NYRbKD5u1cDehOfapzIEhrJ" ||
           data.arg.cartItems[i].price === "price_1NYRcWD5u1cDehOfiPRDAB3v" ||
           data.arg.cartItems[i].price === "price_1NYU4xD5u1cDehOfzRdl9hRN" ||
-          data.arg.cartItems[i].price === "price_1NYRbrD5u1cDehOfLWSsrUWc"
+          data.arg.cartItems[i].price === "price_1NYRbrD5u1cDehOfLWSsrUWc" ||
+          data.arg.cartItems[i].price === "price_1NdRU4D5u1cDehOfQPQPLvIz"
         ) {
           let session;
           session = await stripe.checkout.sessions.create({
@@ -59,9 +60,9 @@ export async function POST(req: Request) {
 
             mode: "subscription",
             allow_promotion_codes: true,
-            payment_intent_data: {
-              setup_future_usage: "off_session",
-            },
+            // payment_intent_data: {
+            //   setup_future_usage: "off_session",
+            // },
             success_url: `${getURL()}/adminHome`,
             cancel_url: `${getURL()}/adminHome`,
           });

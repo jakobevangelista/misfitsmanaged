@@ -51,8 +51,17 @@ async function checkContracts() {
   //   END
   // )`);
   await db.execute(sql`UPDATE ${members}
-  JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
-  SET ${members.contractStatus} = ${contracts.status};`);
+  LEFT JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
+  SET ${members.contractStatus} = COALESCE(${contracts.status}, 'none');`);
+
+  await db.execute(sql`UPDATE ${contracts}
+  SET ${contracts.status} = (
+    CASE
+      WHEN ${contracts.remainingDays} = 0 THEN 'Inactive'
+      ELSE ${contracts.status}
+    END
+  )
+  WHERE ${contracts.remainingDays} IS NOT NULL;`);
 }
 
 async function getProducts() {

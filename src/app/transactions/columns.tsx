@@ -25,6 +25,7 @@ export type Transaction = {
   amount: number;
   paymentMethod: string;
   date: string;
+  quantity: number | null;
 };
 
 export const columns: ColumnDef<Transaction>[] = [
@@ -95,6 +96,10 @@ export const columns: ColumnDef<Transaction>[] = [
     //   date.setHours(date.getHours() - 5);
     //   return <div>{date.toLocaleString()}</div>;
     // },
+  },
+  {
+    accessorKey: "quantity",
+    header: "Quantity",
   },
   {
     id: "action",

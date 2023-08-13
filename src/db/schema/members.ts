@@ -49,6 +49,7 @@ export const transactions = mysqlTable("transactions", {
   paymentMethod: text("payment_method").notNull(),
   type: text("type").notNull(),
   createdAt: datetime("created_at").notNull(),
+  quantity: int("quantity").default(1),
 });
 
 export const products = mysqlTable("products", {

@@ -29,13 +29,18 @@ const relevantEvents = new Set([
   "customer.subscription.deleted",
 ]);
 
+interface PriceData {
+  priceId: string;
+  quantity: number;
+}
+
 export async function POST(req: Request) {
   const body = await req.text();
   //   let event: Stripe.Event;
   const sig = headers().get("Stripe-Signature") as string;
   // const secret = "whsec_1GELcqsBjQT3lighVRSc0e7PerHopo2s"; // personal test mode
-  // const secret = "whsec_GmTLlRKwQ5Xh1XLm9ezQFhsJihueNeqb"; // personal live
-  const secret = process.env.STRIPE_WEBHOOK_SECRET as string;
+  const secret = "whsec_Xjcs5cS81VExzwEIsVF12d2ePx0Kp8KL"; // personal live
+  // const secret = process.env.STRIPE_WEBHOOK_SECRET as string;
   const event = stripe.webhooks.constructEvent(
     body,
     sig,
@@ -153,6 +158,33 @@ export async function POST(req: Request) {
       const chargeSucceeded = event.data.object;
       console.log(chargeSucceeded.metadata.line_items);
       console.log(chargeSucceeded.customer);
+
+      const priceDataArray: PriceData[] = chargeSucceeded.metadata.line_items
+        .trim()
+        .split(",")
+        .map((entry) => {
+          const [priceId, quantity] = entry.trim().split(":");
+          return { priceId, quantity: parseInt(quantity, 10) };
+        });
+      for (const priceData of priceDataArray) {
+        const singleProductAmount = await db.query.products.findFirst({
+          where: eq(products.priceId, priceData.priceId),
+        });
+        console.log(priceData);
+        const totalAmount = singleProductAmount!.price * priceData.quantity;
+        console.log(singleProductAmount?.price);
+        console.log(totalAmount + " total amount");
+
+        await db.insert(transactions).values({
+          ownerId: chargeSucceeded.receipt_email as string,
+          amount: totalAmount,
+          date: new Date().toLocaleString(),
+          paymentMethod: "card",
+          type: singleProductAmount!.name,
+          createdAt: new Date(),
+          quantity: priceData.quantity,
+        });
+      }
 
       break;
     case "price.created":

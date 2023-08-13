@@ -62,7 +62,7 @@ export function DataTable<TData, TValue>({
     },
     initialState: {
       //   columnVisibility: { realScanId: false, actions: true },
-      pagination: { pageSize: 20 },
+      pagination: { pageSize: 10 }, // total sorts by total filtered
     },
   });
 

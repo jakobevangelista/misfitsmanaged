@@ -21,6 +21,7 @@ async function getData(): Promise<Transaction[]> {
         amount: true,
         paymentMethod: true,
         date: true,
+        quantity: true,
       },
     });
 

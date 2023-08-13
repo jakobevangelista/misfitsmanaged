@@ -32,6 +32,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoveDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
 export const revalidate = 15; // revalidate this page every 15 seconds
 
 interface DataTableProps<TData, TValue> {
@@ -46,6 +56,8 @@ export function DataTable<TData, TValue>({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sortType, setSortType] = useState<String>("");
+  const [date, setDate] = useState<Date>();
+  const [dateOpen, setDateOpen] = useState(false);
 
   const table = useReactTable({
     data,
@@ -84,57 +96,105 @@ export function DataTable<TData, TValue>({
       case "card":
         return <Badge className="ml-2">Card</Badge>;
       case "":
-        return <Badge className="ml-2">Date</Badge>;
+        return <Badge className="ml-2">All</Badge>;
     }
   }
 
   return (
     <>
-      <div>
-        <div className="flex flex-row items-center py-4">
-          <Input
+      <div className="w-full">
+        <div className="flex flex-row py-4">
+          {/* <Input
             placeholder="Filter dates..."
             value={(table.getColumn("date")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
               table.getColumn("date")?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button className="ml-1" variant="outline">
-                Sort By:
-                {filterBadge()}
-                <MoveDown />
+          /> */}
+          <Popover open={dateOpen} onOpenChange={setDateOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[280px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? (
+                  format(date, "PPP")
+                ) : (
+                  <span>Pick a date to filter transactions</span>
+                )}
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem
-                onClick={() => {
-                  setSortType("");
-                  table.getColumn("paymentMethod")?.setFilterValue("");
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                onDayClick={(event) => {
+                  setDateOpen(false);
+                  // console.log(`${date?.getMonth()} / ${date?.getDate()}`);
+                  // console.log(`${event.getMonth()}/${event.getDate()}`);
+                  table
+                    .getColumn("date")
+                    ?.setFilterValue(
+                      `${event.getMonth() + 1}/${event.getDate()}`
+                    );
                 }}
-              >
-                All
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setSortType("cash");
-                  table.getColumn("paymentMethod")?.setFilterValue("cash");
-                }}
-              >
-                Cash
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setSortType("card");
-                  table.getColumn("paymentMethod")?.setFilterValue("card");
-                }}
-              >
-                Card
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          <Button
+            variant="outline"
+            className="px-1"
+            onClick={() => {
+              table.getColumn("date")?.setFilterValue("");
+              setDate(undefined);
+            }}
+          >
+            <Label>Clear Date</Label>
+          </Button>
+          <div className="ml-auto">
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button variant="outline">
+                  Filter Transactions By:
+                  {filterBadge()}
+                  <MoveDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortType("");
+                    table.getColumn("paymentMethod")?.setFilterValue("");
+                  }}
+                >
+                  All
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortType("cash");
+                    table.getColumn("paymentMethod")?.setFilterValue("cash");
+                  }}
+                >
+                  Cash
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSortType("card");
+                    table.getColumn("paymentMethod")?.setFilterValue("card");
+                  }}
+                >
+                  Card
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
         <div className="rounded-md border">
           <Table>

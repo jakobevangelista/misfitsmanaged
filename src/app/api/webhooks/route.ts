@@ -39,8 +39,8 @@ export async function POST(req: Request) {
   //   let event: Stripe.Event;
   const sig = headers().get("Stripe-Signature") as string;
   // const secret = "whsec_1GELcqsBjQT3lighVRSc0e7PerHopo2s"; // personal test mode
-  const secret = "whsec_Xjcs5cS81VExzwEIsVF12d2ePx0Kp8KL"; // personal live
-  // const secret = process.env.STRIPE_WEBHOOK_SECRET as string;
+  // const secret = "whsec_Xjcs5cS81VExzwEIsVF12d2ePx0Kp8KL"; // personal live
+  const secret = process.env.STRIPE_WEBHOOK_SECRET as string;
   const event = stripe.webhooks.constructEvent(
     body,
     sig,

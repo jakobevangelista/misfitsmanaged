@@ -29,6 +29,7 @@ export const members = mysqlTable("members", {
   minorDOB: text("minor_dob"),
   DOB: date("DOB"),
   contractStatus: text("contract_status").default("none").notNull(), //"active","incomplete","incomplete_expired","past_due","canceled","unpaid","none",
+  profilePicture: text("profile_picture"),
 });
 
 export const contracts = mysqlTable("contracts", {

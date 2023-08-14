@@ -1,5 +1,5 @@
 import { Button, buttonVariants } from "@/components/ui/button";
-import { MoveLeft } from "lucide-react";
+import { MoveLeft, UserCircle } from "lucide-react";
 import Link from "next/link";
 import QuickCheckout from "./quickCheckout";
 import { db } from "@/db";
@@ -78,6 +78,14 @@ export default async function Page({ params }: { params: { userId: string } }) {
             <Label className="p-4 mb-10">Contracts</Label>
             <DataTable2 columns={columns2} data={userContracts} />
           </div>
+        </div>
+        <div className="mx-auto m-4">
+          <Button asChild>
+            <Link href={`/adminHome/${params.userId}/profilePicture`}>
+              <UserCircle className="mr-2" />
+              Set Profile Picture
+            </Link>
+          </Button>
         </div>
       </div>
     </>

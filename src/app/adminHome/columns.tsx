@@ -8,6 +8,7 @@ import {
   CheckIcon,
   ChevronsUpDown,
   MoreHorizontal,
+  UserSquare2,
 } from "lucide-react";
 import { User as UserIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -83,6 +84,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { DataTable } from "./data-table";
+import Image from "next/image";
 
 // const items = [
 //   { label: "Day Pass", value: "price_1NYRbKD5u1cDehOfapzIEhrJ" },
@@ -107,6 +109,7 @@ export type User = {
   name: string;
   contractStatus: string;
   emailAddress: string;
+  profilePicture: string | null;
 };
 
 export const DataTableWithColumns = (props: {
@@ -301,6 +304,22 @@ export const DataTableWithColumns = (props: {
             </DialogTrigger>
             <DialogContent className="DialogOverlay w-full mx-auto">
               <div className="flex flex-col space-y-4 mx-auto">
+                <div className="mx-auto">
+                  {row.original.profilePicture ? (
+                    <Image
+                      src={row.original.profilePicture}
+                      width={250}
+                      height={250}
+                      alt="no profile picture"
+                      className="rounded-md"
+                    />
+                  ) : (
+                    <div className="mx-auto text-center">
+                      <UserSquare2 className="mx-auto" size={48} />
+                      <Label>No Profile Picture</Label>
+                    </div>
+                  )}
+                </div>
                 <div className="flex flex-row space-x-4 mx-auto">
                   <div className="flex flex-col space-y-4 mx-auto">
                     <DialogHeader className="mx-auto">

@@ -25,6 +25,7 @@ async function getData(): Promise<User[]> {
       name: true,
       contractStatus: true,
       emailAddress: true,
+      profilePicture: true,
     },
   });
 

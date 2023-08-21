@@ -213,6 +213,10 @@ export default function RegisterForm(props: {
                         name={`parentName.${index}.name`}
                         render={({ field }) => (
                           <>
+                            <iframe
+                              src="/corruptedStrengthWaiver.pdf"
+                              className="mx-auto w-full md:h-[50vh] lg:w-1/3"
+                            />
                             <FormItem>
                               <FormLabel>Parent Name</FormLabel>
                               <FormControl>

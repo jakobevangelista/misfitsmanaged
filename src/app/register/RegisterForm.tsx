@@ -152,10 +152,10 @@ export default function RegisterForm(props: {
 
   return (
     <>
-      <iframe
+      {/* <iframe
         src="/corruptedStrengthWaiver.pdf"
         className="flex mx-auto w-[100vw] md:h-[50vh] "
-      />
+      /> */}
       <div className="flex flex-col justify-center w-full">
         {/* <iframe
           src="/corruptedStrengthWaiver.pdf"

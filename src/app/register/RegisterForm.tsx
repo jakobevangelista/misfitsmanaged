@@ -154,7 +154,7 @@ export default function RegisterForm(props: {
     <>
       <iframe
         src="/corruptedStrengthWaiver.pdf"
-        className="mx-auto w-full md:h-[50vh] "
+        className="flex mx-auto w-full md:h-[50vh] "
       />
       <div className="flex flex-col justify-center w-full">
         {/* <iframe

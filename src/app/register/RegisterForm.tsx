@@ -155,7 +155,7 @@ export default function RegisterForm(props: {
       <div className="flex flex-col justify-center">
         <iframe
           src="/corruptedStrengthWaiver.pdf"
-          className="mx-auto w-full md:h-[50vh] lg:w-1/3"
+          className="mx-auto w-full md:h-[50vh] "
         />
         <div className="mx-auto">
           <Link
@@ -217,6 +217,12 @@ export default function RegisterForm(props: {
                               src="/corruptedStrengthMinorWaiver.pdf"
                               className="mx-auto w-full md:h-[50vh] lg:w-1/3"
                             />
+                            <Link
+                              className="font-bold text-4xl hover:underline"
+                              href="/corruptedStrengthWaiver.pdf"
+                            >
+                              Click here to view the waiver
+                            </Link>
                             <FormItem>
                               <FormLabel>Parent Name</FormLabel>
                               <FormControl>

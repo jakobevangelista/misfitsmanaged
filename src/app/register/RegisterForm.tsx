@@ -152,11 +152,15 @@ export default function RegisterForm(props: {
 
   return (
     <>
-      <div className="flex flex-col justify-center">
-        <iframe
+      <iframe
+        src="/corruptedStrengthWaiver.pdf"
+        className="mx-auto w-full md:h-[50vh] "
+      />
+      <div className="flex flex-col justify-center w-full">
+        {/* <iframe
           src="/corruptedStrengthWaiver.pdf"
           className="mx-auto w-full md:h-[50vh] "
-        />
+        /> */}
         <div className="mx-auto">
           <Link
             className="font-bold text-4xl hover:underline"

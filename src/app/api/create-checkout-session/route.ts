@@ -91,7 +91,8 @@ export async function POST(req: Request) {
           },
           line_items: [
             {
-              price: "price_1NYRaXD5u1cDehOfi3XqF0jV", // personal test mode
+              // price: "price_1NYRaXD5u1cDehOfi3XqF0jV", // personal test mode
+              price: "price_1NJ5vUD5u1cDehOfPyC6RenZ", // cs live mode
               quantity: 1,
             },
           ],

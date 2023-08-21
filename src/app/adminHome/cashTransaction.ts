@@ -76,7 +76,7 @@ export async function cashTransactionDayPass(emailAddress: string) {
     })
     .then((res) => {
       return { message: `successfully updated transactions` };
-      revalidatePath(`/adminHome/${customerId.emailAddress}`);
+      // revalidatePath(`/adminHome/${customerId!.emailAddress}`);
     })
     .catch((err) => {
       return { message: `failed` };

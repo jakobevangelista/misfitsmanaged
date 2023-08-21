@@ -159,16 +159,16 @@ export default function RegisterForm(props: {
       <div className="flex flex-col justify-center w-full">
         {/* <iframe
           src="/corruptedStrengthWaiver.pdf"
-          className="mx-auto w-full md:h-[50vh] "
+          className="mx-auto w-full md:h-[50vh] lg:w-1/2"
         /> */}
-        <div className="mx-auto">
+        {/* <div className="mx-auto">
           <Link
             className="font-bold text-4xl hover:underline"
             href="/corruptedStrengthWaiver.pdf"
           >
             Click here to view the waiver
           </Link>
-        </div>
+        </div> */}
         <div className="mx-auto">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -177,6 +177,16 @@ export default function RegisterForm(props: {
                 name="memberName"
                 render={({ field }) => (
                   <FormItem>
+                    <iframe
+                      src="/corruptedStrengthWaiver.pdf"
+                      className="mx-auto w-full md:h-[50vh] lg:w-1/2"
+                    />
+                    <Link
+                      className="font-bold text-4xl hover:underline"
+                      href="/corruptedStrengthWaiver.pdf"
+                    >
+                      Click here to view the waiver
+                    </Link>
                     <FormLabel>
                       By signing your name and clicking Accept, you agree to all
                       the terms in the{" "}

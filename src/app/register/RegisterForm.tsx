@@ -214,7 +214,7 @@ export default function RegisterForm(props: {
                         render={({ field }) => (
                           <>
                             <iframe
-                              src="/corruptedStrengthWaiver.pdf"
+                              src="/corruptedStrengthMinorWaiver.pdf"
                               className="mx-auto w-full md:h-[50vh] lg:w-1/3"
                             />
                             <FormItem>

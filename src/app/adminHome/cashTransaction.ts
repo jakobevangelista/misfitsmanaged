@@ -10,6 +10,7 @@ import {
 import { User } from "./columns";
 import { Row } from "@tanstack/table-core/build/lib/types";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export async function cashTransactionWater(formdata: FormData) {
   //   console.log(row.original.emailAddress);
@@ -34,18 +35,24 @@ export async function cashTransactionWater(formdata: FormData) {
   return { message: `successfully updated transactions` };
 }
 
-export async function cashTransactionDayPass(formdata: FormData) {
+export async function cashTransactionDayPass(emailAddress: string) {
   //   console.log(row.original.emailAddress);
   const now = new Date();
 
   const tomorrow = new Date();
   tomorrow.setHours(tomorrow.getHours() + 24);
   const localNow = new Date(now.toLocaleString());
+  localNow.setHours(localNow.getHours() - 5);
   const localTomorrow = new Date(tomorrow.toLocaleString());
+  localTomorrow.setHours(localTomorrow.getHours() - 5);
+  // console.log(localNow.toLocaleString());
+  // console.log(localTomorrow.toLocaleString());
+  // return;
   const customerId = await db.query.members.findFirst({
-    where: eq(members.emailAddress, formdata.get("email")!.toString()),
+    where: eq(members.emailAddress, emailAddress),
     columns: {
       customerId: true,
+      emailAddress: true,
     },
   });
   console.log(now.toLocaleString());
@@ -60,7 +67,7 @@ export async function cashTransactionDayPass(formdata: FormData) {
   await db
     .insert(transactions)
     .values({
-      ownerId: formdata.get("email")!.toString(),
+      ownerId: emailAddress,
       amount: 1500,
       date: now.toLocaleString(),
       paymentMethod: "cash",
@@ -69,6 +76,7 @@ export async function cashTransactionDayPass(formdata: FormData) {
     })
     .then((res) => {
       return { message: `successfully updated transactions` };
+      revalidatePath(`/adminHome/${customerId.emailAddress}`);
     })
     .catch((err) => {
       return { message: `failed` };

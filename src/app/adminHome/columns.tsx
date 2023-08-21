@@ -246,6 +246,7 @@ export const DataTableWithColumns = (props: {
           // ✅ This will be type-safe and validated.
           console.log("hwer");
           console.log(values);
+          cashTransactionDayPass(row.original.emailAddress);
         };
 
         const checkoutSubmit = async (
@@ -353,7 +354,7 @@ export const DataTableWithColumns = (props: {
                     </div>
                     {/* <Label>Cash Transactions:</Label> */}
                     <div className="flex w-full max-w-sm items-center space-x-2">
-                      <Form {...quickDayPassCashTransactionForm}>
+                      {/* <Form {...quickDayPassCashTransactionForm}>
                         <form
                           onSubmit={quickDayPassCashTransactionForm.handleSubmit(
                             quickDayPassCashTransactionOnSubmit
@@ -383,13 +384,21 @@ export const DataTableWithColumns = (props: {
                             variant="green"
                             onSubmit={() => {
                               console.log("clicked");
+                              toast({
+                                title: "Day Pass Cash Transaction Recorded",
+                                description: `Change: ${
+                                  quickDayPassCashTransactionForm.getValues(
+                                    "cashAmount"
+                                  )! - 15
+                                }`,
+                              });
                             }}
                             type="submit"
                           >
                             Transact Cash Day Pass
                           </Button>
                         </form>
-                      </Form>
+                      </Form> */}
                       {/* <form action={cashTransactionDayPass}>
                       <Label>Enter cash given for day pass Here:</Label>
                       <Input

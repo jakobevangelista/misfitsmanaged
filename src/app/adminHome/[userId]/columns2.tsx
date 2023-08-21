@@ -74,7 +74,7 @@ export const columns: ColumnDef<Contract>[] = [
     accessorKey: "startDate",
     header: "Start Date",
     cell: ({ row }) => {
-      const localDate = new Date(row.original.endDate);
+      const localDate = new Date(row.original.startDate);
       //   localDate.setHours(localDate.getHours() + 7);
       return localDate.toLocaleString();
     },

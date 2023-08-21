@@ -18,5 +18,5 @@ export async function setProfilePicture(
     .where(eq(members.id, userId));
 
   revalidatePath(`/adminHome`);
-
+  revalidatePath(`/adminHome/${userId}`);
 }

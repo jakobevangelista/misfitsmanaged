@@ -1,5 +1,5 @@
 import { Button, buttonVariants } from "@/components/ui/button";
-import { MoveLeft, UserCircle } from "lucide-react";
+import { MoveLeft, UserCircle, UserSquare2 } from "lucide-react";
 import Link from "next/link";
 import QuickCheckout from "./quickCheckout";
 import { db } from "@/db";
@@ -10,6 +10,7 @@ import { Contract, columns as columns2 } from "./columns2";
 import { DataTable } from "./data-table";
 import { Label } from "@/components/ui/label";
 import { DataTable2 } from "./data-table2";
+import Image from "next/image";
 
 async function getUserData(userId: number) {
   const user = await db.query.members.findFirst({
@@ -64,6 +65,22 @@ export default async function Page({ params }: { params: { userId: string } }) {
           >
             <MoveLeft /> Go Back To Admin Home
           </Link>
+        </div>
+        <div className="flex mx-auto m-2">
+          {userData?.profilePicture ? (
+            <Image
+              src={userData.profilePicture}
+              width={250}
+              height={250}
+              alt="no profile picture"
+              className="rounded-md"
+            />
+          ) : null
+          // <div className="flex flex-col">
+          //   <UserSquare2 className="mx-auto" size={48} />
+          //   <Label>No Profile Picture</Label>
+          // </div>
+          }
         </div>
         <h1 className="p-4 scroll-m-20 mx-auto text-4xl font-extrabold tracking-tight lg:text-5xl">
           {userData?.name}

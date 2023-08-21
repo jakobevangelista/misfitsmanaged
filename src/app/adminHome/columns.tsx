@@ -354,7 +354,7 @@ export const DataTableWithColumns = (props: {
                     </div>
                     {/* <Label>Cash Transactions:</Label> */}
                     <div className="flex w-full max-w-sm items-center space-x-2">
-                      {/* <Form {...quickDayPassCashTransactionForm}>
+                      <Form {...quickDayPassCashTransactionForm}>
                         <form
                           onSubmit={quickDayPassCashTransactionForm.handleSubmit(
                             quickDayPassCashTransactionOnSubmit
@@ -384,6 +384,9 @@ export const DataTableWithColumns = (props: {
                             variant="green"
                             onSubmit={() => {
                               console.log("clicked");
+                            }}
+                            onClick={() => {
+                              // setTimeout()
                               toast({
                                 title: "Day Pass Cash Transaction Recorded",
                                 description: `Change: ${
@@ -392,13 +395,14 @@ export const DataTableWithColumns = (props: {
                                   )! - 15
                                 }`,
                               });
+                              // quickDayPassCashTransactionForm.reset();
                             }}
                             type="submit"
                           >
                             Transact Cash Day Pass
                           </Button>
                         </form>
-                      </Form> */}
+                      </Form>
                       {/* <form action={cashTransactionDayPass}>
                       <Label>Enter cash given for day pass Here:</Label>
                       <Input

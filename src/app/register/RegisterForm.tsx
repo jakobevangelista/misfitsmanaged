@@ -160,7 +160,7 @@ export default function RegisterForm(props: {
         <div className="mx-auto">
           <Link
             className="font-bold text-4xl hover:underline"
-            href="/waiver.pdf"
+            href="/corruptedStrengthWaiver.pdf"
           >
             Click here to view the waiver
           </Link>

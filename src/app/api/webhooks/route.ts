@@ -74,6 +74,7 @@ export async function POST(req: Request) {
           paymentMethod: "card",
           type: itemName.name,
           createdAt: date,
+          quantity: itemsPurchased.data[i].quantity,
         });
       }
 

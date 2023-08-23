@@ -16,6 +16,8 @@ import {
   manageSubscription,
 } from "../../../../utils/dbHelper";
 import { check } from "drizzle-orm/mysql-core";
+import { revalidate } from "@/app/transactions/data-table";
+import { revalidatePath } from "next/cache";
 /// <reference types="stripe-event-types" />
 
 const relevantEvents = new Set([
@@ -82,8 +84,11 @@ export async function POST(req: Request) {
         const subscriptionId = checkoutSession.subscription as string;
         const customer = checkoutSession.customer as string;
         manageSubscription(subscriptionId!, customer!);
+        revalidatePath(`/adminHome`);
+
         break;
       }
+      revalidatePath(`/adminHome`);
 
       break;
     case "customer.subscription.created":
@@ -135,6 +140,8 @@ export async function POST(req: Request) {
         //     )
         //   );
       }
+      revalidatePath(`/adminHome`);
+
       break;
     case "customer.subscription.updated":
       const customerSubscriptionUpdated = event.data.object;
@@ -144,6 +151,8 @@ export async function POST(req: Request) {
       const subscriptionId = subscriptionUpdate.id as string;
       const customer = subscriptionUpdate.customer as string;
       manageSubscription(subscriptionId!, customer!);
+      revalidatePath(`/adminHome`);
+
       break;
 
     case "customer.subscription.deleted":
@@ -153,6 +162,8 @@ export async function POST(req: Request) {
       const subscriptionIdDelete = subscriptionDelete.id as string;
       const customerDelete = subscriptionDelete.customer as string;
       manageSubscription(subscriptionIdDelete!, customerDelete!);
+      revalidatePath(`/adminHome`);
+
       break;
 
     case "charge.succeeded":
@@ -186,6 +197,8 @@ export async function POST(req: Request) {
           quantity: priceData.quantity,
         });
       }
+      revalidatePath(`/adminHome`);
+      revalidatePath(`/transactions`);
 
       break;
     case "price.created":
@@ -224,6 +237,32 @@ export async function POST(req: Request) {
           customerId: customerCreated.id,
         })
         .where(eq(members.emailAddress, customerCreated.email!));
+      break;
+    case "invoice.payment_failed":
+      const invoicePaymentFailed = event.data.object as Stripe.Invoice;
+      await db
+        .update(contracts)
+        .set({
+          status: "Unpaid",
+        })
+        .where(
+          eq(contracts.stripeId, invoicePaymentFailed.subscription as string)
+        );
+
+      await stripe.subscriptions.update(
+        invoicePaymentFailed.subscription as string,
+        {
+          cancel_at_period_end: true,
+        }
+      );
+
+      await db
+        .update(members)
+        .set({
+          contractStatus: "Unpaid",
+        })
+        .where(eq(members.customerId, invoicePaymentFailed.customer as string));
+      revalidatePath(`/adminHome`);
       break;
   }
 

@@ -158,6 +158,9 @@ export const DataTableWithColumns = (props: {
               return <Badge variant="inactive">Inactive</Badge>;
             case "Limited":
               return <Badge variant="limited">Limited</Badge>;
+            case "Unpaid":
+            case "unpaid":
+              return <Badge variant="destructive">Unpaid</Badge>;
             default:
               return <Badge>None</Badge>;
           }

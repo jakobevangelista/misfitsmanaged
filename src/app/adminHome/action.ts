@@ -8,6 +8,7 @@ import { members } from "../../db/schema/members";
 import { eq, sql } from "drizzle-orm";
 
 import { createOrRetrieveCustomer } from "../../../utils/dbHelper";
+import { revalidatePath } from "next/cache";
 
 export async function validatedAction(formdata: FormData) {
   console.log(formdata.get("userId"));
@@ -34,6 +35,7 @@ export async function validatedAction(formdata: FormData) {
     })
     .where(eq(members.id, id))
     .then(() => {
+      revalidatePath(`/adminHome`);
       console.log("updated tag");
       formdata.delete("newTagCode");
     })

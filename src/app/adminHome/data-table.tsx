@@ -53,6 +53,7 @@ export function DataTable<TData, TValue>({
   const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [sortType, setSortType] = React.useState<String>("realScanId");
+  const [specificSortType, setSpecificSortType] = React.useState<String>("");
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -84,7 +85,7 @@ export function DataTable<TData, TValue>({
         return (
           <Input
             autoFocus
-            placeholder="Filter emails..."
+            placeholder="Search emails..."
             value={
               (table.getColumn("emailAddress")?.getFilterValue() as string) ??
               ""
@@ -103,7 +104,7 @@ export function DataTable<TData, TValue>({
         return (
           <Input
             autoFocus
-            placeholder="Filter names..."
+            placeholder="Search names..."
             value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) => {
               table.getColumn("emailAddress")?.setFilterValue("");
@@ -118,7 +119,7 @@ export function DataTable<TData, TValue>({
         return (
           <Input
             autoFocus
-            placeholder="Filter ID's..."
+            placeholder="Search ID's..."
             value={
               (table.getColumn("realScanId")?.getFilterValue() as string) ?? ""
             }
@@ -170,16 +171,26 @@ export function DataTable<TData, TValue>({
     }
   }
 
+  function specificFilterBadge() {
+    switch (specificSortType) {
+      case "Unpaid":
+        return <Badge className="ml-2">Cash</Badge>;
+      case "Active":
+        return <Badge className="ml-2">Card</Badge>;
+      case "":
+        return <Badge className="ml-2">All</Badge>;
+    }
+  }
+
   return (
     <>
       <BarcodeReader onScan={handleScan} />
 
       <div className="flex items-center py-4">
-        {sortByFilters(sortType)}
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button className="ml-1" variant="outline">
-              Sort By:
+              Search By:
               {filterBadge(sortType)}
               <MoveDown />
             </Button>
@@ -196,6 +207,38 @@ export function DataTable<TData, TValue>({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        {sortByFilters(sortType)}
+
+        <div className="ml-auto">
+          {" "}
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Button variant="outline">
+                Filter Contracts By:
+                {specificFilterBadge()}
+                <MoveDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => {
+                  setSpecificSortType("");
+                  table.getColumn("contractStatus")?.setFilterValue("");
+                }}
+              >
+                All
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setSpecificSortType("Unpaid");
+                  table.getColumn("contractStatus")?.setFilterValue("Unpaid");
+                }}
+              >
+                Unpaid
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>

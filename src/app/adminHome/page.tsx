@@ -14,7 +14,8 @@ import { customCheckoutPost, postData } from "../../../utils/helpers";
 import CustomButton from "./customButton";
 import { DataTableWithColumns } from "./columns";
 import { stripe } from "../../../utils/stripe";
-// export const revalidate = 0; // revalidate this page every 15 seconds
+export const revalidate = 5; // revalidate this page every 15 seconds
+// export const dynamic = "force-dynamic";
 
 async function getData(): Promise<User[]> {
   // Fetch data from your API here.

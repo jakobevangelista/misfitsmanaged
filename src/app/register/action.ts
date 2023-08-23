@@ -6,7 +6,7 @@ import { zact } from "zact/server";
 import { db } from "../../db/index";
 import { members } from "../../db/schema/members";
 import { createOrRetrieveCustomer } from "../../../utils/dbHelper";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { eq } from "drizzle-orm";
 import { stripe } from "../../../utils/stripe";
 
@@ -45,6 +45,8 @@ export const validatedAction = zact(
       })
       .where(eq(members.emailAddress, input.emailAddress))
       .then(async () => {
+        revalidatePath(`/adminHome`);
+
         await createOrRetrieveCustomer({
           userId: input.userId,
           email: input.emailAddress,
@@ -83,6 +85,7 @@ export const validatedAction = zact(
       //   console.log(err);
       //   return { message: `error creating customer` };
       // });
+      revalidatePath(`/adminHome`);
       return { message: `successfully inserted member` };
     })
     .catch((err) => {

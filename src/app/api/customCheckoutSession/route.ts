@@ -45,7 +45,8 @@ export async function POST(req: Request) {
           data.arg.cartItems[i].price === "price_1NYRbKD5u1cDehOfapzIEhrJ" ||
           data.arg.cartItems[i].price === "price_1NYRcWD5u1cDehOfiPRDAB3v" ||
           data.arg.cartItems[i].price === "price_1NYRbrD5u1cDehOfLWSsrUWc" || 
-          data.arg.cartItems[i].price === "price_1NdRU4D5u1cDehOfQPQPLvIz"
+          data.arg.cartItems[i].price === "price_1NdRU4D5u1cDehOfQPQPLvIz" ||
+          data.arg.cartItems[i].price === "price_1NjPG7D5u1cDehOf42qaFmXy" 
         ) {
           let session;
           session = await stripe.checkout.sessions.create({

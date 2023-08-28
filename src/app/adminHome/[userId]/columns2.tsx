@@ -133,7 +133,10 @@ export const columns: ColumnDef<Contract>[] = [
                 <DropdownMenuItem
                   onClick={() =>
                     startTransition(() =>
-                      cancelActiveSubscription(row.original.stripeId)
+                      cancelActiveSubscription(
+                        row.original.stripeId,
+                        row.original.ownerId
+                      )
                     )
                   }
                 >

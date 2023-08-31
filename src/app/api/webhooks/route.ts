@@ -228,6 +228,20 @@ export async function POST(req: Request) {
       break;
     case "product.created":
       break;
+    case "product.updated":
+      const updateProduct = event.data.object as Stripe.Product;
+      const updatedProductName = await stripe.products.retrieve(
+        updateProduct.id
+      );
+      const updatedProductPrice = await stripe.prices.retrieve(
+        updateProduct.default_price as string
+      );
+      await db.insert(products).values({
+        priceId: updateProduct.id,
+        name: updatedProductName.name,
+        price: updatedProductPrice.unit_amount as number,
+      });
+      break;
     case "customer.created":
     case "customer.updated":
       const customerCreated = event.data.object as Stripe.Customer;

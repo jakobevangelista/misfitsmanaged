@@ -239,13 +239,13 @@ export async function POST(req: Request) {
       await db
         .insert(products)
         .values({
-          priceId: updateProduct.id,
+          priceId: updateProduct.default_price as string,
           name: updatedProductName.name,
           price: updatedProductPrice.unit_amount as number,
         })
         .onDuplicateKeyUpdate({
           set: {
-            priceId: updateProduct.id,
+            priceId: updateProduct.default_price as string,
             price: updatedProductPrice.unit_amount as number,
           },
         });

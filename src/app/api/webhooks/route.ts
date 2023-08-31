@@ -236,11 +236,19 @@ export async function POST(req: Request) {
       const updatedProductPrice = await stripe.prices.retrieve(
         updateProduct.default_price as string
       );
-      await db.insert(products).values({
-        priceId: updateProduct.id,
-        name: updatedProductName.name,
-        price: updatedProductPrice.unit_amount as number,
-      });
+      await db
+        .insert(products)
+        .values({
+          priceId: updateProduct.id,
+          name: updatedProductName.name,
+          price: updatedProductPrice.unit_amount as number,
+        })
+        .onDuplicateKeyUpdate({
+          set: {
+            priceId: updateProduct.id,
+            price: updatedProductPrice.unit_amount as number,
+          },
+        });
       break;
     case "customer.created":
     case "customer.updated":

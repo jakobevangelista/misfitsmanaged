@@ -137,11 +137,17 @@ export function DataTable<TData, TValue>({
                 onDayClick={(event) => {
                   setDateOpen(false);
                   // console.log(`${date?.getMonth()} / ${date?.getDate()}`);
-                  // console.log(`${event.getMonth()}/${event.getDate()}`);
+                  console.log(
+                    `${
+                      event.getMonth() + 1
+                    }/${event.getDate()}/${event.getFullYear()}`
+                  );
                   table
                     .getColumn("date")
                     ?.setFilterValue(
-                      `${event.getMonth() + 1}/${event.getDate()}`
+                      `${
+                        event.getMonth() + 1
+                      }/${event.getDate()}/${event.getFullYear()}`
                     );
                 }}
                 initialFocus

@@ -35,6 +35,10 @@ async function getData(): Promise<User[]> {
 
 async function checkContracts() {
   const today = new Date();
+
+  // await db.execute(sql`UPDATE ${members}
+  // LEFT JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
+  // SET ${members.contractStatus} = COALESCE(${contracts.status}, 'none');`);
   await db
     .update(contracts)
     .set({ status: "Inactive" })
@@ -52,9 +56,6 @@ async function checkContracts() {
   //     else 'none'
   //   END
   // )`);
-  await db.execute(sql`UPDATE ${members}
-  LEFT JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
-  SET ${members.contractStatus} = COALESCE(${contracts.status}, 'none');`);
 
   await db.execute(sql`UPDATE ${contracts}
   SET ${contracts.status} = (
@@ -64,6 +65,22 @@ async function checkContracts() {
     END
   )
   WHERE ${contracts.remainingDays} IS NOT NULL;`);
+  // await db.execute(sql`UPDATE ${members}
+  // JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
+  // SET ${members.contractStatus} = CASE
+  //   WHEN ${contracts.status} = 'active' THEN 'Active'
+  //   ELSE ${members.contractStatus}
+  // END
+  // WHERE ${contracts.status} = 'active';`);
+  await db.execute(sql`UPDATE ${members}
+  LEFT JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
+  SET ${members.contractStatus} = COALESCE(
+    CASE
+      WHEN ${contracts.status} = 'active' THEN 'active'
+      ELSE ${members.contractStatus}
+    END,
+    'none'
+  );`);
 }
 
 async function getProducts() {

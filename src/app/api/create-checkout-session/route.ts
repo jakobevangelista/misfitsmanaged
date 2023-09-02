@@ -122,6 +122,46 @@ export async function POST(req: Request) {
             { status: 500 }
           );
         }
+      } else if (data.data === "cssat") {
+        let session;
+        session = await stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+          billing_address_collection: "required",
+          customer,
+          customer_update: {
+            address: "auto",
+          },
+          line_items: [
+            {
+              price: "price_1NjPG7D5u1cDehOf42qaFmXy", //live mode price id for day pass
+              // price: "price_1NXFYAD5u1cDehOfSgf9D1AQ", // test mode price id for day pass
+              quantity: 1,
+            },
+          ],
+
+          mode: "subscription",
+          allow_promotion_codes: false,
+          // payment_intent_data: {
+          //   setup_future_usage: "off_session",
+          // },
+          success_url: `${getURL()}/adminHome`,
+          cancel_url: `${getURL()}/adminHome`,
+        });
+
+        if (session) {
+          revalidatePath("/adminHome");
+          revalidatePath("/transactions");
+          return new Response(JSON.stringify({ sessionId: session.id }), {
+            status: 200,
+          });
+        } else {
+          return new Response(
+            JSON.stringify({
+              error: { statusCode: 500, message: "Session is not defined" },
+            }),
+            { status: 500 }
+          );
+        }
       } else if (data.data === "Day Pass") {
         let session;
         session = await stripe.checkout.sessions.create({

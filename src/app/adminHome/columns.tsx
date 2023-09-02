@@ -161,6 +161,9 @@ export const DataTableWithColumns = (props: {
             case "Unpaid":
             case "unpaid":
               return <Badge variant="destructive">Unpaid</Badge>;
+            case "incomplete":
+              return <Badge variant="destructive">Incomplete</Badge>;
+
             default:
               return <Badge>None</Badge>;
           }
@@ -244,6 +247,29 @@ export const DataTableWithColumns = (props: {
         });
         const quickDayPassCashTransactionOnSubmit = (
           values: z.infer<typeof quickDayPassCashTransactionSchema>
+        ) => {
+          // Do something with the form values.
+          // ✅ This will be type-safe and validated.
+          console.log("hwer");
+          console.log(values);
+          cashTransactionDayPass(row.original.emailAddress);
+        };
+
+        const quickCsSaturdayCashTransactionSchema = z.object({
+          cashAmount: z.coerce.number().gte(10, {
+            message: "Please collect more than 10 dollars for day pass",
+          }),
+        });
+        const quickCsSaturdayCashTransactionForm = useForm<
+          z.infer<typeof quickCsSaturdayCashTransactionSchema>
+        >({
+          resolver: zodResolver(quickCsSaturdayCashTransactionSchema),
+          defaultValues: {
+            cashAmount: 0,
+          },
+        });
+        const quickCsSaturdayTransactionOnSubmit = (
+          values: z.infer<typeof quickCsSaturdayCashTransactionSchema>
         ) => {
           // Do something with the form values.
           // ✅ This will be type-safe and validated.
@@ -347,16 +373,23 @@ export const DataTableWithColumns = (props: {
                       >
                         Charge Small Water Bottle
                       </Button>
-                      <Button
+                      {/* <Button
                         variant="outline"
                         onClick={() => handleCheckout("month")}
                         className="flex"
                       >
                         Charge Month
+                      </Button> */}
+                      <Button
+                        variant="outline"
+                        onClick={() => handleCheckout("cssat")}
+                        className="flex"
+                      >
+                        Charge Corrupted Saturday Pass
                       </Button>
                     </div>
                     {/* <Label>Cash Transactions:</Label> */}
-                    <div className="flex w-full max-w-sm items-center space-x-2">
+                    <div className="flex flex-row w-full max-w-sm items-center space-x-2">
                       <Form {...quickDayPassCashTransactionForm}>
                         <form
                           onSubmit={quickDayPassCashTransactionForm.handleSubmit(
@@ -390,19 +423,88 @@ export const DataTableWithColumns = (props: {
                             }}
                             onClick={() => {
                               // setTimeout()
-                              toast({
-                                title: "Day Pass Cash Transaction Recorded",
-                                description: `Change: ${
-                                  quickDayPassCashTransactionForm.getValues(
-                                    "cashAmount"
-                                  )! - 15
-                                }`,
-                              });
+                              if (
+                                quickDayPassCashTransactionForm.getValues(
+                                  "cashAmount"
+                                )! < 15
+                              ) {
+                                toast({
+                                  title: "❌ Not enough cash given",
+                                });
+                              } else {
+                                toast({
+                                  title: "Day Pass Cash Transaction Recorded",
+                                  description: `Change: ${
+                                    quickDayPassCashTransactionForm.getValues(
+                                      "cashAmount"
+                                    )! - 15
+                                  }`,
+                                });
+                              }
                               // quickDayPassCashTransactionForm.reset();
                             }}
                             type="submit"
                           >
                             Transact Cash Day Pass
+                          </Button>
+                        </form>
+                      </Form>
+                      <Form {...quickCsSaturdayCashTransactionForm}>
+                        <form
+                          onSubmit={quickCsSaturdayCashTransactionForm.handleSubmit(
+                            quickCsSaturdayTransactionOnSubmit
+                          )}
+                          className="space-y-8"
+                        >
+                          <FormField
+                            control={quickCsSaturdayCashTransactionForm.control}
+                            name="cashAmount"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>
+                                  Quick $10 Corrupted Saturday Cash Transaction
+                                </FormLabel>
+                                <FormControl>
+                                  <Input
+                                    placeholder="Cash Amount"
+                                    type="number"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Button
+                            variant="green"
+                            onSubmit={() => {
+                              console.log("clicked");
+                            }}
+                            onClick={() => {
+                              // setTimeout()
+                              if (
+                                quickDayPassCashTransactionForm.getValues(
+                                  "cashAmount"
+                                )! < 10
+                              ) {
+                                toast({
+                                  title: "❌ Not enough cash given",
+                                });
+                              } else {
+                                toast({
+                                  title: "Day Pass Cash Transaction Recorded",
+                                  description: `Change: ${
+                                    quickCsSaturdayCashTransactionForm.getValues(
+                                      "cashAmount"
+                                    )! - 10
+                                  }`,
+                                });
+                              }
+                              // quickDayPassCashTransactionForm.reset();
+                            }}
+                            type="submit"
+                          >
+                            Transact Cash CS Saturday
                           </Button>
                         </form>
                       </Form>

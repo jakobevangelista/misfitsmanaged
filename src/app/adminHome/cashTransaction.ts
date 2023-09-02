@@ -84,6 +84,55 @@ export async function cashTransactionDayPass(emailAddress: string) {
   return { message: `successfully updated transactions` };
 }
 
+export async function cashTransactionCorruptedSaturday(emailAddress: string) {
+  //   console.log(row.original.emailAddress);
+  const now = new Date();
+
+  const tomorrow = new Date();
+  tomorrow.setHours(tomorrow.getHours() + 24);
+  const localNow = new Date(now.toLocaleString());
+  localNow.setHours(localNow.getHours() - 5);
+  const localTomorrow = new Date(tomorrow.toLocaleString());
+  localTomorrow.setHours(localTomorrow.getHours() - 5);
+  // console.log(localNow.toLocaleString());
+  // console.log(localTomorrow.toLocaleString());
+  // return;
+  const customerId = await db.query.members.findFirst({
+    where: eq(members.emailAddress, emailAddress),
+    columns: {
+      customerId: true,
+      emailAddress: true,
+    },
+  });
+  console.log(now.toLocaleString());
+  await db.insert(contracts).values({
+    ownerId: customerId!.customerId!,
+    status: "active",
+    type: "Corrupted Saturday Day Pass",
+    startDate: localNow,
+    endDate: localTomorrow,
+    stripeId: Math.random().toString(),
+  });
+  await db
+    .insert(transactions)
+    .values({
+      ownerId: emailAddress,
+      amount: 1000,
+      date: now.toLocaleString(),
+      paymentMethod: "cash",
+      type: "Corrupted Saturday Day Pass",
+      createdAt: now,
+    })
+    .then((res) => {
+      return { message: `successfully updated transactions` };
+      // revalidatePath(`/adminHome/${customerId!.emailAddress}`);
+    })
+    .catch((err) => {
+      return { message: `failed` };
+    });
+  return { message: `successfully updated transactions` };
+}
+
 export async function cashTransactionCustom(
   id: number,
   total: number,

@@ -75,7 +75,7 @@ export async function POST(req: Request) {
           date: date.toLocaleString(),
           paymentMethod: "card",
           type: itemName.name,
-          createdAt: date,
+          createdAt: new Date(checkoutSession.created * 1000),
           quantity: itemsPurchased.data[i].quantity,
         });
       }
@@ -190,10 +190,12 @@ export async function POST(req: Request) {
         await db.insert(transactions).values({
           ownerId: chargeSucceeded.receipt_email as string,
           amount: totalAmount,
-          date: new Date().toLocaleString(),
+          // date: new Date().toLocaleString(),
+          date: new Date(chargeSucceeded.created * 1000).toLocaleString(),
           paymentMethod: "card",
           type: singleProductAmount!.name,
-          createdAt: new Date(),
+          // createdAt: new Date(),
+          createdAt: new Date(chargeSucceeded.created * 1000),
           quantity: priceData.quantity,
         });
       }

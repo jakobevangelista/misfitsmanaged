@@ -24,7 +24,7 @@ export default function WebcamCapture({
           Profile Picture:
         </div>
         <WebCamComponent userId={params.userId} />
-        <ImageUpload />
+        <ImageUpload userId={params.userId} />
       </div>
     </>
   );

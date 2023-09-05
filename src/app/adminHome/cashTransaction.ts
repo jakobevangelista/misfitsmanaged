@@ -37,19 +37,6 @@ export async function cashTransactionWater(formdata: FormData) {
 }
 
 export async function cashTransactionDayPass(emailAddress: string) {
-  //   console.log(row.original.emailAddress);
-  // const now = new Date();
-
-  // const tomorrow = new Date();
-  // tomorrow.setHours(tomorrow.getHours() + 24);
-  // const localNow = new Date(now.toLocaleString());
-  // localNow.setHours(localNow.getHours() - 5);
-  // const localTomorrow = new Date(tomorrow.toLocaleString());
-  // localTomorrow.setHours(localTomorrow.getHours() - 5);
-  // console.log(localNow.toLocaleString());
-  // console.log(localTomorrow.toLocaleString());
-  // return;
-
   const now = DateTime.now().setZone("America/Chicago");
   const tomorrow = now.plus({ days: 1 });
   const customerId = await db.query.members.findFirst({
@@ -79,8 +66,8 @@ export async function cashTransactionDayPass(emailAddress: string) {
       createdAt: now.toJSDate(),
     })
     .then((res) => {
-      return { message: `successfully updated transactions` };
       // revalidatePath(`/adminHome/${customerId!.emailAddress}`);
+      return { message: `successfully updated transactions` };
     })
     .catch((err) => {
       return { message: `failed` };
@@ -89,18 +76,9 @@ export async function cashTransactionDayPass(emailAddress: string) {
 }
 
 export async function cashTransactionCorruptedSaturday(emailAddress: string) {
-  //   console.log(row.original.emailAddress);
-  const now = new Date();
+  const now = DateTime.now().setZone("America/Chicago");
+  const tomorrow = now.plus({ days: 1 });
 
-  const tomorrow = new Date();
-  tomorrow.setHours(tomorrow.getHours() + 24);
-  const localNow = new Date(now.toLocaleString());
-  localNow.setHours(localNow.getHours() - 5);
-  const localTomorrow = new Date(tomorrow.toLocaleString());
-  localTomorrow.setHours(localTomorrow.getHours() - 5);
-  // console.log(localNow.toLocaleString());
-  // console.log(localTomorrow.toLocaleString());
-  // return;
   const customerId = await db.query.members.findFirst({
     where: eq(members.emailAddress, emailAddress),
     columns: {
@@ -113,8 +91,8 @@ export async function cashTransactionCorruptedSaturday(emailAddress: string) {
     ownerId: customerId!.customerId!,
     status: "active",
     type: "Corrupted Saturday Day Pass",
-    startDate: localNow,
-    endDate: localTomorrow,
+    startDate: now.toJSDate(),
+    endDate: tomorrow.toJSDate(),
     stripeId: Math.random().toString(),
   });
   await db
@@ -122,10 +100,10 @@ export async function cashTransactionCorruptedSaturday(emailAddress: string) {
     .values({
       ownerId: emailAddress,
       amount: 1000,
-      date: now.toLocaleString(),
+      date: now.toLocaleString(DateTime.DATETIME_SHORT),
       paymentMethod: "cash",
       type: "Corrupted Saturday Day Pass",
-      createdAt: now,
+      createdAt: now.toJSDate(),
     })
     .then((res) => {
       return { message: `successfully updated transactions` };

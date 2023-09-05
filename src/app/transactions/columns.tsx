@@ -93,7 +93,7 @@ export const columns: ColumnDef<Transaction>[] = [
     header: "Transaction Date",
     cell: ({ row }) => {
       const date = new Date(row.original.date);
-      date.setHours(date.getHours() - 5);
+      // date.setHours(date.getHours() - 5);
       return <div>{date.toLocaleString()}</div>;
     },
   },

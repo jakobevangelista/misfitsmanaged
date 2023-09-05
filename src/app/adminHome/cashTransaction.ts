@@ -11,6 +11,7 @@ import { User } from "./columns";
 import { Row } from "@tanstack/table-core/build/lib/types";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { DateTime } from "luxon";
 
 export async function cashTransactionWater(formdata: FormData) {
   //   console.log(row.original.emailAddress);
@@ -37,17 +38,20 @@ export async function cashTransactionWater(formdata: FormData) {
 
 export async function cashTransactionDayPass(emailAddress: string) {
   //   console.log(row.original.emailAddress);
-  const now = new Date();
+  // const now = new Date();
 
-  const tomorrow = new Date();
-  tomorrow.setHours(tomorrow.getHours() + 24);
-  const localNow = new Date(now.toLocaleString());
-  localNow.setHours(localNow.getHours() - 5);
-  const localTomorrow = new Date(tomorrow.toLocaleString());
-  localTomorrow.setHours(localTomorrow.getHours() - 5);
+  // const tomorrow = new Date();
+  // tomorrow.setHours(tomorrow.getHours() + 24);
+  // const localNow = new Date(now.toLocaleString());
+  // localNow.setHours(localNow.getHours() - 5);
+  // const localTomorrow = new Date(tomorrow.toLocaleString());
+  // localTomorrow.setHours(localTomorrow.getHours() - 5);
   // console.log(localNow.toLocaleString());
   // console.log(localTomorrow.toLocaleString());
   // return;
+
+  const now = DateTime.now().setZone("America/Chicago");
+  const tomorrow = now.plus({ days: 1 });
   const customerId = await db.query.members.findFirst({
     where: eq(members.emailAddress, emailAddress),
     columns: {
@@ -60,8 +64,8 @@ export async function cashTransactionDayPass(emailAddress: string) {
     ownerId: customerId!.customerId!,
     status: "active",
     type: "Day Pass",
-    startDate: localNow,
-    endDate: localTomorrow,
+    startDate: now.toJSDate(),
+    endDate: tomorrow.toJSDate(),
     stripeId: Math.random().toString(),
   });
   await db
@@ -69,10 +73,10 @@ export async function cashTransactionDayPass(emailAddress: string) {
     .values({
       ownerId: emailAddress,
       amount: 1500,
-      date: now.toLocaleString(),
+      date: now.toLocaleString(DateTime.DATETIME_SHORT),
       paymentMethod: "cash",
       type: "Day Pass",
-      createdAt: now,
+      createdAt: now.toJSDate(),
     })
     .then((res) => {
       return { message: `successfully updated transactions` };

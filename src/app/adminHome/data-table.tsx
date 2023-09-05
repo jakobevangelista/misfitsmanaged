@@ -40,15 +40,23 @@ import { useRouter } from "next/navigation";
 import { db } from "@/db";
 import { contracts, members } from "@/db/schema/members";
 import { eq } from "drizzle-orm";
+import Menu from "./menu";
+import { useState } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  products: {
+    name: string;
+    priceId: string;
+    price: number;
+  }[];
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  products,
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -58,6 +66,7 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+
   const table = useReactTable({
     data,
     columns,
@@ -74,7 +83,12 @@ export function DataTable<TData, TValue>({
       columnFilters,
     },
     initialState: {
-      columnVisibility: { realScanId: false, actions: true },
+      columnVisibility: {
+        realScanId: false,
+        actions: true,
+        id: false,
+        profilePicture: false,
+      },
       pagination: { pageSize: 15 },
     },
   });
@@ -168,6 +182,15 @@ export function DataTable<TData, TValue>({
       setSortType("realScanId");
       table.getColumn("realScanId")?.setFilterValue(data);
       table.getColumn("realScanId")?.getFilterValue() as string;
+      setlocalId(table.getRowModel().rows[0].getValue("id"));
+      setlocalEmail(table.getRowModel().rows[0].getValue("emailAddress"));
+      setlocalName(table.getRowModel().rows[0].getValue("name"));
+      setlocalProfilePic(
+        table.getRowModel().rows[0].getValue("profilePicture")
+      );
+      setTimeout(() => {
+        table.getColumn("realScanId")?.setFilterValue("");
+      }, 5000);
     }
   }
 
@@ -182,148 +205,178 @@ export function DataTable<TData, TValue>({
     }
   }
 
+  const [localId, setlocalId] = useState("");
+  const [localEmail, setlocalEmail] = useState("");
+  const [localName, setlocalName] = useState("");
+  const [localProfilePic, setlocalProfilePic] = useState("");
+
   return (
     <>
-      <BarcodeReader onScan={handleScan} />
+      <div className="flex flex-row">
+        <div className="outline-zinc-800 outline outline-1">
+          <BarcodeReader onScan={handleScan} />
 
-      <div className="flex items-center py-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button className="ml-1" variant="outline">
-              Search By:
-              {filterBadge(sortType)}
-              <MoveDown />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={() => setSortType("realScanId")}>
-              ID
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSortType("name")}>
-              Name
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSortType("email")}>
-              Email
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        {sortByFilters(sortType)}
+          <div className="flex items-center py-4">
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button className="ml-1" variant="outline">
+                  Search By:
+                  {filterBadge(sortType)}
+                  <MoveDown />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setSortType("realScanId")}>
+                  ID
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortType("name")}>
+                  Name
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortType("email")}>
+                  Email
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            {sortByFilters(sortType)}
 
-        <div className="ml-auto">
-          {" "}
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button variant="outline">
-                Filter Contracts By:
-                {specificFilterBadge()}
-                <MoveDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => {
-                  setSpecificSortType("");
-                  table.getColumn("contractStatus")?.setFilterValue("");
-                }}
-              >
-                All
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  setSpecificSortType("Unpaid");
-                  table.getColumn("contractStatus")?.setFilterValue("Unpaid");
-                }}
-              >
-                Unpaid
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
+            <div className="ml-auto">
+              {" "}
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button variant="outline">
+                    Filter Contracts By:
+                    {specificFilterBadge()}
+                    <MoveDown />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSpecificSortType("");
+                      table.getColumn("contractStatus")?.setFilterValue("");
+                    }}
+                  >
+                    All
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setSpecificSortType("Unpaid");
+                      table
+                        .getColumn("contractStatus")
+                        ?.setFilterValue("Unpaid");
+                    }}
+                  >
+                    Unpaid
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                      onClick={() => {
+                        // console.log("for later");
+                        // const date = new Date();
+                        // console.log(date.toLocaleString());
+                        // router.push(`/adminHome/${row.original}`);
+                        // console.log(row.original.id);
+                        setlocalId(row.getValue("id"));
+                        setlocalEmail(row.getValue("emailAddress"));
+                        setlocalName(row.getValue("name"));
+                        setlocalProfilePic(row.getValue("profilePicture"));
+                      }}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
                           )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  onClick={() => {
-                    // console.log("for later");
-                    // const date = new Date();
-                    // console.log(date.toLocaleString());
-                    // router.push(`/adminHome/${row.original}`);
-                    // console.log(row.original.id);
-                  }}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      No results.
                     </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-            {/* </tr> */}
-          </TableBody>
-        </Table>
-      </div>
+                  </TableRow>
+                )}
+                {/* </tr> */}
+              </TableBody>
+            </Table>
+          </div>
 
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <span className="flex items-center gap-1">
-          <div>Page</div>
-          <strong>
-            {table.getState().pagination.pageIndex + 1} of{" "}
-            {table.getPageCount()}
-          </strong>
-        </span>
-        <div className="space-x-2 pr-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <span className="flex items-center gap-1">
+              <div>Page</div>
+              <strong>
+                {table.getState().pagination.pageIndex + 1} of{" "}
+                {table.getPageCount()}
+              </strong>
+            </span>
+            <div className="space-x-2 pr-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        </div>
+        {/* <Input
+          value={fakeProp}
+          onChange={(e) => {
+            setFakeProp(e.target.value);
+          }}
+        ></Input> */}
+        <div className="hidden flex-none mx-auto xl:flex xl:w-fulll xl:mx-auto">
+          <Menu
+            id={localId}
+            email={localEmail}
+            name={localName}
+            profilePic={localProfilePic}
+            products={products}
+          />
         </div>
       </div>
     </>

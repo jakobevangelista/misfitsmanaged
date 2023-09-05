@@ -14,7 +14,8 @@ import { customCheckoutPost, postData } from "../../../utils/helpers";
 import CustomButton from "./customButton";
 import { DataTableWithColumns } from "./columns";
 import { stripe } from "../../../utils/stripe";
-export const revalidate = 5; // revalidate this page every 15 seconds
+import { desc } from "drizzle-orm";
+export const revalidate = 2; // revalidate this page every 2 seconds
 // export const dynamic = "force-dynamic";
 
 async function getData(): Promise<User[]> {
@@ -28,6 +29,7 @@ async function getData(): Promise<User[]> {
       emailAddress: true,
       profilePicture: true,
     },
+    orderBy: [desc(members.id)],
   });
 
   return users;
@@ -72,15 +74,32 @@ async function checkContracts() {
   //   ELSE ${members.contractStatus}
   // END
   // WHERE ${contracts.status} = 'active';`);
+
+  // await db.execute(sql`UPDATE ${members}
+  // LEFT JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
+  // SET ${members.contractStatus} = COALESCE(
+  //   CASE
+  //     WHEN ${contracts.status} = 'active' THEN 'Active: ${contracts.type}'
+  //     ELSE ${members.contractStatus}
+  //   END,
+  //   'none'
+  // );`);
+
   await db.execute(sql`UPDATE ${members}
-  LEFT JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
-  SET ${members.contractStatus} = COALESCE(
-    CASE
-      WHEN ${contracts.status} = 'active' THEN 'active'
-      ELSE ${members.contractStatus}
-    END,
-    'none'
-  );`);
+SET ${members.contractStatus} = (
+  SELECT CONCAT('Active: ', ${contracts.type})
+  FROM ${contracts}
+  WHERE ${contracts.ownerId} = ${members.customerId}
+    AND ${contracts.status} = 'active'
+  LIMIT 1
+)
+WHERE EXISTS (
+  SELECT 1
+  FROM ${contracts}
+  WHERE ${contracts.ownerId} = ${members.customerId}
+    AND ${contracts.status} = 'active'
+  LIMIT 1
+);`);
 }
 
 async function getProducts() {
@@ -159,7 +178,7 @@ export default async function AdminHome() {
 
           <CustomButton />
         </div>
-        <div className="mx-auto py-10">
+        <div className="mx-auto my-10 ">
           {/* <DataTable columns={columns} data={data} /> */}
           <DataTableWithColumns data={data} products={products} />
         </div>

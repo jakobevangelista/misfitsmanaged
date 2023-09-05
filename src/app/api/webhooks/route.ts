@@ -18,6 +18,8 @@ import {
 import { check } from "drizzle-orm/mysql-core";
 import { revalidate } from "@/app/transactions/data-table";
 import { revalidatePath } from "next/cache";
+import { DateTime } from "luxon";
+
 /// <reference types="stripe-event-types" />
 
 const relevantEvents = new Set([
@@ -54,9 +56,7 @@ export async function POST(req: Request) {
     case "checkout.session.completed":
       const checkoutSession = event.data.object as Stripe.Checkout.Session;
 
-      const now = new Date();
-      const date = new Date(now);
-      // date.setHours(date.getHours() - 5);
+      const now = DateTime.now().setZone("America/Chicago");
 
       const itemsPurchased = await stripe.checkout.sessions.listLineItems(
         checkoutSession.id,
@@ -72,10 +72,10 @@ export async function POST(req: Request) {
         await db.insert(transactions).values({
           ownerId: event.data.object.customer_details?.email || " ",
           amount: itemsPurchased.data[i].amount_total,
-          date: date.toLocaleString(),
+          date: now.toLocaleString(DateTime.DATETIME_SHORT),
           paymentMethod: "card",
           type: itemName.name,
-          createdAt: new Date(checkoutSession.created * 1000),
+          createdAt: now.toJSDate(),
           quantity: itemsPurchased.data[i].quantity,
         });
       }
@@ -113,15 +113,16 @@ export async function POST(req: Request) {
 
       if (subscriptionCreated?.name === "5 Day Pass") {
         console.log("WE MADE IT HERE WOOOOOO");
-        const futureDate = new Date();
-        futureDate.setFullYear(futureDate.getFullYear() + 10);
+        const now = DateTime.now().setZone("America/Chicago");
+        const futureDate = now.plus({ years: 10 });
+
         await db.insert(contracts).values({
           ownerId: customerSubscriptionCreated.customer as string,
           stripeId: customerSubscriptionCreated.id,
           status: "Limited",
           type: "5 Day Pass",
-          startDate: new Date(),
-          endDate: futureDate,
+          startDate: now.toJSDate(),
+          endDate: futureDate.toJSDate(),
           remainingDays: 5,
         });
         // await db
@@ -190,12 +191,12 @@ export async function POST(req: Request) {
         await db.insert(transactions).values({
           ownerId: chargeSucceeded.receipt_email as string,
           amount: totalAmount,
-          // date: new Date().toLocaleString(),
-          date: new Date(chargeSucceeded.created * 1000).toLocaleString(),
+          date: DateTime.now()
+            .setZone("America/Chicago")
+            .toLocaleString(DateTime.DATETIME_SHORT),
           paymentMethod: "card",
           type: singleProductAmount!.name,
-          // createdAt: new Date(),
-          createdAt: new Date(chargeSucceeded.created * 1000),
+          createdAt: DateTime.now().setZone("America/Chicago").toJSDate(),
           quantity: priceData.quantity,
         });
       }

@@ -60,8 +60,8 @@ export default function WebCamComponent(props: { userId: number }) {
           <>
             <Webcam
               className="mx-auto m-4"
-              height={600}
-              width={600}
+              // height={720}
+              // width={1280}
               ref={webcamRef}
             />
             <Button className="m-4 mx-auto" onClick={capture}>

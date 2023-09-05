@@ -25,6 +25,7 @@ export default function ImageUpload(props: { userId: number }) {
       reader.onload = (e) => {
         const dataUrl = e.target!.result as string;
         setImageDataUrl(dataUrl); // Set the data URL in the state
+        // setImageDataUrl(compressed); // Set the data URL in the state
       };
 
       // Read the file as a data URL

@@ -92,7 +92,7 @@ export function DataTable<TData, TValue>({
       pagination: { pageSize: 15 },
     },
   });
-
+  const [searchId, setSearchId] = useState("");
   function sortByFilters(type: String) {
     switch (type) {
       case "email":
@@ -131,19 +131,61 @@ export function DataTable<TData, TValue>({
       case "realScanId":
         console.log(table.getColumn("realScanId")?.getFilterValue() as string);
         return (
-          <Input
-            autoFocus
-            placeholder="Search ID's..."
-            value={
-              (table.getColumn("realScanId")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) => {
-              table.getColumn("emailAddress")?.setFilterValue("");
-              table.getColumn("name")?.setFilterValue("");
-              table.getColumn("realScanId")?.setFilterValue(event.target.value);
-            }}
-            className="max-w-sm"
-          />
+          <>
+            <form
+              className="hidden xl:block w-full"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setlocalId(table.getRowModel().rows[0].getValue("id"));
+                setlocalEmail(
+                  table.getRowModel().rows[0].getValue("emailAddress")
+                );
+                setlocalName(table.getRowModel().rows[0].getValue("name"));
+                setlocalProfilePic(
+                  table.getRowModel().rows[0].getValue("profilePicture")
+                );
+                setLocalContractStatus(
+                  table.getRowModel().rows[0].getValue("contractStatus")
+                );
+                setTimeout(() => {
+                  table.getColumn("realScanId")?.setFilterValue("");
+                }, 500);
+              }}
+            >
+              <Input
+                autoFocus
+                placeholder="Search ID's..."
+                value={
+                  (table.getColumn("realScanId")?.getFilterValue() as string) ??
+                  ""
+                }
+                onChange={(event) => {
+                  table.getColumn("emailAddress")?.setFilterValue("");
+                  table.getColumn("name")?.setFilterValue("");
+                  table
+                    .getColumn("realScanId")
+                    ?.setFilterValue(event.target.value);
+                }}
+                className="w-full"
+              />
+            </form>
+            <Input
+              autoFocus
+              placeholder="Search ID's..."
+              value={
+                (table.getColumn("realScanId")?.getFilterValue() as string) ??
+                ""
+              }
+              onChange={(event) => {
+                table.getColumn("emailAddress")?.setFilterValue("");
+                table.getColumn("name")?.setFilterValue("");
+                table
+                  .getColumn("realScanId")
+                  ?.setFilterValue(event.target.value);
+              }}
+              className="xl:hidden"
+            />
+          </>
         );
       // default:
       //   return (
@@ -175,22 +217,23 @@ export function DataTable<TData, TValue>({
     }
   }
   function handleScan(data: string) {
-    router.refresh();
+    // router.refresh();
     if (data) {
       table.getColumn("emailAddress")?.setFilterValue("");
       table.getColumn("name")?.setFilterValue("");
+      table.getColumn("realScanId")?.setFilterValue("");
       setSortType("realScanId");
       table.getColumn("realScanId")?.setFilterValue(data);
       table.getColumn("realScanId")?.getFilterValue() as string;
-      setlocalId(table.getRowModel().rows[0].getValue("id"));
-      setlocalEmail(table.getRowModel().rows[0].getValue("emailAddress"));
-      setlocalName(table.getRowModel().rows[0].getValue("name"));
-      setlocalProfilePic(
-        table.getRowModel().rows[0].getValue("profilePicture")
-      );
-      setTimeout(() => {
-        table.getColumn("realScanId")?.setFilterValue("");
-      }, 5000);
+      // setlocalId(table.getRowModel().rows[0].getValue("id"));
+      // setlocalEmail(table.getRowModel().rows[0].getValue("emailAddress"));
+      // setlocalName(table.getRowModel().rows[0].getValue("name"));
+      // setlocalProfilePic(
+      //   table.getRowModel().rows[0].getValue("profilePicture")
+      // );
+      // setTimeout(() => {
+      //   table.getColumn("realScanId")?.setFilterValue("");
+      // }, 5000);
     }
   }
 
@@ -209,6 +252,7 @@ export function DataTable<TData, TValue>({
   const [localEmail, setlocalEmail] = useState("");
   const [localName, setlocalName] = useState("");
   const [localProfilePic, setlocalProfilePic] = useState("");
+  const [localContractStatus, setLocalContractStatus] = useState("");
 
   return (
     <>
@@ -244,7 +288,7 @@ export function DataTable<TData, TValue>({
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Button variant="outline">
-                    Filter Contracts By:
+                    Filter Contracts:
                     {specificFilterBadge()}
                     <MoveDown />
                   </Button>
@@ -308,6 +352,7 @@ export function DataTable<TData, TValue>({
                         setlocalEmail(row.getValue("emailAddress"));
                         setlocalName(row.getValue("name"));
                         setlocalProfilePic(row.getValue("profilePicture"));
+                        setLocalContractStatus(row.getValue("contractStatus"));
                       }}
                     >
                       {row.getVisibleCells().map((cell) => (
@@ -376,6 +421,7 @@ export function DataTable<TData, TValue>({
             name={localName}
             profilePic={localProfilePic}
             products={products}
+            contractStatus={localContractStatus}
           />
         </div>
       </div>

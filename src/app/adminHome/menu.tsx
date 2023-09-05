@@ -103,6 +103,7 @@ export default function Menu(props: {
     priceId: string;
     price: number;
   }[];
+  contractStatus: string;
 }) {
   const { toast } = useToast();
   const [multiCashAmount, setMultiCashAmount] = useState<number>(0);
@@ -242,6 +243,53 @@ export default function Menu(props: {
     }
   };
 
+  function renderStatus(contractStatus: string) {
+    if (contractStatus.toLowerCase().includes("active")) {
+      return (
+        <Badge className="text-xl" variant="active">
+          {contractStatus}
+        </Badge>
+      );
+    }
+    switch (contractStatus) {
+      case "active":
+        return (
+          <Badge className="text-xl" variant="active">
+            Active
+          </Badge>
+        );
+      case "inactive":
+      case "Inactive":
+        return (
+          <Badge className="text-xl" variant="inactive">
+            Inactive
+          </Badge>
+        );
+      case "Limited":
+        return (
+          <Badge className="text-xl" variant="limited">
+            Limited
+          </Badge>
+        );
+      case "Unpaid":
+      case "unpaid":
+        return (
+          <Badge className="text-xl" variant="destructive">
+            Unpaid
+          </Badge>
+        );
+      case "incomplete":
+        return (
+          <Badge className="text-xl" variant="destructive">
+            Incomplete
+          </Badge>
+        );
+
+      default:
+        return <Badge className="text-xl">None</Badge>;
+    }
+  }
+
   if (
     props.id === "" ||
     props.email === "" ||
@@ -259,9 +307,15 @@ export default function Menu(props: {
   return (
     <>
       <div className="flex flex-col outline outline-zinc-800 outline-offset-8 outline-1 rounded-md m-4">
-        <h1 className="p-4 scroll-m-20 mx-auto text-4xl font-extrabold tracking-tight lg:text-5xl">
-          {props.name}
-        </h1>
+        <div className="mx-auto">
+          <h1 className="flex flex-row p-4 scroll-m-20 mx-auto text-4xl font-extrabold tracking-tight lg:text-5xl">
+            {props.name}
+          </h1>
+          <div className="text-center">
+            {renderStatus(props.contractStatus)}
+          </div>
+        </div>
+
         <div className="mx-auto">
           {props.profilePic ? (
             <Image
@@ -366,6 +420,7 @@ export default function Menu(props: {
                       // quickDayPassCashTransactionForm.reset();
                     }}
                     type="submit"
+                    className="text-white"
                   >
                     Transact Cash Day Pass
                   </Button>

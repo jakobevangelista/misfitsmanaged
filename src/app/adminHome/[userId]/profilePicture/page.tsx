@@ -1,5 +1,4 @@
 import Link from "next/link";
-import WebCamComponent from "./webCam";
 import { buttonVariants } from "@/components/ui/button";
 import { MoveLeft } from "lucide-react";
 import ImageUpload from "./imageUpload";
@@ -21,9 +20,8 @@ export default function WebcamCapture({
           </Link>
         </div>
         <div className="scroll-m-20 mx-auto text-4xl font-extrabold tracking-tight lg:text-5xl">
-          Profile Picture:
+          Upload an Image to Set Profile Picture:
         </div>
-        <WebCamComponent userId={params.userId} />
         <ImageUpload userId={params.userId} />
       </div>
     </>

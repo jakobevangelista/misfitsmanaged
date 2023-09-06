@@ -420,7 +420,6 @@ export default function Menu(props: {
                       // quickDayPassCashTransactionForm.reset();
                     }}
                     type="submit"
-                    className="text-white"
                   >
                     Transact Cash Day Pass
                   </Button>

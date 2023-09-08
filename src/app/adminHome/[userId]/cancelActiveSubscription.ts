@@ -27,5 +27,5 @@ export async function cancelActiveSubscription(
     })
     .where(eq(members.customerId, ownerId));
   revalidatePath(`/adminHome`);
-  revalidatePath(`/adminHome/[userId]`);
+  revalidatePath(`/adminHome/${ownerId}`);
 }

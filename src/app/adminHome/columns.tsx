@@ -156,11 +156,15 @@ export const DataTableWithColumns = (props: {
       },
       cell: ({ row }) => {
         function renderStatus(contractStatus: string) {
-          if (contractStatus.toLowerCase().includes("active")) {
+          // if (contractStatus.toLowerCase() === "inactive") {
+          //   return <Badge variant="inactive">{contractStatus}</Badge>;
+          // }
+          if (contractStatus.toLowerCase().includes("active:")) {
             return <Badge variant="active">{contractStatus}</Badge>;
           }
+
           switch (contractStatus) {
-            case "active":
+            case "Active":
               return <Badge variant="active">Active</Badge>;
             case "inactive":
             case "Inactive":
@@ -174,7 +178,7 @@ export const DataTableWithColumns = (props: {
               return <Badge variant="destructive">Incomplete</Badge>;
 
             default:
-              return <Badge>None</Badge>;
+              return <Badge>{contractStatus}</Badge>;
           }
         }
         return <>{renderStatus(row.getValue("contractStatus"))}</>;

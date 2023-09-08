@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
 import { cancelActiveSubscription } from "./cancelActiveSubscription";
+import { upgradeSubscription } from "./upgradeSubscription";
 
 export type Contract = {
   stripeId: string;
@@ -130,18 +131,34 @@ export const columns: ColumnDef<Contract>[] = [
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {row.original.status === "active" ? (
-                <DropdownMenuItem
-                  onClick={() =>
-                    startTransition(() =>
-                      cancelActiveSubscription(
-                        row.original.stripeId,
-                        row.original.ownerId
+                <>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      startTransition(() =>
+                        cancelActiveSubscription(
+                          row.original.stripeId,
+                          row.original.ownerId
+                        )
                       )
-                    )
-                  }
-                >
-                  Cancel Membership
-                </DropdownMenuItem>
+                    }
+                  >
+                    Cancel Membership
+                  </DropdownMenuItem>
+                  {row.original.type.includes("Month-to-Month") ? (
+                    <DropdownMenuItem
+                      onClick={() =>
+                        startTransition(() =>
+                          upgradeSubscription(
+                            row.original.stripeId,
+                            row.original.ownerId
+                          )
+                        )
+                      }
+                    >
+                      Upgrade Membership to Yearly
+                    </DropdownMenuItem>
+                  ) : null}
+                </>
               ) : null}
 
               {isDaysLeft ? (

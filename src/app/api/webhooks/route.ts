@@ -94,6 +94,9 @@ export async function POST(req: Request) {
     case "customer.subscription.created":
       const customerSubscriptionCreated = event.data
         .object as Stripe.Subscription;
+      const subscriptionCreatedId = customerSubscriptionCreated.id as string;
+      const subscriptionCreatedCustomer =
+        customerSubscriptionCreated.customer as string;
       console.log(customerSubscriptionCreated);
       const subscriptionCreated = await db.query.products.findFirst({
         where: eq(
@@ -141,7 +144,10 @@ export async function POST(req: Request) {
         //     )
         //   );
       }
+      manageSubscription(subscriptionCreatedId!, subscriptionCreatedCustomer!);
+
       revalidatePath(`/adminHome`);
+      return NextResponse.json({ processed: "customer.subscription.created" });
 
       break;
     case "customer.subscription.updated":
@@ -153,6 +159,7 @@ export async function POST(req: Request) {
       const customer = subscriptionUpdate.customer as string;
       manageSubscription(subscriptionId!, customer!);
       revalidatePath(`/adminHome`);
+      return NextResponse.json({ processed: "customer.subscription.updated" });
 
       break;
 
@@ -164,6 +171,7 @@ export async function POST(req: Request) {
       const customerDelete = subscriptionDelete.customer as string;
       manageSubscription(subscriptionIdDelete!, customerDelete!);
       revalidatePath(`/adminHome`);
+      return NextResponse.json({ processed: "customer.subscription.deleted" });
 
       break;
 
@@ -273,6 +281,12 @@ export async function POST(req: Request) {
         .where(
           eq(contracts.stripeId, invoicePaymentFailed.subscription as string)
         );
+      await db
+        .update(members)
+        .set({
+          contractStatus: "Unpaid",
+        })
+        .where(eq(members.customerId, invoicePaymentFailed.customer as string));
 
       await stripe.subscriptions.update(
         invoicePaymentFailed.subscription as string,
@@ -287,6 +301,23 @@ export async function POST(req: Request) {
           contractStatus: "Unpaid",
         })
         .where(eq(members.customerId, invoicePaymentFailed.customer as string));
+      revalidatePath(`/adminHome`);
+      break;
+    case "invoice.paid":
+      const invoicePaid = event.data.object as Stripe.Invoice;
+      const invoicePaidSubscription = await stripe.subscriptions.retrieve(
+        invoicePaid.subscription as string
+      );
+      await db
+        .update(contracts)
+        .set({
+          status: "Active",
+          startDate: new Date(
+            invoicePaidSubscription.current_period_start * 1000
+          ),
+          endDate: new Date(invoicePaidSubscription.current_period_end * 1000),
+        })
+        .where(eq(contracts.stripeId, invoicePaid.subscription as string));
       revalidatePath(`/adminHome`);
       break;
   }

@@ -2,12 +2,8 @@ import { stripe } from "../../../../utils/stripe";
 import { getURL } from "../../../../utils/helpers";
 import { currentUser } from "@clerk/nextjs";
 import { createOrRetrieveCustomer } from "../../../../utils/dbHelper";
-import { members } from "@/db/schema/members";
-import { eq } from "drizzle-orm";
-import { db } from "@/db";
 import { revalidatePath } from "next/cache";
-import { SYSTEM_ENTRYPOINTS } from "next/dist/shared/lib/constants";
-import { type } from "os";
+import { DateTime } from "luxon";
 
 export async function POST(req: Request) {
   if (req.method === "POST") {
@@ -42,12 +38,57 @@ export async function POST(req: Request) {
     try {
       for (let i = 0; i < data.arg.cartItems.length; i++) {
         if (
-          data.arg.cartItems[i].price === "price_1NYRbKD5u1cDehOfapzIEhrJ" ||
+          data.arg.cartItems[i].price === "price_1NYRbKD5u1cDehOfapzIEhrJ" || // yearly membership
           data.arg.cartItems[i].price === "price_1NYRcWD5u1cDehOfiPRDAB3v" ||
-          data.arg.cartItems[i].price === "price_1NYRbrD5u1cDehOfLWSsrUWc" || 
+          data.arg.cartItems[i].price === "price_1NYRbrD5u1cDehOfLWSsrUWc" ||
           data.arg.cartItems[i].price === "price_1NdRU4D5u1cDehOfQPQPLvIz" ||
-          data.arg.cartItems[i].price === "price_1NjPG7D5u1cDehOf42qaFmXy" 
+          data.arg.cartItems[i].price === "price_1NjPG7D5u1cDehOf42qaFmXy" // corrupted saturday
         ) {
+          if (
+            data.arg.cartItems[i].price === "price_1NYRcWD5u1cDehOfiPRDAB3v"
+          ) {
+            const now = DateTime.now().setZone("America/Chicago");
+            const startOfTheNextMonth = now
+              .plus({ months: 1 })
+              .startOf("month");
+
+            let session;
+            session = await stripe.checkout.sessions.create({
+              payment_method_types: ["card"],
+              billing_address_collection: "required",
+              customer,
+              customer_update: {
+                address: "auto",
+              },
+              line_items: data.arg.cartItems,
+
+              mode: "subscription",
+              allow_promotion_codes: true,
+              // payment_intent_data: {
+              //   setup_future_usage: "off_session",
+              // },
+              success_url: `${getURL()}/adminHome`,
+              cancel_url: `${getURL()}/adminHome`,
+              subscription_data: {
+                billing_cycle_anchor: startOfTheNextMonth.toUnixInteger(),
+              },
+            });
+
+            if (session) {
+              revalidatePath("/adminHome");
+              revalidatePath("/transactions");
+              return new Response(JSON.stringify({ sessionId: session.id }), {
+                status: 200,
+              });
+            } else {
+              return new Response(
+                JSON.stringify({
+                  error: { statusCode: 500, message: "Session is not defined" },
+                }),
+                { status: 500 }
+              );
+            }
+          }
           let session;
           session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],

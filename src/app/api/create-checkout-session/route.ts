@@ -6,9 +6,7 @@ import { members } from "@/db/schema/members";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { revalidatePath } from "next/cache";
-import { SYSTEM_ENTRYPOINTS } from "next/dist/shared/lib/constants";
-import { redirect, useRouter } from "next/navigation";
-import { NextResponse } from "next/server";
+import { DateTime } from "luxon";
 
 export async function POST(req: Request) {
   if (req.method === "POST") {
@@ -52,7 +50,8 @@ export async function POST(req: Request) {
           },
           line_items: [
             {
-              price: "price_1NYRbrD5u1cDehOfLWSsrUWc", // month to month membership
+              // price: "price_1NYRbrD5u1cDehOfLWSsrUWc", // live mode month to month membership
+              price: "price_1NVLLCD5u1cDehOfchFtQrz6", // test mode month to month membership
               quantity: 1,
             },
           ],
@@ -64,6 +63,52 @@ export async function POST(req: Request) {
           // },
           success_url: `${getURL()}/adminHome`,
           cancel_url: `${getURL()}/adminHome`,
+        });
+
+        if (session) {
+          revalidatePath("/adminHome");
+          revalidatePath("/transactions");
+          return new Response(JSON.stringify({ sessionId: session.id }), {
+            status: 200,
+          });
+        } else {
+          return new Response(
+            JSON.stringify({
+              error: { statusCode: 500, message: "Session is not defined" },
+            }),
+            { status: 500 }
+          );
+        }
+      } else if (data.data === "yearly") {
+        console.log("here");
+        const now = DateTime.now().setZone("America/Chicago");
+        const startOfTheNextMonth = now.plus({ months: 1 }).startOf("month");
+
+        let session;
+        session = await stripe.checkout.sessions.create({
+          payment_method_types: ["card"],
+          billing_address_collection: "required",
+          customer,
+          customer_update: {
+            address: "auto",
+          },
+          line_items: [
+            {
+              price: "price_1NVLLzD5u1cDehOfDPCQ0SGN", // test mode yearly membership
+              quantity: 1,
+            },
+          ],
+
+          mode: "subscription",
+          allow_promotion_codes: true,
+          // payment_intent_data: {
+          //   setup_future_usage: "off_session",
+          // },
+          success_url: `${getURL()}/adminHome`,
+          cancel_url: `${getURL()}/adminHome`,
+          subscription_data: {
+            billing_cycle_anchor: startOfTheNextMonth.toUnixInteger(),
+          },
         });
 
         if (session) {
@@ -93,6 +138,7 @@ export async function POST(req: Request) {
             {
               // price: "price_1NYRaXD5u1cDehOfi3XqF0jV", // personal test mode
               price: "price_1NJ5vUD5u1cDehOfPyC6RenZ", // cs live mode
+              // price: "price_1NVLLzD5u1cDehOfDPCQ0SGN", // cs test mode yearly subscriptions
               quantity: 1,
             },
           ],

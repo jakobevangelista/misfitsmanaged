@@ -10,11 +10,10 @@ import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { RefreshPage } from "./refresh-page";
-import { customCheckoutPost, postData } from "../../../utils/helpers";
 import CustomButton from "./customButton";
 import { DataTableWithColumns } from "./columns";
-import { stripe } from "../../../utils/stripe";
 import { desc } from "drizzle-orm";
+import { DateTime } from "luxon";
 export const revalidate = 2; // revalidate this page every 2 seconds
 // export const dynamic = "force-dynamic";
 
@@ -36,29 +35,7 @@ async function getData(): Promise<User[]> {
 }
 
 async function checkContracts() {
-  const today = new Date();
-
-  // await db.execute(sql`UPDATE ${members}
-  // LEFT JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
-  // SET ${members.contractStatus} = COALESCE(${contracts.status}, 'none');`);
-  await db
-    .update(contracts)
-    .set({ status: "Inactive" })
-    .where(lt(contracts.endDate, today));
-
-  // await db.execute(sql`update ${members}
-  // set ${members.contractStatus} = (
-  //   case
-  //     when (
-  //       select ${contracts.status}
-  //       from ${contracts}
-  //       where ${contracts.ownerId} = ${members.customerId} AND ${contracts.status} = 'active' OR ${contracts.status} = 'limited'
-  //       limit 1
-  //     ) is not null then 'active'
-  //     else 'none'
-  //   END
-  // )`);
-
+  const today = DateTime.now().setZone("America/Chicago").toJSDate();
   await db.execute(sql`UPDATE ${contracts}
   SET ${contracts.status} = (
     CASE
@@ -67,39 +44,34 @@ async function checkContracts() {
     END
   )
   WHERE ${contracts.remainingDays} IS NOT NULL;`);
-  // await db.execute(sql`UPDATE ${members}
-  // JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
-  // SET ${members.contractStatus} = CASE
-  //   WHEN ${contracts.status} = 'active' THEN 'Active'
-  //   ELSE ${members.contractStatus}
-  // END
-  // WHERE ${contracts.status} = 'active';`);
 
-  // await db.execute(sql`UPDATE ${members}
-  // LEFT JOIN ${contracts} ON ${members.customerId} = ${contracts.ownerId}
-  // SET ${members.contractStatus} = COALESCE(
-  //   CASE
-  //     WHEN ${contracts.status} = 'active' THEN 'Active: ${contracts.type}'
-  //     ELSE ${members.contractStatus}
-  //   END,
-  //   'none'
-  // );`);
+  await db
+    .update(contracts)
+    .set({ status: "Inactive" })
+    .where(lt(contracts.endDate, today));
 
   await db.execute(sql`UPDATE ${members}
-SET ${members.contractStatus} = (
-  SELECT CONCAT('Active: ', ${contracts.type})
-  FROM ${contracts}
-  WHERE ${contracts.ownerId} = ${members.customerId}
-    AND ${contracts.status} = 'active'
-  LIMIT 1
-)
-WHERE EXISTS (
-  SELECT 1
-  FROM ${contracts}
-  WHERE ${contracts.ownerId} = ${members.customerId}
-    AND ${contracts.status} = 'active'
-  LIMIT 1
-);`);
+  SET ${members.contractStatus} =
+      CASE
+          WHEN EXISTS (
+              SELECT 1
+              FROM ${contracts}
+              WHERE ${members.customerId} = ${contracts.ownerId}
+              AND ${contracts.status} != 'Inactive'
+          ) THEN (
+            SELECT CONCAT('Active: ', ${contracts.type})
+            FROM ${contracts}
+            WHERE ${members.customerId} = ${contracts.ownerId}
+            AND ${contracts.status} != 'Inactive'
+            LIMIT 1
+        )
+          WHEN NOT EXISTS (
+              SELECT 1
+              FROM ${contracts}
+              WHERE ${members.customerId} = ${contracts.ownerId}
+          ) THEN 'None'
+          ELSE 'Inactive'
+      END;`);
 }
 
 async function getProducts() {

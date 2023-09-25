@@ -11,13 +11,14 @@ export async function cancelActiveSubscription(
   ownerId: string
 ) {
   // await stripe.subscriptions.cancel(subscription);
-  await stripe.subscriptions.update(subscription, {
+  const updatedSubscription = await stripe.subscriptions.update(subscription, {
     cancel_at_period_end: true,
   });
   await db
     .update(contracts)
     .set({
       status: "Ending at the end of the billing period",
+      type: `Ending at the end of the billing period`,
     })
     .where(eq(contracts.stripeId, subscription));
   await db

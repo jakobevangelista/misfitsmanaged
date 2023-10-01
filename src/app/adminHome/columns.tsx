@@ -67,6 +67,7 @@ import {
   cashTransactionWater,
   cashTransactionDayPass,
   cashTransactionCustom,
+  cashTransactionCorruptedSaturday,
 } from "./cashTransaction";
 import { useTransition } from "react";
 import { stripe } from "../../../utils/stripe";
@@ -288,7 +289,7 @@ export const DataTableWithColumns = (props: {
           // ✅ This will be type-safe and validated.
           console.log("hwer");
           console.log(values);
-          cashTransactionDayPass(row.original.emailAddress);
+          cashTransactionCorruptedSaturday(row.original.emailAddress);
         };
 
         const checkoutSubmit = async (

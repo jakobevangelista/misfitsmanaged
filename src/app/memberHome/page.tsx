@@ -1,20 +1,23 @@
-import Image from "next/image";
-import { UserButton } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs";
-import { db } from "../../db/index";
-import { eq, and } from "drizzle-orm";
+import { buttonVariants } from "@/components/ui/button";
 import { members } from "@/db/schema/members";
-import { redirect } from "next/navigation";
-import { Button, buttonVariants } from "@/components/ui/button";
-import Link from "next/link";
-import ManageAccountButton from "./ManageAccountButton";
 import { cn } from "@/lib/utils";
+import { UserButton, auth, currentUser, redirectToSignIn } from "@clerk/nextjs";
+import { eq } from "drizzle-orm";
+import Image from "next/image";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { db } from "../../db/index";
+import ManageAccountButton from "./ManageAccountButton";
 
 export default async function Page() {
-  const { userId } = auth();
+  const loggedInUser = await currentUser();
+  if (!loggedInUser) {
+    return redirectToSignIn();
+  }
+  console.log(loggedInUser.id);
 
   const user = await db.query.members.findFirst({
-    where: eq(members.userId, userId!),
+    where: eq(members.userId, loggedInUser.id),
     columns: {
       isWaiverSigned: true,
       qrCodeUrl: true,

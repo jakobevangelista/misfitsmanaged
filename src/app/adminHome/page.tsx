@@ -1,4 +1,4 @@
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, redirectToSignIn } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs";
 import { User } from "./columns";
@@ -113,21 +113,23 @@ async function getProducts() {
 }
 
 export default async function AdminHome() {
-  const { userId } = auth();
   const user = await currentUser();
   const data = await getData();
   const products = await getProducts();
   // console.log(products);
+  if (!user) {
+    return redirectToSignIn();
+  }
 
   const checkAdmin = await db.query.members.findFirst({
-    where: eq(members.userId, userId!),
+    where: eq(members.userId, user.id),
     columns: {
       isAdmin: true,
     },
   });
 
   if (checkAdmin?.isAdmin === false) {
-    redirect("/memberHome");
+    return redirect("/memberHome");
   }
 
   checkContracts();

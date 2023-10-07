@@ -12,7 +12,7 @@ import ManageAccountButton from "./ManageAccountButton";
 export default async function Page() {
   const loggedInUser = await currentUser();
   if (!loggedInUser) {
-    return redirectToSignIn();
+    redirect("/");
   }
   console.log(loggedInUser.id);
 

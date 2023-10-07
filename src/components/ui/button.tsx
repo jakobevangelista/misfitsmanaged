@@ -27,6 +27,10 @@ const buttonVariants = cva(
         creme:
           "bg-[#EFE1B2] text-neutral-50 hover:bg-neutral-900/90 dark:bg-[#EFE1B2] dark:text-neutral-900 dark:hover:bg-[#EFE1B2]/90",
         red: "relative bg-[#EA0607] flex-grow mx-10 text-black hover:bg-[#EA0607]/90",
+        signInRed:
+          "relative bg-[#EA0607] flex-grow mx-16 text-black hover:bg-[#EA0607]/90",
+        signInCreme:
+          "relative bg-[#EFE1B2] flex-grow mx-16 text-neutral-50 hover:bg-neutral-900/90 dark:bg-[#EFE1B2] dark:text-neutral-900 dark:hover:bg-[#EFE1B2]/90",
       },
       size: {
         default: "h-10 px-4 py-2",

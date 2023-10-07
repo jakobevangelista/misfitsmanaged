@@ -28,7 +28,7 @@ export default async function Home() {
           </div>
           <div className="flex mx-auto mb-auto md:m-auto">
             <AuthElement />
-            {/* <SignUp
+            <SignUp
               // afterSignInUrl="/memberHome"
               // afterSignUpUrl='/memberHome'
               appearance={{
@@ -38,7 +38,7 @@ export default async function Home() {
                   b3fm6y: "bg-[#EA0606]",
                 },
               }}
-            /> */}
+            />
           </div>
         </div>
       </div>

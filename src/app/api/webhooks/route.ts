@@ -107,7 +107,9 @@ export async function POST(req: Request) {
       // Then define and call a function to handle the event customer.subscription.created
       if (
         customerSubscriptionCreated.items.data[0].price.recurring?.interval ===
-        "day"
+          "day" ||
+        customerSubscriptionCreated.items.data[0].id ===
+          "price_1NYRbrD5u1cDehOfLWSsrUWc"
       ) {
         await stripe.subscriptions.update(customerSubscriptionCreated.id, {
           cancel_at_period_end: true,

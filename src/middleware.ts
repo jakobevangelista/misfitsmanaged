@@ -1,13 +1,6 @@
 import { authMiddleware } from "@clerk/nextjs/server";
 
-const publicRoutes = [
-  "/",
-  "/sign-in",
-  "/sign-up",
-  "/api(.*)",
-  "/info(.*)",
-  "/proxy(.*)",
-];
+const publicRoutes = ["/api(.*)", "/info(.*)", "/proxy(.*)"];
 
 export default authMiddleware({ publicRoutes });
 

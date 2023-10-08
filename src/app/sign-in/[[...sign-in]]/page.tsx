@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs";
+import { SignIn, auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import AuthElement from "./auth-element";
 
@@ -22,7 +22,7 @@ export default async function Home() {
             Welcome to Misfits Managed!
           </div>
           <div className="flex mx-auto mb-auto md:m-auto">
-            <AuthElement />
+            <SignIn />
           </div>
         </div>
       </div>

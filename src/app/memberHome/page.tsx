@@ -14,7 +14,6 @@ export default async function Page() {
   if (!loggedInUser) {
     redirect("/");
   }
-  console.log(loggedInUser.id);
 
   const user = await db.query.members.findFirst({
     where: eq(members.userId, loggedInUser.id),

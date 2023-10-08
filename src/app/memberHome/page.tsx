@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "../../db/index";
-import ManageAccountButton from "./ManageAccountButton";
+import ManageAccountButton from "../ManageAccountButton";
 
 export default async function Page() {
   const loggedInUser = await currentUser();

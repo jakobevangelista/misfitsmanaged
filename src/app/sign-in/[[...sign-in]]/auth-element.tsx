@@ -13,11 +13,11 @@ const AuthElement = () => {
     <>
       {login === "default" && (
         <div className="flex flex-col space-y-2">
-          <Button variant="signInRed" onClick={() => setLogin("in")}>
-            Sign In
-          </Button>
           <Button variant="signInCreme" onClick={() => setLogin("up")}>
             Sign Up
+          </Button>
+          <Button variant="signInRed" onClick={() => setLogin("in")}>
+            Sign In
           </Button>
         </div>
       )}

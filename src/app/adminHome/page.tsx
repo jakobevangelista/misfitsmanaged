@@ -118,7 +118,7 @@ export default async function AdminHome() {
   const products = await getProducts();
   // console.log(products);
   if (!user) {
-    return redirectToSignIn();
+    redirect("/sign-in");
   }
 
   const checkAdmin = await db.query.members.findFirst({
@@ -129,7 +129,7 @@ export default async function AdminHome() {
   });
 
   if (checkAdmin?.isAdmin === false) {
-    return redirect("/memberHome");
+    redirect("/memberHome");
   }
 
   checkContracts();

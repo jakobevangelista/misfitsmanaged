@@ -17,7 +17,7 @@ export const config = {
      */
     // "/((?!static|.*\\..*|_next|favicon.ico).*)",
     // "/",
-    "/((?!.*\\..*|_next).*)",
+    "/((?!.+\\.[\\w]+$|_next).*)",
     "/",
     "/(api|trpc)(.*)",
   ],

@@ -138,9 +138,9 @@ export default async function AdminHome() {
     <>
       <RefreshPage />
       <div className="flex flex-col">
-        <div className="flex justify-end">
+        {/* <div className="flex justify-end">
           <UserButton afterSignOutUrl="/" />
-        </div>
+        </div> */}
         <div className="flex flex-row m-auto space-x-4">
           <Button className="mx-auto my-4" asChild>
             <Link href="/memberHome">Go to Member View</Link>

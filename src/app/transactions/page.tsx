@@ -33,9 +33,13 @@ export default async function Page() {
   const user = await currentUser();
   const data = await getData();
   // console.log(typeof data[0].date);
+  if (!user) {
+    redirect("/sign-in");
+  }
 
   const checkAdmin = await db.query.members.findFirst({
-    where: eq(members.userId, userId!),
+    where: eq(members.emailAddress, user.emailAddresses[0].emailAddress),
+
     columns: {
       isAdmin: true,
     },

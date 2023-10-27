@@ -61,7 +61,8 @@ export default async function Page({ params }: { params: { userId: string } }) {
   }
 
   const checkAdmin = await db.query.members.findFirst({
-    where: eq(members.userId, user.id),
+    where: eq(members.emailAddress, user.emailAddresses[0].emailAddress),
+
     columns: {
       isAdmin: true,
     },

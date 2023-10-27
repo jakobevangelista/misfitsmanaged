@@ -17,7 +17,10 @@ export default async function Page() {
   console.log(loggedInUser.emailAddresses[0].emailAddress);
 
   const user = await db.query.members.findFirst({
-    where: eq(members.userId, loggedInUser.id),
+    where: eq(
+      members.emailAddress,
+      loggedInUser.emailAddresses[0].emailAddress
+    ),
     columns: {
       isWaiverSigned: true,
       qrCodeUrl: true,

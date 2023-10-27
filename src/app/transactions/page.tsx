@@ -40,12 +40,13 @@ export default async function Page() {
       isAdmin: true,
     },
   });
+  if (!checkAdmin) {
+    redirect("/memberHome");
+  }
 
   if (checkAdmin?.isAdmin === false) {
     redirect("/memberHome");
   }
-
-  console.log(new Date().toString());
 
   return (
     <>

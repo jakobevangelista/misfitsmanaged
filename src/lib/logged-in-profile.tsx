@@ -10,7 +10,6 @@ export const getLoggedInUser = async () => {
   if (!user) {
     return redirectToSignIn();
   }
-  console.log(user.emailAddresses[0].emailAddress);
 
   const profile = await db.query.members.findFirst({
     where: eq(members.emailAddress, user.emailAddresses[0].emailAddress),

@@ -257,7 +257,7 @@ export function DataTable<TData, TValue>({
   return (
     <>
       <div className="flex flex-row">
-        <div className="outline-zinc-800 outline outline-1">
+        <div className="">
           <BarcodeReader onScan={handleScan} />
 
           <div className="flex items-center py-4">

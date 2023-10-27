@@ -14,7 +14,7 @@ export default async function Page() {
   }
 
   const isRegistered = await db.query.members.findFirst({
-    where: eq(members.userId, user.emailAddresses[0].emailAddress),
+    where: eq(members.emailAddress, user.emailAddresses[0].emailAddress),
   });
 
   if (isRegistered) {

@@ -11,6 +11,8 @@ import { DataTable } from "./data-table";
 import { Label } from "@/components/ui/label";
 import { DataTable2 } from "./data-table2";
 import Image from "next/image";
+import { auth, currentUser } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
 async function getUserData(userId: number) {
   const user = await db.query.members.findFirst({
@@ -50,11 +52,27 @@ async function getUserTransactions(emailAddress: string) {
 }
 
 export default async function Page({ params }: { params: { userId: string } }) {
-  console.log(params.userId);
+  const user = await currentUser();
   const userData = await getUserData(Number(params.userId));
   const userContracts = await getUserContracts(userData!.customerId!);
   const userTransactions = await getUserTransactions(userData!.emailAddress!);
-  // console.log(userTransactions);
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const checkAdmin = await db.query.members.findFirst({
+    where: eq(members.userId, user.id),
+    columns: {
+      isAdmin: true,
+    },
+  });
+  if (!checkAdmin) {
+    redirect("/memberHome");
+  }
+
+  if (checkAdmin?.isAdmin === false) {
+    redirect("/memberHome");
+  }
   return (
     <>
       <div className="flex flex-col p-4">
@@ -67,19 +85,20 @@ export default async function Page({ params }: { params: { userId: string } }) {
           </Link>
         </div>
         <div className="flex mx-auto m-2">
-          {userData?.profilePicture ? (
-            <Image
-              src={userData.profilePicture}
-              width={250}
-              height={250}
-              alt="no profile picture"
-              className="rounded-md"
-            />
-          ) : null
-          // <div className="flex flex-col">
-          //   <UserSquare2 className="mx-auto" size={48} />
-          //   <Label>No Profile Picture</Label>
-          // </div>
+          {
+            userData?.profilePicture ? (
+              <Image
+                src={userData.profilePicture}
+                width={250}
+                height={250}
+                alt="no profile picture"
+                className="rounded-md"
+              />
+            ) : null
+            // <div className="flex flex-col">
+            //   <UserSquare2 className="mx-auto" size={48} />
+            //   <Label>No Profile Picture</Label>
+            // </div>
           }
         </div>
         <h1 className="p-4 scroll-m-20 mx-auto text-4xl font-extrabold tracking-tight lg:text-5xl">

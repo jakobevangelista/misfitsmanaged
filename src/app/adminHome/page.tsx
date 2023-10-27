@@ -127,6 +127,9 @@ export default async function AdminHome() {
       isAdmin: true,
     },
   });
+  if (!checkAdmin) {
+    redirect("/memberHome");
+  }
 
   if (checkAdmin?.isAdmin === false) {
     redirect("/memberHome");

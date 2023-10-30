@@ -1,26 +1,58 @@
 "use client";
 
+import { send } from "process";
+import { useEffect } from "react";
+
 const NotificationButton = () => {
-  function sendNotification() {
+  async function sendNotification() {
     if (
       Notification.permission === "default" ||
       Notification.permission === "denied"
     ) {
-      //   await Notification.requestPermission().then((perm) => {
-      //     alert(perm);
-      //   });
+      await Notification.requestPermission().then((perm) => {
+        alert(perm);
+      });
     }
     if (Notification.permission === "granted") {
+      const registration = await navigator.serviceWorker.register(
+        "serviceworker.js",
+        {
+          scope: "./",
+        }
+      );
+      await Notification.requestPermission().then(async (perm) => {
+        new Notification("work", {
+          body: "hello my amigo",
+          icon: "/croppedMisfitsLogo.png",
+          tag: "test",
+        });
+        await registration.showNotification("hello", {
+          body: "hello from the other side",
+        });
+        // alert(perm);
+      });
+    }
+  }
+  useEffect(() => {
+    async function deeznuts() {
+      await Notification.requestPermission().then((perm) => {
+        new Notification("work", {
+          body: "hello from the other side",
+          icon: "/croppedMisfitsLogo.png",
+        });
+      });
+    }
+  }, []);
+
+  function askPermission() {
+    if (Notification.permission === "granted") {
+      alert("granted");
+    }
+    void Notification.requestPermission().then((perm) => {
       new Notification("work", {
         body: "hello from the other side",
         icon: "/croppedMisfitsLogo.png",
       });
-    }
-  }
-
-  async function askPermission() {
-    await Notification.requestPermission().then((perm) => {
-      alert(perm);
     });
   }
   //   if (!(typeof window === undefined)) {

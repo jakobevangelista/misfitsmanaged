@@ -6,23 +6,23 @@ import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata = {
-  title: "Misfits Managed",
-  description: "Where Misfits are Managed",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
-  icons: {
-    icon: "/croppedMisfitsLogo.png",
-  },
-  display: "standalone",
-  name: "Misfits Managed",
-  short_name: "MM",
-  start_url: "/",
-  id: "/",
-  theme_color: "#EFE1B2",
-};
+// export const metadata = {
+//   title: "Misfits Managed",
+//   description: "Where Misfits are Managed",
+//   themeColor: [
+//     { media: "(prefers-color-scheme: light)", color: "white" },
+//     { media: "(prefers-color-scheme: dark)", color: "black" },
+//   ],
+//   icons: {
+//     icon: "/croppedMisfitsLogo.png",
+//   },
+//   display: "standalone",
+//   name: "Misfits Managed",
+//   short_name: "MM",
+//   start_url: "/",
+//   id: "/",
+//   background_color: "#EFE1B2",
+// };
 
 export default function RootLayout({
   children,

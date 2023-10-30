@@ -1,0 +1,17 @@
+{
+    "title": "Misfits Managed",
+  "description": "Where Misfits are Managed",
+  "themeColor": [
+    { "media": "(prefers-color-scheme: light)", "color": "white" },
+    { "media": "(prefers-color-scheme: dark)", "color": "black" }
+  ],
+  "icons": {
+    "icon": "/croppedMisfitsLogo.png"
+  },
+  "display": "standalone",
+  "name": "Misfits Managed",
+  "short_name": "MM",
+  "start_url": "/",
+  "id": "/",
+  "background_color": "#EFE1B2"
+}

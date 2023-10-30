@@ -1,5 +1,5 @@
-import { db } from "../../db/index";
-import { members } from "../../db/schema/members";
+import { db } from "../../server/db/index";
+import { members } from "../../server/db/schema/members";
 import { UserButton, currentUser } from "@clerk/nextjs";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
@@ -9,7 +9,7 @@ import RegisterForm from "./RegisterForm";
 export default async function Page() {
   const user = await currentUser();
 
-  if (!user) {
+  if (user?.emailAddresses[0] === undefined) {
     redirect("/sign-in");
   }
 

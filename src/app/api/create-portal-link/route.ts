@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     try {
       const customer = await createOrRetrieveCustomer({
         userId: user.id,
-        email: user.emailAddresses[0].emailAddress,
+        email: user.emailAddresses[0]!.emailAddress,
         name: `${user.firstName} ${user.lastName}`,
       });
 
@@ -31,14 +31,11 @@ export async function POST(req: Request) {
       return new Response(JSON.stringify({ url }), {
         status: 200,
       });
-    } catch (err: any) {
+    } catch (err) {
       console.log(err);
-      return new Response(
-        JSON.stringify({ error: { statusCode: 500, message: err.message } }),
-        {
-          status: 500,
-        }
-      );
+      return new Response(JSON.stringify({ error: { statusCode: 500 } }), {
+        status: 500,
+      });
     }
   } else {
     return new Response("Method Not Allowed", {

@@ -1,15 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { stripe } from "../../../../utils/stripe";
 import { getURL } from "../../../../utils/helpers";
 import { currentUser } from "@clerk/nextjs";
 import { createOrRetrieveCustomer } from "../../../../utils/dbHelper";
-import { members } from "@/db/schema/members";
+import { members } from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
-import { db } from "@/db";
+import { db } from "@/server/db";
 import { revalidatePath } from "next/cache";
 import { DateTime } from "luxon";
 
 export async function POST(req: Request) {
   if (req.method === "POST") {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const data = await req.json();
     // console.log(data);
     const user = await currentUser();
@@ -30,6 +32,7 @@ export async function POST(req: Request) {
     }
 
     const customer = await createOrRetrieveCustomer({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
       userId: data.id,
       email: memberEmail!.emailAddress,
       // name: `${user.firstName} ${user.lastName}`,
@@ -37,11 +40,11 @@ export async function POST(req: Request) {
     // console.log(data);
 
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (data.data === "month") {
         console.log("here");
 
-        let session;
-        session = await stripe.checkout.sessions.create({
+        const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
           billing_address_collection: "auto",
           customer,
@@ -79,13 +82,13 @@ export async function POST(req: Request) {
             { status: 500 }
           );
         }
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       } else if (data.data === "yearly") {
         console.log("here");
         const now = DateTime.now().setZone("America/Chicago");
         const startOfTheNextMonth = now.plus({ months: 1 }).startOf("month");
 
-        let session;
-        session = await stripe.checkout.sessions.create({
+        const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
           billing_address_collection: "auto",
           customer,
@@ -126,8 +129,7 @@ export async function POST(req: Request) {
           );
         }
       } else if (data.data === "Water") {
-        let session;
-        session = await stripe.checkout.sessions.create({
+        const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
           billing_address_collection: "auto",
           customer,
@@ -169,8 +171,7 @@ export async function POST(req: Request) {
           );
         }
       } else if (data.data === "cssat") {
-        let session;
-        session = await stripe.checkout.sessions.create({
+        const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
           billing_address_collection: "auto",
           customer,
@@ -209,8 +210,7 @@ export async function POST(req: Request) {
           );
         }
       } else if (data.data === "Day Pass") {
-        let session;
-        session = await stripe.checkout.sessions.create({
+        const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
           billing_address_collection: "auto",
           customer,
@@ -249,8 +249,7 @@ export async function POST(req: Request) {
           );
         }
       } else {
-        let session;
-        session = await stripe.checkout.sessions.create({
+        const session = await stripe.checkout.sessions.create({
           payment_method_types: ["card"],
 
           line_items: [
@@ -281,7 +280,7 @@ export async function POST(req: Request) {
           );
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       console.log(err);
       return new Response(JSON.stringify(err), { status: 500 });
     }

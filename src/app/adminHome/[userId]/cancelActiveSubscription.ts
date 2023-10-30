@@ -1,7 +1,7 @@
 "use server";
 
-import { db } from "@/db";
-import { contracts, members } from "@/db/schema/members";
+import { db } from "@/server/db";
+import { contracts, members } from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { stripe } from "../../../../utils/stripe";

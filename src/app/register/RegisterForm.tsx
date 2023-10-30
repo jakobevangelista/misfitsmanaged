@@ -87,7 +87,7 @@ export default function RegisterForm(props: {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 
@@ -108,7 +108,7 @@ export default function RegisterForm(props: {
     if (values.parentName == undefined || values.parentName.length == 0) {
       console.log("right place");
 
-      mutate({
+      await mutate({
         qrCode: props.qrCode,
         userId: props.userId,
         emailAddress: values.emailAddress,
@@ -124,7 +124,7 @@ export default function RegisterForm(props: {
       });
     } else {
       console.log("wronge place");
-      mutate({
+      await mutate({
         qrCode: props.qrCode,
         userId: props.userId,
         emailAddress: values.emailAddress,
@@ -132,9 +132,9 @@ export default function RegisterForm(props: {
         waiverAccept: values.waiverAccept,
         waiverSignature: values.signature,
         waiverSignDate: date,
-        parentName: values.parentName[0].name,
-        parentSignature: values.parentName[0].parentSignature,
-        minorDOB: values.parentName[0].DOB,
+        parentName: values.parentName[0]!.name,
+        parentSignature: values.parentName[0]!.parentSignature,
+        minorDOB: values.parentName[0]!.DOB,
       }).then(() => {
         router.refresh();
       });

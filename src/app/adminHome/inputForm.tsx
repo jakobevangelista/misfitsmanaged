@@ -15,13 +15,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { db } from "@/db";
-import { members } from "@/db/schema/members";
+import { db } from "@/server/db";
+import { members } from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
 import { useZact } from "zact/client";
 import { validatedAction } from "./action";
 import { useRouter } from "next/navigation";
-
 
 const FormSchema = z.object({
   tag: z.string().min(2, {
@@ -29,7 +28,7 @@ const FormSchema = z.object({
   }),
 });
 
-export async function InputForm(props: { userId: string }) {
+export function InputForm(props: { userId: string }) {
   //   const { mutate, error } = useZact(validatedAction);
   const router = useRouter();
   const form = useForm<z.infer<typeof FormSchema>>({

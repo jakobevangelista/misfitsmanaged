@@ -2,9 +2,9 @@
 import { Button, buttonVariants } from "@/components/ui/button";
 import { MoveLeft } from "lucide-react";
 import Link from "next/link";
-import { db } from "@/db";
+import { db } from "@/server/db";
 import { redirect } from "next/navigation";
-import { members } from "@/db/schema/members";
+import { members } from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
 import { useAuth } from "@clerk/nextjs";
 import { get } from "http";
@@ -19,12 +19,14 @@ export default function QuickCheckout(props: { userId: string }) {
   const handleCheckout = async (data: string) => {
     try {
       console.log("hanndle checkout");
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const { sessionId } = await postData({
         url: "/api/create-checkout-session",
         data: { data: data, id: memberId },
       });
       const stripe = await getStripe();
-      stripe?.redirectToCheckout({ sessionId });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      await stripe?.redirectToCheckout({ sessionId });
     } catch (error) {
       return alert((error as Error)?.message);
     }

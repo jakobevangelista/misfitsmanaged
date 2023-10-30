@@ -45,7 +45,7 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sortType, setSortType] = useState<String>("");
+  const [sortType, setSortType] = useState<string>("");
 
   const table = useReactTable({
     data,
@@ -66,7 +66,7 @@ export function DataTable<TData, TValue>({
     },
   });
 
-  function sortByFilters(type: String) {
+  function sortByFilters(type: string) {
     switch (type) {
       case "cash":
         table.getColumn("paymentMethod")?.setFilterValue("cash");

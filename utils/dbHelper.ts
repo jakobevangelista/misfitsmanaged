@@ -1,6 +1,6 @@
-import { db } from "@/db";
+import { db } from "@/server/db";
 import { stripe } from "./stripe";
-import { contracts, members, transactions } from "@/db/schema/members";
+import { contracts, members, transactions } from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
 import { User } from "../src/app/adminHome/columns";
 import { Row } from "@tanstack/table-core/build/lib/types";
@@ -18,7 +18,7 @@ export const createOrRetrieveCustomer = async ({
     email: email,
   });
   if (stripeCustomer.data.length > 0) {
-    return stripeCustomer.data[0].id;
+    return stripeCustomer.data[0]!.id;
   } else {
     const customer = await stripe.customers.create({
       email: email,
@@ -56,7 +56,7 @@ export async function manageSubscription(
   });
 
   const product = await stripe.products.retrieve(
-    subscription.items.data[0].price.product as string
+    subscription.items.data[0]!.price.product as string
   );
 
   if (product.name === "5 Day Pass") {

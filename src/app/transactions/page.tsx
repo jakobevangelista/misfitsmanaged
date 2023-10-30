@@ -5,9 +5,9 @@ import { MoveLeft } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { auth, currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
-import { members, transactions } from "@/db/schema/members";
+import { members, transactions } from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
-import { db } from "@/db";
+import { db } from "@/server/db";
 import { string } from "zod";
 export const revalidate = 0; // revalidate this page every 15 seconds
 
@@ -33,7 +33,7 @@ export default async function Page() {
   const user = await currentUser();
   const data = await getData();
   // console.log(typeof data[0].date);
-  if (!user) {
+  if (user?.emailAddresses[0] === undefined) {
     redirect("/sign-in");
   }
 

@@ -2,9 +2,9 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { MoveLeft, UserCircle, UserSquare2 } from "lucide-react";
 import Link from "next/link";
 import QuickCheckout from "./quickCheckout";
-import { db } from "@/db";
+import { db } from "@/server/db";
 import { eq } from "drizzle-orm";
-import { contracts, members, transactions } from "@/db/schema/members";
+import { contracts, members, transactions } from "@/server/db/schema/members";
 import { Transaction, columns } from "./columns";
 import { Contract, columns as columns2 } from "./columns2";
 import { DataTable } from "./data-table";
@@ -56,7 +56,7 @@ export default async function Page({ params }: { params: { userId: string } }) {
   const userData = await getUserData(Number(params.userId));
   const userContracts = await getUserContracts(userData!.customerId!);
   const userTransactions = await getUserTransactions(userData!.emailAddress!);
-  if (!user) {
+  if (user?.emailAddresses[0] === undefined) {
     redirect("/sign-in");
   }
 

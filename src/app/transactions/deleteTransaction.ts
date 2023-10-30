@@ -1,7 +1,7 @@
 "use server";
 
-import { db } from "@/db";
-import { transactions } from "@/db/schema/members";
+import { db } from "@/server/db";
+import { transactions } from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 

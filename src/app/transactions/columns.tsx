@@ -124,8 +124,8 @@ export const columns: ColumnDef<Transaction>[] = [
               <DialogFooter>
                 <Button
                   type="submit"
-                  onClick={() => {
-                    deleteTransaction(row.original.id);
+                  onClick={async () => {
+                    await deleteTransaction(row.original.id);
                     router.refresh();
                     setOpen(false);
                   }}

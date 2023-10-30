@@ -9,7 +9,7 @@ import { stripe } from "../../../utils/stripe";
 
 export default function CustomButton() {
   const router = useRouter();
-  async function handleOnclick() {
+  function handleOnclick() {
     // try {
     //     const { sessionId } = await postData({
     //         url: "/api/create-checkout-session",

@@ -3,9 +3,9 @@ import { auth } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs";
 import { User } from "./columns";
 import { DataTable } from "./data-table";
-import { db } from "@/db";
+import { db } from "@/server/db";
 import { eq, lt, sql } from "drizzle-orm";
-import { members, contracts, products } from "@/db/schema/members";
+import { members, contracts, products } from "@/server/db/schema/members";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -117,7 +117,7 @@ export default async function AdminHome() {
   const data = await getData();
   const products = await getProducts();
   // console.log(products);
-  if (!user) {
+  if (!user?.emailAddresses[0]) {
     redirect("/sign-in");
   }
 
@@ -135,7 +135,7 @@ export default async function AdminHome() {
     redirect("/memberHome");
   }
 
-  checkContracts();
+  await checkContracts();
 
   return (
     <>

@@ -1,12 +1,12 @@
 "use server";
 
-import { db } from "@/db";
+import { db } from "@/server/db";
 import {
   contracts,
   members,
   products,
   transactions,
-} from "@/db/schema/members";
+} from "@/server/db/schema/members";
 import { User } from "./columns";
 import { Row } from "@tanstack/table-core/build/lib/types";
 import { eq } from "drizzle-orm";
@@ -140,9 +140,27 @@ export async function cashTransactionCustom(
   const now = new Date();
   console.log(cartItems);
 
-  for (let i = 0; i < cartItems.length; i++) {
+  // for (let i = 0; i < cartItems.length; i++) {
+  //   const amount = await db.query.products.findFirst({
+  //     where: eq(products.priceId, cartItems[i]!.price),
+  //     columns: {
+  //       price: true,
+  //       name: true,
+  //     },
+  //   });
+  //   await db.insert(transactions).values({
+  //     ownerId: customer!.customerId!,
+  //     amount: amount!.price,
+  //     date: now.toLocaleString(),
+  //     paymentMethod: "cash",
+  //     type: amount!.name,
+  //     createdAt: now,
+  //   });
+  // }
+
+  for (const item of cartItems) {
     const amount = await db.query.products.findFirst({
-      where: eq(products.priceId, cartItems[i].price),
+      where: eq(products.priceId, item.price),
       columns: {
         price: true,
         name: true,

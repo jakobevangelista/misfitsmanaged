@@ -1,6 +1,6 @@
 import { buttonVariants } from "@/components/ui/button";
-import { db } from "@/db/index";
-import { members } from "@/db/schema/members";
+import { db } from "@/server/db/index";
+import { members } from "@/server/db/schema/members";
 import { cn } from "@/lib/utils";
 import { UserButton, currentUser } from "@clerk/nextjs";
 import { eq } from "drizzle-orm";
@@ -8,10 +8,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import ManageAccountButton from "./ManageAccountButton";
+// export const runtime = "edge";
 
 export default async function Page() {
   const loggedInUser = await currentUser();
-  if (!loggedInUser) {
+  if (!loggedInUser?.emailAddresses[0]) {
     redirect("/sign-in");
   }
 

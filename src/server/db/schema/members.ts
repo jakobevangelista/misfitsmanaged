@@ -9,6 +9,7 @@ import {
   mysqlEnum,
   varchar,
   date,
+  uniqueIndex,
 } from "drizzle-orm/mysql-core";
 
 export const members = mysqlTable("members", {
@@ -59,3 +60,30 @@ export const products = mysqlTable("products", {
   description: text("description"),
   price: int("price").notNull(),
 });
+
+export const users = mysqlTable(
+  "users",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    name: text("name").notNull(),
+    qrCodeUrl: text("qr_code").notNull(),
+    isAdmin: boolean("is_admin").default(false).notNull(),
+    emailAddress: varchar("email_address", { length: 255 }).notNull(),
+    phoneNumber: text("phone_number"),
+    isWaiverSigned: boolean("is_waiver_signed").default(false),
+    customerId: text("customer_id"),
+    waiverSignature: text("waiver_signature"),
+    waiverSignDate: text("waiver_date"),
+    realScanId: text("real_scan_id").notNull().default("0"),
+    parentName: text("parent_name"),
+    parentSignature: text("parent_signature"),
+    minorDOB: text("minor_dob"),
+    DOB: date("DOB"),
+    contractStatus: text("contract_status").default("none").notNull(), //"active","incomplete","incomplete_expired","past_due","canceled","unpaid","none",
+    profilePicture: text("profile_picture"),
+  },
+  (t) => ({
+    unq: uniqueIndex("email_idx").on(t.emailAddress),
+  })
+);

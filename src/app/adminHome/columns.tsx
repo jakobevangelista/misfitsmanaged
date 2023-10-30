@@ -59,9 +59,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { members, transactions } from "@/db/schema/members";
+import { members, transactions } from "@/server/db/schema/members";
 import { eq, sql } from "drizzle-orm";
-import { db } from "@/db";
+import { db } from "@/server/db";
 import { InputForm } from "./inputForm";
 import {
   cashTransactionWater,
@@ -206,12 +206,14 @@ export const DataTableWithColumns = (props: {
         const [multiCashAmount, setMultiCashAmount] = useState<number>(0);
         const handleCheckout = async (data: string) => {
           try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const { sessionId } = await postData({
               url: "/api/create-checkout-session",
               data: { data: data, id: row.original.id },
             });
             const stripe = await getStripe();
-            stripe?.redirectToCheckout({ sessionId });
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            await stripe?.redirectToCheckout({ sessionId });
           } catch (error) {
             return alert((error as Error)?.message);
           }
@@ -259,14 +261,14 @@ export const DataTableWithColumns = (props: {
             cashAmount: 0,
           },
         });
-        const quickDayPassCashTransactionOnSubmit = (
+        const quickDayPassCashTransactionOnSubmit = async (
           values: z.infer<typeof quickDayPassCashTransactionSchema>
         ) => {
           // Do something with the form values.
           // ✅ This will be type-safe and validated.
           console.log("hwer");
           console.log(values);
-          cashTransactionDayPass(row.original.emailAddress);
+          await cashTransactionDayPass(row.original.emailAddress);
         };
 
         const quickCsSaturdayCashTransactionSchema = z.object({
@@ -282,14 +284,14 @@ export const DataTableWithColumns = (props: {
             cashAmount: 0,
           },
         });
-        const quickCsSaturdayTransactionOnSubmit = (
+        const quickCsSaturdayTransactionOnSubmit = async (
           values: z.infer<typeof quickCsSaturdayCashTransactionSchema>
         ) => {
           // Do something with the form values.
           // ✅ This will be type-safe and validated.
           console.log("hwer");
           console.log(values);
-          cashTransactionCorruptedSaturday(row.original.emailAddress);
+          await cashTransactionCorruptedSaturday(row.original.emailAddress);
         };
 
         const checkoutSubmit = async (
@@ -306,24 +308,25 @@ export const DataTableWithColumns = (props: {
               )?.price;
               total += price!;
             }
-            if (multiCashAmount! * 100 - total < 0) {
+            if (multiCashAmount * 100 - total < 0) {
               toast({
                 title: "❌ Not enough cash given",
               });
             } else {
-              cashTransactionCustom(
+              await cashTransactionCustom(
                 Number(row.original.id),
                 total,
                 values.cartItems
               );
               toast({
-                title: `Change: $${(multiCashAmount! - total / 100.0).toFixed(
+                title: `Change: $${(multiCashAmount - total / 100.0).toFixed(
                   2
                 )}`,
               });
             }
           } else {
             try {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
               const { sessionId } = await customCheckoutPost(
                 values,
                 row.original.emailAddress,
@@ -331,7 +334,8 @@ export const DataTableWithColumns = (props: {
               );
               console.log(sessionId);
               const stripe = await getStripe();
-              stripe?.redirectToCheckout({ sessionId });
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+              await stripe?.redirectToCheckout({ sessionId });
             } catch (error) {
               return alert((error as Error)?.message);
             }
@@ -577,7 +581,6 @@ export const DataTableWithColumns = (props: {
                             />
                             <Button
                               type="submit"
-                              onSubmit={() => {}}
                               onClick={() => {
                                 // setTagId("");
                                 setTimeout(() => {

@@ -59,9 +59,9 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { members, transactions } from "@/db/schema/members";
+import { members, transactions } from "@/server/db/schema/members";
 import { eq, sql } from "drizzle-orm";
-import { db } from "@/db";
+import { db } from "@/server/db";
 import { InputForm } from "./inputForm";
 import {
   cashTransactionWater,
@@ -109,12 +109,14 @@ export default function Menu(props: {
   const [multiCashAmount, setMultiCashAmount] = useState<number>(0);
   const handleCheckout = async (data: string) => {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const { sessionId } = await postData({
         url: "/api/create-checkout-session",
         data: { data: data, id: Number(props.id) },
       });
       const stripe = await getStripe();
-      stripe?.redirectToCheckout({ sessionId });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      await stripe?.redirectToCheckout({ sessionId });
     } catch (error) {
       return alert((error as Error)?.message);
     }
@@ -162,14 +164,14 @@ export default function Menu(props: {
       cashAmount: 0,
     },
   });
-  const quickDayPassCashTransactionOnSubmit = (
+  const quickDayPassCashTransactionOnSubmit = async (
     values: z.infer<typeof quickDayPassCashTransactionSchema>
   ) => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log("hwer");
     console.log(values);
-    cashTransactionDayPass(props.email);
+    await cashTransactionDayPass(props.email);
   };
 
   const quickCsSaturdayCashTransactionSchema = z.object({
@@ -185,14 +187,14 @@ export default function Menu(props: {
       cashAmount: 0,
     },
   });
-  const quickCsSaturdayTransactionOnSubmit = (
+  const quickCsSaturdayTransactionOnSubmit = async (
     values: z.infer<typeof quickCsSaturdayCashTransactionSchema>
   ) => {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log("hwer");
     console.log(values);
-    cashTransactionDayPass(props.email);
+    await cashTransactionDayPass(props.email);
   };
   const fetchProducts = props.products;
   let items: { label: string; value: string }[];
@@ -217,18 +219,19 @@ export default function Menu(props: {
         )?.price;
         total += price!;
       }
-      if (multiCashAmount! * 100 - total < 0) {
+      if (multiCashAmount * 100 - total < 0) {
         toast({
           title: "❌ Not enough cash given",
         });
       } else {
-        cashTransactionCustom(Number(props.id), total, values.cartItems);
+        await cashTransactionCustom(Number(props.id), total, values.cartItems);
         toast({
-          title: `Change: $${(multiCashAmount! - total / 100.0).toFixed(2)}`,
+          title: `Change: $${(multiCashAmount - total / 100.0).toFixed(2)}`,
         });
       }
     } else {
       try {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const { sessionId } = await customCheckoutPost(
           values,
           props.email,
@@ -236,7 +239,8 @@ export default function Menu(props: {
         );
         console.log(sessionId);
         const stripe = await getStripe();
-        stripe?.redirectToCheckout({ sessionId });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        await stripe?.redirectToCheckout({ sessionId });
       } catch (error) {
         return alert((error as Error)?.message);
       }
@@ -531,7 +535,6 @@ export default function Menu(props: {
                   <Input type="hidden" name="userId" value={String(rowId)} />
                   <Button
                     type="submit"
-                    onSubmit={() => {}}
                     onClick={() => {
                       // setTagId("");
                       setTimeout(() => {

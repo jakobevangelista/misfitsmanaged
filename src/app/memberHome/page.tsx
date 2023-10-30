@@ -1,17 +1,19 @@
 import { buttonVariants } from "@/components/ui/button";
-import { members } from "@/db/schema/members";
+import { members } from "@/server/db/schema/members";
 import { cn } from "@/lib/utils";
 import { UserButton, auth, currentUser, redirectToSignIn } from "@clerk/nextjs";
 import { eq } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { db } from "../../db/index";
+import { db } from "../../server/db/index";
 import ManageAccountButton from "../ManageAccountButton";
+export const runtime = "edge";
 
 export default async function Page() {
   const loggedInUser = await currentUser();
-  if (!loggedInUser) {
+
+  if (!loggedInUser?.emailAddresses[0]) {
     redirect("/");
   }
   console.log(loggedInUser.emailAddresses[0].emailAddress);
@@ -43,14 +45,14 @@ export default async function Page() {
         </div>
         <div className="mx-auto mb-4">
           <Image
-            src={user!.qrCodeUrl}
+            src={user.qrCodeUrl}
             alt="QR Code to check in"
             width={300}
             height={300}
           />
         </div>
         <ManageAccountButton />
-        {user!.isAdmin ? (
+        {user.isAdmin ? (
           // <Button variant="creme" className="mx-auto">
           <Link
             href="/adminHome"

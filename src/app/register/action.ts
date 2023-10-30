@@ -3,8 +3,8 @@
 import { z } from "zod";
 import { zact } from "zact/server";
 
-import { db } from "../../db/index";
-import { members } from "../../db/schema/members";
+import { db } from "../../server/db/index";
+import { members } from "../../server/db/schema/members";
 import { createOrRetrieveCustomer } from "../../../utils/dbHelper";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { eq } from "drizzle-orm";

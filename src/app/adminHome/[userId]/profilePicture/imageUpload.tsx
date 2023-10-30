@@ -89,8 +89,8 @@ export default function Home(props: { userId: number }) {
         onClientUploadComplete={(res) => {
           // Do something with the response
           console.log("Files: ", res);
-          console.log("FileURL: ", res![0].url);
-          startTransition(() => setProfilePicture(props.userId, res![0].url));
+          console.log("FileURL: ", res![0]!.url);
+          startTransition(() => setProfilePicture(props.userId, res![0]!.url));
           router.push(`/adminHome/${props.userId}`);
         }}
         onUploadError={(error: Error) => {

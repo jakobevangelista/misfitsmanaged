@@ -2,7 +2,7 @@ import { SignIn, auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import AuthElement from "./auth-element";
 
-export default async function Home() {
+export default function Home() {
   const { userId } = auth();
 
   if (userId) {

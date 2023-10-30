@@ -37,8 +37,8 @@ import { Badge } from "@/components/ui/badge";
 import BarcodeReader from "react-barcode-reader";
 import { redirect } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { db } from "@/db";
-import { contracts, members } from "@/db/schema/members";
+import { db } from "@/server/db";
+import { contracts, members } from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
 import Menu from "./menu";
 import { useState } from "react";
@@ -60,8 +60,8 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [sortType, setSortType] = React.useState<String>("realScanId");
-  const [specificSortType, setSpecificSortType] = React.useState<String>("");
+  const [sortType, setSortType] = React.useState<string>("realScanId");
+  const [specificSortType, setSpecificSortType] = React.useState<string>("");
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -93,7 +93,7 @@ export function DataTable<TData, TValue>({
     },
   });
   const [searchId, setSearchId] = useState("");
-  function sortByFilters(type: String) {
+  function sortByFilters(type: string) {
     switch (type) {
       case "email":
         return (
@@ -130,22 +130,23 @@ export function DataTable<TData, TValue>({
         );
       case "realScanId":
         console.log(table.getColumn("realScanId")?.getFilterValue() as string);
+
         return (
           <>
             <form
               className="hidden xl:block w-full"
               onSubmit={(e) => {
                 e.preventDefault();
-                setlocalId(table.getRowModel().rows[0].getValue("id"));
+                setlocalId(table.getRowModel().rows[0]!.getValue("id"));
                 setlocalEmail(
-                  table.getRowModel().rows[0].getValue("emailAddress")
+                  table.getRowModel().rows[0]!.getValue("emailAddress")
                 );
-                setlocalName(table.getRowModel().rows[0].getValue("name"));
+                setlocalName(table.getRowModel().rows[0]!.getValue("name"));
                 setlocalProfilePic(
-                  table.getRowModel().rows[0].getValue("profilePicture")
+                  table.getRowModel().rows[0]!.getValue("profilePicture")
                 );
                 setLocalContractStatus(
-                  table.getRowModel().rows[0].getValue("contractStatus")
+                  table.getRowModel().rows[0]!.getValue("contractStatus")
                 );
                 setTimeout(() => {
                   table.getColumn("realScanId")?.setFilterValue("");
@@ -204,7 +205,7 @@ export function DataTable<TData, TValue>({
     }
   }
 
-  function filterBadge(type: String) {
+  function filterBadge(type: string) {
     switch (sortType) {
       case "email":
         return <Badge className="ml-2">Email</Badge>;

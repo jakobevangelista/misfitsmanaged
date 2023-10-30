@@ -3,8 +3,8 @@
 import { number, z } from "zod";
 import { zact } from "zact/server";
 
-import { db } from "../../db/index";
-import { members } from "../../db/schema/members";
+import { db } from "../../server/db/index";
+import { members } from "../../server/db/schema/members";
 import { eq, sql } from "drizzle-orm";
 
 import { createOrRetrieveCustomer } from "../../../utils/dbHelper";
@@ -14,18 +14,18 @@ export async function validatedAction(formdata: FormData) {
   console.log(formdata.get("userId"));
   console.log(formdata.get("newTagCode"));
 
-  const id: number = +(formdata.get("userId") || 0);
+  const id: number = +(formdata.get("userId") ?? 0);
   const oldCode = await db
     .select({ realScanId: members.realScanId })
     .from(members)
     .where(eq(members.id, id));
-  console.log(oldCode[0].realScanId);
+  console.log(oldCode[0]!.realScanId);
 
   //   const newCode: string = (String(formdata.get("newTagCode")) || " ").concat(
   //     oldCode[0].realScanId
   //   );
 
-  const newCode: string = oldCode[0].realScanId.concat(
+  const newCode: string = oldCode[0]!.realScanId.concat(
     String(formdata.get("newTagCode")) || " "
   );
   await db

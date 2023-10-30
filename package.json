@@ -58,7 +58,7 @@
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.233.0",
     "luxon": "^3.4.2",
-    "next": "^14.0.1",
+    "next": "^13.5.2",
     "next-themes": "^0.2.1",
     "postcss": "^8.4.31",
     "qrcode": "^1.5.3",

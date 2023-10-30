@@ -16,6 +16,12 @@ export const metadata = {
   icons: {
     icon: "/croppedMisfitsLogo.png",
   },
+  display: "standalone",
+  name: "Misfits Managed",
+  short_name: "MM",
+  start_url: "/",
+  id: "/",
+  theme_color: "#EFE1B2",
 };
 
 export default function RootLayout({

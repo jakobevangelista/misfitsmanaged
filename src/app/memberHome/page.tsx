@@ -7,14 +7,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { db } from "../../server/db/index";
-import ManageAccountButton from "../ManageAccountButton";
+import ManageAccountButton from "./ManageAccountButton";
 export const runtime = "edge";
-
 export default async function Page() {
   const loggedInUser = await currentUser();
 
   if (!loggedInUser?.emailAddresses[0]) {
-    redirect("/");
+    redirect("/sign-in");
   }
   console.log(loggedInUser.emailAddresses[0].emailAddress);
 

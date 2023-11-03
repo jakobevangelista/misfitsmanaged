@@ -1,8 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverActions: true,
-  },
   images: {
     domains: [
       "cdn.shopify.com",
@@ -11,8 +8,10 @@ const nextConfig = {
       "assets.roguefitness.com",
       "m.media-amazon.com",
       "static1.squarespace.com",
+      "tailwindui.com",
+      "corruptedstrengthgym.com",
     ],
   },
 };
 
-module.exports = nextConfig;
+export default nextConfig;

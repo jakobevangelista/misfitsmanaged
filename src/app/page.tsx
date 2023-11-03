@@ -6,7 +6,8 @@ export const runtime = "edge";
 import Hero from "@/components/landingPage/Hero";
 import LogoSection from "@/components/landingPage/LogoSection";
 import FeatureSection from "@/components/landingPage/FeatureSection";
-import NotificationButton from "./notificationButton";
+import FAQ from "@/components/landingPage/FAQ";
+import Contact from "@/components/landingPage/contact";
 
 export default function Page() {
   return (
@@ -14,7 +15,8 @@ export default function Page() {
       <Hero />
       <LogoSection />
       <FeatureSection />
-      <NotificationButton />
+      <FAQ />
+      <Contact />
     </>
   );
 }

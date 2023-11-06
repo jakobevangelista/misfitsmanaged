@@ -17,9 +17,9 @@ const faqs = [
         803 Summer Park Dr. Suite 150, Stafford, TX 77477
         <iframe
           src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d13875.568944181003!2d-95.5686459!3d29.6068188!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8640e70d80e7d075%3A0x56bfac1bc0e5b292!2sCorrupted%20Strength!5e0!3m2!1sen!2sus!4v1699040748550!5m2!1sen!2sus"
-          width="550"
-          height="400"
-          className="border-0"
+          width="400"
+          height="390"
+          className="border-0 flex"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
         ></iframe>

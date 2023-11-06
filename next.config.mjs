@@ -11,6 +11,12 @@ const nextConfig = {
       "tailwindui.com",
       "corruptedstrengthgym.com",
     ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "corruptedstrengthgym.com",
+      },
+    ],
   },
 };
 

@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { db } from "../../server/db/index";
+import { db } from "../../../server/db/index";
 import ManageAccountButton from "./ManageAccountButton";
 export const runtime = "edge";
 export default async function Page() {
@@ -36,9 +36,6 @@ export default async function Page() {
   return (
     <>
       <div className="flex flex-col bg:[url('https://misfitsmanaged.vercel.app/croppedMisfitsLogo.png')]">
-        <div className="flex justify-end">
-          <UserButton afterSignOutUrl="/" />
-        </div>
         <div className="flex text-[#EFE1B2] text-3xl md:text-9xl text-center font-sans font-black mx-auto">
           Welcome Misfits!
         </div>

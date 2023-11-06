@@ -25,8 +25,6 @@ import { redirect, useRouter } from "next/navigation";
 // import { SignatureCanvas } from "react-signature-canvas";
 import SignaturePad from "react-signature-canvas";
 import { useRef, useState } from "react";
-import ReactSignatureCanvas from "react-signature-canvas";
-import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   memberName: z.string().min(2, {
@@ -152,23 +150,7 @@ export default function RegisterForm(props: {
 
   return (
     <>
-      {/* <iframe
-        src="/corruptedStrengthWaiver.pdf"
-        className="flex mx-auto w-[100vw] md:h-[50vh] "
-      /> */}
       <div className="flex flex-col justify-center w-full">
-        {/* <iframe
-          src="/corruptedStrengthWaiver.pdf"
-          className="mx-auto w-full md:h-[50vh] lg:w-1/2"
-        /> */}
-        {/* <div className="mx-auto">
-          <Link
-            className="font-bold text-4xl hover:underline"
-            href="/corruptedStrengthWaiver.pdf"
-          >
-            Click here to view the waiver
-          </Link>
-        </div> */}
         <div className="mx-auto">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -181,6 +163,7 @@ export default function RegisterForm(props: {
                       src="/corruptedStrengthWaiver.pdf"
                       className="mx-auto w-full md:h-[50vh] lg:w-1/2"
                     />
+
                     <Link
                       className="font-bold text-4xl hover:underline"
                       href="/corruptedStrengthWaiver.pdf"

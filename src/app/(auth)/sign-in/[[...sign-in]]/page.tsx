@@ -1,12 +1,6 @@
-import { SignIn, currentUser } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
+import { SignIn } from "@clerk/nextjs";
 
-export default async function Home() {
-  const user = await currentUser();
-
-  if (user) {
-    redirect("/memberHome");
-  }
+export default function Home() {
   return (
     <>
       <div className="flex flex-row h-screen w-screen">

@@ -1,4 +1,4 @@
-import Stripe from "stripe";
+import type Stripe from "stripe";
 import { stripe } from "../../../../utils/stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -10,13 +10,7 @@ import {
   products,
 } from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
-import { string } from "zod";
-import {
-  createOrRetrieveCustomer,
-  manageSubscription,
-} from "../../../../utils/dbHelper";
-import { check } from "drizzle-orm/mysql-core";
-import { revalidate } from "@/app/transactions/data-table";
+import { manageSubscription } from "../../../../utils/dbHelper";
 import { revalidatePath } from "next/cache";
 import { DateTime } from "luxon";
 
@@ -39,14 +33,14 @@ interface PriceData {
 }
 
 export async function POST(req: Request) {
-  const body = await req.text();
+  const body = (await req.blob()).text();
   //   let event: Stripe.Event;
-  const sig = headers()!.get("Stripe-Signature")!;
+  const sig = headers().get("Stripe-Signature")!;
   // const secret = "whsec_1GELcqsBjQT3lighVRSc0e7PerHopo2s"; // personal test mode
   // const secret = "whsec_Xjcs5cS81VExzwEIsVF12d2ePx0Kp8KL"; // personal live
   const secret = process.env.STRIPE_WEBHOOK_SECRET!;
   const event = stripe.webhooks.constructEvent(
-    body,
+    await body,
     sig,
     secret
   ) as Stripe.DiscriminatedEvent;

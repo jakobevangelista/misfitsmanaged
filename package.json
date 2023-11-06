@@ -15,7 +15,7 @@
     "ngrokauth": "ngrok config add-authtoken 2SMI5QLicPRvhsJyOZMr47jSTvt_ABKtogRZtz23k8vF2HnV"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.26.1",
+    "@clerk/nextjs": "^4.26.2",
     "@clerk/themes": "^1.7.7",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
@@ -54,7 +54,7 @@
     "date-fns": "^2.30.0",
     "dotenv": "^16.1.4",
     "drizzle-orm": "^0.27.0",
-    "eslint": "^7.23.0",
+    "eslint": "^8.53.0",
     "framer-motion": "^10.16.4",
     "geist": "^1.0.0",
     "lucide-react": "^0.233.0",
@@ -70,6 +70,7 @@
     "react-dropzone": "^14.2.3",
     "react-hook-form": "^7.44.3",
     "react-html5-camera-photo": "^1.5.11",
+    "react-pdf": "^7.5.1",
     "react-signature-canvas": "^1.0.6",
     "stripe": "^12.9.0",
     "stripe-event-types": "^2.4.0",

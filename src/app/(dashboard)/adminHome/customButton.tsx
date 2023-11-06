@@ -2,10 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { getURL, postData } from "../../../utils/helpers";
+import { getURL, postData } from "../../../../utils/helpers";
 import { redirect } from "next/navigation";
-import { getStripe } from "../../../utils/stripe-client";
-import { stripe } from "../../../utils/stripe";
+import { getStripe } from "../../../../utils/stripe-client";
+import { stripe } from "../../../../utils/stripe";
 
 export default function CustomButton() {
   const router = useRouter();

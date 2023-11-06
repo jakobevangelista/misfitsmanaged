@@ -36,8 +36,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { postData, customCheckoutPost } from "../../../utils/helpers";
-import { getStripe } from "../../../utils/stripe-client";
+import { postData, customCheckoutPost } from "../../../../utils/helpers";
+import { getStripe } from "../../../../utils/stripe-client";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -70,7 +70,7 @@ import {
   cashTransactionCorruptedSaturday,
 } from "./cashTransaction";
 import { useTransition } from "react";
-import { stripe } from "../../../utils/stripe";
+import { stripe } from "../../../../utils/stripe";
 import {
   Popover,
   PopoverContent,

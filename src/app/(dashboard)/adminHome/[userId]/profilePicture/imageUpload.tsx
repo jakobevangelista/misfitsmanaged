@@ -73,7 +73,7 @@
 // You need to import our styles for the button to look right. Best to import in the root /layout.tsx but this is fine
 import "@uploadthing/react/styles.css";
 import { useRouter } from "next/navigation";
-import { UploadButton } from "../../../../../utils/uploadthing";
+import { UploadButton } from "../../../../../../utils/uploadthing";
 import { useTransition } from "react";
 import { setProfilePicture } from "./setProfilePicture";
 import { as } from "drizzle-orm/select.types.d-1d455120";

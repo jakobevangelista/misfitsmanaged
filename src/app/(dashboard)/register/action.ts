@@ -3,12 +3,12 @@
 import { z } from "zod";
 import { zact } from "zact/server";
 
-import { db } from "../../server/db/index";
-import { members } from "../../server/db/schema/members";
-import { createOrRetrieveCustomer } from "../../../utils/dbHelper";
+import { db } from "../../../server/db/index";
+import { members } from "../../../server/db/schema/members";
+import { createOrRetrieveCustomer } from "../../../../utils/dbHelper";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { eq } from "drizzle-orm";
-import { stripe } from "../../../utils/stripe";
+import { stripe } from "../../../../utils/stripe";
 
 export const validatedAction = zact(
   z.object({

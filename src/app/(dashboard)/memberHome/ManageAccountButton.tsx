@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { postData } from "../../../utils/helpers";
+import { postData } from "../../../../utils/helpers";
 import router, { useRouter } from "next/navigation";
 
 export default function ManageAccountButton() {

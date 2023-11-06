@@ -8,8 +8,10 @@ import LogoSection from "@/components/landingPage/LogoSection";
 import FeatureSection from "@/components/landingPage/FeatureSection";
 import FAQ from "@/components/landingPage/FAQ";
 import Contact from "@/components/landingPage/contact";
+import { api } from "@/trpc/server";
 
-export default function Page() {
+export default async function Page() {
+  const testTrpc = await api.post.hello.query({ text: "deeznuts" });
   return (
     <>
       <Hero />
@@ -17,6 +19,7 @@ export default function Page() {
       <FeatureSection />
       <FAQ />
       <Contact />
+      {testTrpc.greeting}
     </>
   );
 }

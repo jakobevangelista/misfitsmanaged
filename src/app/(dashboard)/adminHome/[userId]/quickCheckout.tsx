@@ -8,8 +8,8 @@ import { members } from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
 import { useAuth } from "@clerk/nextjs";
 import { get } from "http";
-import { postData } from "../../../../utils/helpers";
-import { getStripe } from "../../../../utils/stripe-client";
+import { postData } from "../../../../../utils/helpers";
+import { getStripe } from "../../../../../utils/stripe-client";
 
 export default function QuickCheckout(props: { userId: string }) {
   const { userId } = useAuth();

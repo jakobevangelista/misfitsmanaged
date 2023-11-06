@@ -3,11 +3,11 @@
 import { number, z } from "zod";
 import { zact } from "zact/server";
 
-import { db } from "../../server/db/index";
-import { members } from "../../server/db/schema/members";
+import { db } from "../../../server/db/index";
+import { members } from "../../../server/db/schema/members";
 import { eq, sql } from "drizzle-orm";
 
-import { createOrRetrieveCustomer } from "../../../utils/dbHelper";
+import { createOrRetrieveCustomer } from "../../../../utils/dbHelper";
 import { revalidatePath } from "next/cache";
 
 export async function validatedAction(formdata: FormData) {

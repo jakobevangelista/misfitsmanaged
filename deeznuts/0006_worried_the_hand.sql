@@ -1,1 +1,0 @@
-ALTER TABLE `members` ADD `is_waiver_signed` boolean DEFAULT false;

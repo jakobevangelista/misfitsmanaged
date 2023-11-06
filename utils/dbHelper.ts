@@ -2,7 +2,7 @@ import { db } from "@/server/db";
 import { stripe } from "./stripe";
 import { contracts, members, transactions } from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
-import { User } from "../src/app/adminHome/columns";
+import { User } from "../src/app/(dashboard)/adminHome/columns";
 import { Row } from "@tanstack/table-core/build/lib/types";
 
 export const createOrRetrieveCustomer = async ({

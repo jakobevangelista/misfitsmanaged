@@ -74,10 +74,10 @@ export default function Contact() {
             <p className="mt-6 text-lg leading-8 text-[#efe1b2]/80">
               Ready to start your powerlifting journey with Corrupted Strength?
               Have questions or need more information? <br />
-              Don't hesitate to reach out to us. We're here to help. Contact us
-              through the form below, and we'll get back to you promptly. You
-              can also call us or visit our gym in person. We look forward to
-              hearing from you and supporting your goals.
+              Don&apos;t hesitate to reach out to us. We&apos;re here to help.
+              Contact us through the form below, and we&apos;ll get back to you
+              promptly. You can also call us or visit our gym in person. We look
+              forward to hearing from you and supporting your goals.
             </p>
             <dl className="mt-10 space-y-4 text-base leading-7 text-[#efe1b2]/70">
               <div className="flex gap-x-4">
@@ -121,7 +121,7 @@ export default function Contact() {
                     className="hover:text-white"
                     href="mailto:hello@example.com"
                   >
-                    hello@example.com
+                    gianella@corruptedstrengthgym.com
                   </a>
                 </dd>
               </div>

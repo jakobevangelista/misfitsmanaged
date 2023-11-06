@@ -113,7 +113,7 @@ const FeatureSection = () => {
               Unleash the relentless strength within you and achieve greatness
               in the world of powerlifting. Our world-class ecosystem,
               cutting-edge equipment, and unwavering support are your keys to
-              redefining what's possible.
+              redefining what&apos;s possible.
             </p>
           </div>
           <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">

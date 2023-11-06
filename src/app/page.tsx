@@ -10,8 +10,8 @@ import FAQ from "@/components/landingPage/FAQ";
 import Contact from "@/components/landingPage/contact";
 import { api } from "@/trpc/server";
 
-export default async function Page() {
-  const testTrpc = await api.post.hello.query({ text: "deeznuts" });
+export default function Page() {
+  // const testTrpc = await api.post.hello.query({ text: "deeznuts" });
   return (
     <>
       <Hero />
@@ -19,7 +19,7 @@ export default async function Page() {
       <FeatureSection />
       <FAQ />
       <Contact />
-      {testTrpc.greeting}
+      {/* {testTrpc.greeting} */}
     </>
   );
 }

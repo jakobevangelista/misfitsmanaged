@@ -1,7 +1,3 @@
-import Image from "next/image";
-import Link from "next/link";
-import { Dialog } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 export const runtime = "edge";
 import Hero from "@/components/landingPage/Hero";
 import LogoSection from "@/components/landingPage/LogoSection";
@@ -10,8 +6,8 @@ import FAQ from "@/components/landingPage/FAQ";
 import Contact from "@/components/landingPage/contact";
 import { api } from "@/trpc/server";
 
-export default function Page() {
-  // const testTrpc = await api.post.hello.query({ text: "deeznuts" });
+export default async function Page() {
+  const testTrpc = await api.post.hello.query({ text: "deeznuts" });
   return (
     <>
       <Hero />
@@ -19,7 +15,7 @@ export default function Page() {
       <FeatureSection />
       <FAQ />
       <Contact />
-      {/* {testTrpc.greeting} */}
+      {testTrpc.greeting}
     </>
   );
 }

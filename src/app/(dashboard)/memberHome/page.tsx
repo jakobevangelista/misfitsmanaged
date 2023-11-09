@@ -48,16 +48,6 @@ export default async function Page() {
           />
         </div>
         <ManageAccountButton />
-        {user.isAdmin ? (
-          // <Button variant="creme" className="mx-auto">
-          <Link
-            href="/adminHome"
-            className={cn(buttonVariants({ variant: "ghost" }), "mx-auto")}
-          >
-            Admin
-          </Link>
-        ) : // </Button>
-        null}
       </div>
     </>
   );

@@ -145,14 +145,6 @@ export default async function AdminHome() {
           <UserButton afterSignOutUrl="/" />
         </div> */}
         <div className="flex flex-row m-auto space-x-4">
-          <Button className="mx-auto my-4" asChild>
-            <Link href="/memberHome">Go to Member View</Link>
-          </Button>
-
-          <Button variant="creme" className="mx-auto my-4" asChild>
-            <a href="/transactions">Go to Transactions</a>
-          </Button>
-
           <CustomButton />
         </div>
         <div className="mx-auto my-10 ">

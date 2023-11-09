@@ -55,14 +55,6 @@ export default async function Page() {
   return (
     <>
       <div className="flex flex-col">
-        <div className="flex ml-10 mt-10">
-          <Link
-            href="/adminHome"
-            className={buttonVariants({ variant: "creme" })}
-          >
-            <MoveLeft /> Go Back To Admin Home
-          </Link>
-        </div>
         <div className="flex flex-col items-center">Transactions</div>
         <div className="container mx-auto py-10">
           <DataTable columns={columns} data={data} />

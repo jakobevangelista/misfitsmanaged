@@ -33,7 +33,7 @@ export async function POST(req: Request) {
 
     const customer = await createOrRetrieveCustomer({
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      userId: data.id,
+
       email: memberEmail!.emailAddress,
       // name: `${user.firstName} ${user.lastName}`,
     });

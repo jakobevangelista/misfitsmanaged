@@ -34,7 +34,6 @@ export async function POST(req: Request) {
     }
 
     const customer = await createOrRetrieveCustomer({
-      userId: data.id,
       email: data.email,
     });
 

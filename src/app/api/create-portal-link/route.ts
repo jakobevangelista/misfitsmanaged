@@ -18,9 +18,7 @@ export async function POST(req: Request) {
   if (req.method === "POST") {
     try {
       const customer = await createOrRetrieveCustomer({
-        userId: user.id,
         email: user.emailAddresses[0]!.emailAddress,
-        name: `${user.firstName} ${user.lastName}`,
       });
 
       if (!customer) throw Error("Could not get customer");

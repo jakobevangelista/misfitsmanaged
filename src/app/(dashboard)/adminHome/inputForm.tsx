@@ -8,18 +8,12 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { db } from "@/server/db";
-import { members } from "@/server/db/schema/members";
-import { eq } from "drizzle-orm";
-import { useZact } from "zact/client";
-import { validatedAction } from "./action";
 import { useRouter } from "next/navigation";
 
 const FormSchema = z.object({
@@ -29,7 +23,6 @@ const FormSchema = z.object({
 });
 
 export function InputForm(props: { userId: string }) {
-  //   const { mutate, error } = useZact(validatedAction);
   const router = useRouter();
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),

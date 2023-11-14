@@ -1,80 +1,31 @@
 "use client";
-import { Label } from "@/components/ui/label";
-import { UserSquare2 } from "lucide-react";
-import Image from "next/image";
-import { ColumnDef } from "@tanstack/react-table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import {
-  ArrowUpDown,
   CheckIcon,
   ChevronsUpDown,
-  MoreHorizontal,
+  User as UserIcon,
+  UserSquare2,
 } from "lucide-react";
-import { User as UserIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import Image from "next/image";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { postData, customCheckoutPost } from "../../../../utils/helpers";
+import { customCheckoutPost, postData } from "../../../../utils/helpers";
 import { getStripe } from "../../../../utils/stripe-client";
-import Link from "next/link";
-import { redirect } from "next/navigation";
 
+import { useState } from "react";
 import { validatedAction } from "./action";
-import { useZact } from "zact/client";
-import { useEffect, useState } from "react";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { set, useFieldArray, useForm } from "react-hook-form";
-import * as z from "zod";
 import { useToast } from "@/components/ui/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFieldArray, useForm } from "react-hook-form";
+import * as z from "zod";
 
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { members, transactions } from "@/server/db/schema/members";
-import { eq, sql } from "drizzle-orm";
-import { db } from "@/server/db";
-import { InputForm } from "./inputForm";
-import {
-  cashTransactionWater,
-  cashTransactionDayPass,
-  cashTransactionCustom,
-} from "./cashTransaction";
-import { useTransition } from "react";
-import { stripe } from "../../../../utils/stripe";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Command,
   CommandEmpty,
@@ -84,14 +35,23 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { DataTable } from "./data-table";
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  cashTransactionCustom,
+  cashTransactionDayPass,
+} from "./cashTransaction";
 
 export default function Menu(props: {
   id: string;

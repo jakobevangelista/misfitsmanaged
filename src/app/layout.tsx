@@ -4,6 +4,8 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { GeistSans } from "geist/font";
+import { TRPCReactProvider } from "@/trpc/react";
+import { headers } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,14 +34,16 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`dark ${GeistSans.className} scroll-smooth`}>
-        <ThemeProvider attribute="class" defaultTheme="dark">
-          <body>
-            {children}
-            <Toaster />
-          </body>
-        </ThemeProvider>
-      </html>
+      <TRPCReactProvider headers={headers()}>
+        <html lang="en" className={`dark ${GeistSans.className} scroll-smooth`}>
+          <ThemeProvider attribute="class" defaultTheme="dark">
+            <body>
+              {children}
+              <Toaster />
+            </body>
+          </ThemeProvider>
+        </html>
+      </TRPCReactProvider>
     </ClerkProvider>
   );
 }

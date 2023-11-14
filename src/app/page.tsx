@@ -8,6 +8,8 @@ import { api } from "@/trpc/server";
 
 export default async function Page() {
   const testTrpc = await api.post.hello.query({ text: "deeznuts" });
+  // const testTrpc2 = await api.post.bye.query({ text: "deeznuts" });
+
   return (
     <>
       <Hero />
@@ -16,6 +18,7 @@ export default async function Page() {
       <FAQ />
       <Contact />
       {testTrpc.greeting}
+      {/* {testTrpc2.greeting} */}
     </>
   );
 }

@@ -1,18 +1,18 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { ColumnDef } from "@tanstack/react-table";
 import {
   ArrowUpDown,
   CheckIcon,
   ChevronsUpDown,
   MoreHorizontal,
+  User as UserIcon,
   UserSquare2,
 } from "lucide-react";
-import { User as UserIcon } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 
 import {
   Dialog,
@@ -21,35 +21,30 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { customCheckoutPost, postData } from "../../../../utils/helpers";
+import { getStripe } from "../../../../utils/stripe-client";
+
+import { useState } from "react";
+import { validatedAction } from "./action";
+
+import { useToast } from "@/components/ui/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFieldArray, useForm } from "react-hook-form";
+import * as z from "zod";
 
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { postData, customCheckoutPost } from "../../../../utils/helpers";
-import { getStripe } from "../../../../utils/stripe-client";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-
-import { validatedAction } from "./action";
-import { useZact } from "zact/client";
-import { useEffect, useState } from "react";
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { set, useFieldArray, useForm } from "react-hook-form";
-import * as z from "zod";
-import { useToast } from "@/components/ui/use-toast";
-
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import {
   Form,
   FormControl,
@@ -59,33 +54,18 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { members, transactions } from "@/server/db/schema/members";
-import { eq, sql } from "drizzle-orm";
-import { db } from "@/server/db";
-import { InputForm } from "./inputForm";
-import {
-  cashTransactionWater,
-  cashTransactionDayPass,
-  cashTransactionCustom,
-  cashTransactionCorruptedSaturday,
-} from "./cashTransaction";
-import { useTransition } from "react";
-import { stripe } from "../../../../utils/stripe";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import { DataTable } from "./data-table";
 import Image from "next/image";
+import {
+  cashTransactionCorruptedSaturday,
+  cashTransactionCustom,
+  cashTransactionDayPass,
+} from "./cashTransaction";
+import { DataTable } from "./data-table";
 
 // const items = [
 //   { label: "Day Pass", value: "price_1NYRbKD5u1cDehOfapzIEhrJ" },

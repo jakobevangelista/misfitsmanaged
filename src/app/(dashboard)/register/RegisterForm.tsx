@@ -18,13 +18,12 @@ import { Input } from "@/components/ui/input";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Checkbox } from "@/components/ui/checkbox";
 
-import { validatedAction } from "./action";
-import { useZact } from "zact/client";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 // import { SignatureCanvas } from "react-signature-canvas";
 import SignaturePad from "react-signature-canvas";
 import { useRef, useState } from "react";
+import { api } from "@/trpc/react";
 
 const formSchema = z.object({
   memberName: z.string().min(2, {
@@ -37,10 +36,10 @@ const formSchema = z.object({
         name: z.string().min(2, {
           message: "Your name must be at least 2 characters long",
         }),
-        parentSignature: z.string().nonempty({
+        parentSignature: z.string().min(1, {
           message: "Please provide a signature",
         }),
-        DOB: z.string().nonempty({
+        DOB: z.string().min(1, {
           message: "Please provide a date of birth of your child", // need to validate
         }),
         // DOB: z.preprocess((arg) => {
@@ -57,13 +56,12 @@ const formSchema = z.object({
   }),
 });
 
-type ProfileFormValues = z.infer<typeof formSchema>;
-
-export default function RegisterForm(props: {
-  qrCode: string;
-  userId: string;
-}) {
-  const { mutate, error } = useZact(validatedAction);
+export default function RegisterForm(props: { userId: string }) {
+  const registerMember = api.member.register.useMutation({
+    onSuccess: () => {
+      router.refresh();
+    },
+  });
   const router = useRouter();
   const sigRef = useRef({} as SignaturePad);
   const sigRef2 = useRef({} as SignaturePad);
@@ -85,61 +83,20 @@ export default function RegisterForm(props: {
   });
 
   // 2. Define a submit handler.
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-
-    // mutate({
-    //   qrCode: props.qrCode,
-    //   userId: props.userId,
-    //   emailAddress: props.emailAddress,
-    //   username: values.username[0].value,
-    //   waiverAccept: values.waiverAccept,
-    //   waiverSignature: values.signature,
-    //   waiverSignDate: date,
-    //   parentName: values.username[1].value,
-    // }).then(() => {
-    //   router.refresh();
-    // });
-    console.log("??????");
-
-    if (values.parentName == undefined || values.parentName.length == 0) {
-      console.log("right place");
-
-      await mutate({
-        qrCode: props.qrCode,
-        userId: props.userId,
-        emailAddress: values.emailAddress,
-        username: values.memberName,
-        waiverAccept: values.waiverAccept,
-        waiverSignature: values.signature,
-        waiverSignDate: date,
-        parentName: undefined,
-        parentSignature: undefined,
-        minorDOB: undefined,
-      }).then(() => {
-        router.refresh();
-      });
-    } else {
-      console.log("wronge place");
-      await mutate({
-        qrCode: props.qrCode,
-        userId: props.userId,
-        emailAddress: values.emailAddress,
-        username: values.memberName,
-        waiverAccept: values.waiverAccept,
-        waiverSignature: values.signature,
-        waiverSignDate: date,
-        parentName: values.parentName[0]!.name,
-        parentSignature: values.parentName[0]!.parentSignature,
-        minorDOB: values.parentName[0]!.DOB,
-      }).then(() => {
-        router.refresh();
-      });
-    }
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    registerMember.mutate({
+      userId: props.userId,
+      emailAddress: values.emailAddress,
+      username: values.memberName,
+      waiverAccept: values.waiverAccept,
+      waiverSignature: values.signature,
+      waiverSignDate: date,
+      parentName: values.parentName?.at(0)?.name,
+      parentSignature: values.parentName?.at(0)?.parentSignature,
+      minorDOB: values.parentName?.at(0)?.DOB,
+    });
   }
 
-  // let sigPad: any = {};
   const clear = () => {
     sigRef.current.clear();
   };

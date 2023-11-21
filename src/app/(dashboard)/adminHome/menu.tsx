@@ -53,6 +53,9 @@ import {
   cashTransactionDayPass,
 } from "./cashTransaction";
 
+import { api } from "@/trpc/react";
+import Link from "next/link";
+
 export default function Menu(props: {
   id: string;
   email: string;
@@ -67,6 +70,15 @@ export default function Menu(props: {
 }) {
   const { toast } = useToast();
   const [multiCashAmount, setMultiCashAmount] = useState<number>(0);
+
+  const changeTag = api.admin.updateTag.useMutation({
+    onSuccess: () => {
+      setTagId("");
+      toast({
+        title: "✅ Tag Updated",
+      });
+    },
+  });
   const handleCheckout = async (data: string) => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -254,6 +266,16 @@ export default function Menu(props: {
     }
   }
 
+  const handleChangeTag = (e: React.FormEvent<HTMLFormElement>) => {
+    // console.log("rowId: ", rowId);
+    // console.log("new Tag: ", tagId);
+    e.preventDefault();
+    changeTag.mutate({
+      userId: rowId,
+      newTagCode: tagId,
+    });
+  };
+
   if (
     props.id === "" ||
     props.email === "" ||
@@ -268,6 +290,7 @@ export default function Menu(props: {
       </>
     );
   }
+
   return (
     <>
       <div className="flex flex-col outline outline-zinc-800 outline-offset-8 outline-1 rounded-md m-4">
@@ -481,7 +504,7 @@ export default function Menu(props: {
             </div>
             <div className="flex flex-col gap-4 py-4">
               <div className="flex w-full max-w-sm items-center space-x-2">
-                <form action={validatedAction}>
+                <form onSubmit={handleChangeTag}>
                   <Input
                     type="text"
                     placeholder="Click here and scan tag"
@@ -496,13 +519,12 @@ export default function Menu(props: {
                   <Button
                     type="submit"
                     onClick={() => {
-                      // setTagId("");
-                      setTimeout(() => {
-                        setTagId("");
-                      }, 10);
-                      toast({
-                        title: "✅ Tag Updated",
-                      });
+                      // setTimeout(() => {
+                      //   setTagId("");
+                      // }, 10);
+                      // toast({
+                      //   title: "✅ Tag Updated",
+                      // });
                     }}
                   >
                     Update Tag
@@ -671,10 +693,10 @@ export default function Menu(props: {
         </div>
         <div className="p-4 mx-auto">
           <Button variant="secondary" asChild>
-            <a href={`/adminHome/${props.id}`}>
+            <Link href={`/adminHome/${props.id}`}>
               <UserIcon className="mr-2 h-4 w-4" />
               Click Here to See More Info
-            </a>
+            </Link>
           </Button>
         </div>
       </div>

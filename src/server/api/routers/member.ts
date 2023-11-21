@@ -24,7 +24,7 @@ export const memberRouter = createTRPCRouter({
         waiverSignDate: z.string().min(1),
         parentName: z.string().min(1).optional(),
         parentSignature: z.string().min(1).optional(),
-        minorDOB: z.string().optional(),
+        parentDOB: z.date().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -49,7 +49,7 @@ export const memberRouter = createTRPCRouter({
             realScanId: input.userId,
             parentName: input.parentName,
             parentSignature: input.parentSignature,
-            minorDOB: input.minorDOB,
+            parentDOB: input.parentDOB,
           })
           .where(eq(members.emailAddress, input.emailAddress))
           .then(async () => {
@@ -76,7 +76,7 @@ export const memberRouter = createTRPCRouter({
           realScanId: input.userId,
           parentName: input.parentName,
           parentSignature: input.parentSignature,
-          minorDOB: input.minorDOB,
+          parentDOB: input.parentDOB,
         })
         .then(async () => {
           // await stripe.customers.create({ email: input.emailAddress });

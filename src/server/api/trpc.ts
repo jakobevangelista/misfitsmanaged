@@ -14,6 +14,8 @@ import { ZodError } from "zod";
 import { db } from "@/server/db";
 
 import { currentUser } from "@clerk/nextjs";
+import { eq } from "drizzle-orm";
+import { members } from "../db/schema/members";
 
 /**
  * 1. CONTEXT
@@ -119,4 +121,26 @@ const enforcedUserIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
+const enforcedUserIsAdmin = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.user?.id) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "u not logged in" });
+  }
+  console.log(ctx.user.id);
+  const user = await ctx.db.query.members.findFirst({
+    where: eq(members.customerId, ctx.user.id),
+  });
+
+  if (user?.isAdmin === false) {
+    throw new TRPCError({ code: "UNAUTHORIZED", message: "u not an admin" });
+  }
+
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      user: { ...ctx.user, user: ctx.user.id },
+    },
+  });
+});
+
 export const protectedProcedure = t.procedure.use(enforcedUserIsAuthed);
+export const adminProcedure = t.procedure.use(enforcedUserIsAdmin);

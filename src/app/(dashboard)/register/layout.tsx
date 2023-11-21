@@ -1,14 +1,11 @@
 import DashboardMobile from "@/components/dashboard/dashboardMobile";
 import { UserButton, currentUser } from "@clerk/nextjs";
 
-import { redirect } from "next/navigation";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 
-import { ClipboardIcon } from "@heroicons/react/24/outline";
 import { cn } from "@/lib/utils";
-import { eq } from "drizzle-orm";
-import { db } from "@/server/db";
-import { users } from "@/server/db/schema/members";
+import { ClipboardIcon } from "@heroicons/react/24/outline";
 
 const navigation = [
   {

@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
-import { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
 import {
   ArrowUpDown,
   CheckIcon,
@@ -30,7 +30,6 @@ import { customCheckoutPost, postData } from "../../../../utils/helpers";
 import { getStripe } from "../../../../utils/stripe-client";
 
 import { useState } from "react";
-import { validatedAction } from "./action";
 
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,6 +65,7 @@ import {
   cashTransactionDayPass,
 } from "./cashTransaction";
 import { DataTable } from "./data-table";
+import { api } from "@/trpc/react";
 
 // const items = [
 //   { label: "Day Pass", value: "price_1NYRbKD5u1cDehOfapzIEhrJ" },
@@ -172,7 +172,6 @@ export const DataTableWithColumns = (props: {
     {
       id: "actions",
       cell: function Cell({ row }) {
-        const user = row.original.id;
         // return (
         //   <>
         //     <Button variant="ghost" className="h-8 w-8 p-0" asChild>
@@ -182,6 +181,15 @@ export const DataTableWithColumns = (props: {
         //     </Button>
         //   </>
         // );
+
+        const changeTag = api.admin.updateTag.useMutation({
+          onSuccess: () => {
+            setTagId("");
+            toast({
+              title: "✅ Tag Updated",
+            });
+          },
+        });
         const { toast } = useToast();
         const [multiCashAmount, setMultiCashAmount] = useState<number>(0);
         const handleCheckout = async (data: string) => {
@@ -322,6 +330,15 @@ export const DataTableWithColumns = (props: {
           }
         };
 
+        const handleChangeTag = () => {
+          // console.log("rowId: ", rowId);
+          // console.log("new Tag: ", tagId);
+          changeTag.mutate({
+            userId: rowId,
+            newTagCode: tagId,
+          });
+        };
+
         return (
           <div className="xl:hidden">
             <Dialog>
@@ -372,13 +389,7 @@ export const DataTableWithColumns = (props: {
                         >
                           Charge Small Water Bottle
                         </Button>
-                        {/* <Button
-                        variant="outline"
-                        onClick={() => handleCheckout("month")}
-                        className="flex"
-                      >
-                        Charge Month
-                      </Button> */}
+
                         <Button
                           variant="outline"
                           onClick={() => handleCheckout("cssat")}
@@ -510,40 +521,10 @@ export const DataTableWithColumns = (props: {
                             </Button>
                           </form>
                         </Form>
-                        {/* <form action={cashTransactionDayPass}>
-                      <Label>Enter cash given for day pass Here:</Label>
-                      <Input
-                        name="cashAmount"
-                        placeholder="Enter amount for Day Pass Here"
-                        type="number"
-                        value={dayPassCashAmount}
-                        onChange={(e) => {
-                          setDayPassCashAmount(parseFloat(e.target.value));
-                        }}
-                      />
-                      <Button
-                        variant="secondary"
-                        className="flex flex-grow"
-                        type="submit"
-                        onClick={() => {
-                          toast({
-                            title: "Day Pass Cash Transaction Recorded",
-                            description: `Change: ${dayPassCashAmount! - 15}`,
-                          });
-                        }}
-                      >
-                        Day Pass: $15
-                      </Button>
-                      <Input
-                        type="hidden"
-                        name="email"
-                        value={String(row.original.emailAddress!)}
-                      />
-                    </form> */}
                       </div>
                       <div className="flex flex-col gap-4 py-4">
                         <div className="flex w-full max-w-sm items-center space-x-2">
-                          <form action={validatedAction}>
+                          <form onSubmit={handleChangeTag}>
                             <Input
                               type="text"
                               placeholder="Click here and scan tag"
@@ -562,13 +543,12 @@ export const DataTableWithColumns = (props: {
                             <Button
                               type="submit"
                               onClick={() => {
-                                // setTagId("");
-                                setTimeout(() => {
-                                  setTagId("");
-                                }, 10);
-                                toast({
-                                  title: "✅ Tag Updated",
-                                });
+                                // setTimeout(() => {
+                                //   setTagId("");
+                                // }, 10);
+                                // toast({
+                                //   title: "✅ Tag Updated",
+                                // });
                               }}
                             >
                               Update Tag

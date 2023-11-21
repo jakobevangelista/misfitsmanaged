@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Form,
   FormControl,
@@ -15,46 +16,64 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useForm, useFieldArray } from "react-hook-form";
-import { Checkbox } from "@/components/ui/checkbox";
+import { useFieldArray, useForm } from "react-hook-form";
 
 import { useRouter } from "next/navigation";
 
-// import { SignatureCanvas } from "react-signature-canvas";
-import SignaturePad from "react-signature-canvas";
-import { useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { api } from "@/trpc/react";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { DateTime } from "luxon";
+import { useRef } from "react";
+import SignaturePad from "react-signature-canvas";
+import { Calendar } from "../ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
-const formSchema = z.object({
-  memberName: z.string().min(2, {
-    message: "Your name must be at least 2 characters long",
-  }),
-  emailAddress: z.string().email({ message: "Please provide a valid email" }),
-  parentName: z
-    .array(
-      z.object({
-        name: z.string().min(2, {
-          message: "Your name must be at least 2 characters long",
-        }),
-        parentSignature: z.string().min(1, {
-          message: "Please provide a signature",
-        }),
-        DOB: z.string().min(1, {
-          message: "Please provide a date of birth of your child", // need to validate
-        }),
-        // DOB: z.preprocess((arg) => {
-        //   if (typeof arg == "string" || arg instanceof Date)
-        //     return new Date(arg);
-        // }, z.coerce.date().optional()),
-        // DOB: z.coerce.date().optional(),
-      })
-    )
-    .optional(),
-  waiverAccept: z.literal<boolean>(true),
-  signature: z.string().nonempty({
-    message: "Please provide a signature",
-  }),
-});
+const formSchema = z
+  .object({
+    memberName: z.string().min(2, {
+      message: "Your name must be at least 2 characters long",
+    }),
+    emailAddress: z.string().email({ message: "Please provide a valid email" }),
+    dob: z.date({
+      required_error: "A date of birth is required",
+    }),
+
+    parentName: z
+      .array(
+        z.object({
+          name: z.string().min(2, {
+            message: "Your name must be at least 2 characters long",
+          }),
+          parentSignature: z.string().min(1, {
+            message: "Please provide a signature",
+          }),
+          DOB: z
+            .date({
+              required_error: "Please provide your date of birth", // need to validate
+            })
+            .min(DateTime.local().minus({ years: 18 }).toJSDate()),
+        })
+      )
+      .optional(),
+    waiverAccept: z.literal<boolean>(true),
+    signature: z.string().min(1, {
+      message: "Please provide a signature",
+    }),
+  })
+  .superRefine((data, refinementContext) => {
+    if (
+      data.dob > DateTime.local().minus({ years: 18 }).toJSDate() &&
+      !data.parentName
+    ) {
+      return refinementContext.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Parent is required if you are less than 18 years old",
+        path: ["dob"],
+      });
+    }
+  });
 
 export default function RegisterForm(props: { userId: string }) {
   const registerMember = api.member.register.useMutation({
@@ -74,6 +93,7 @@ export default function RegisterForm(props: { userId: string }) {
       memberName: "",
       waiverAccept: false,
       signature: "",
+      dob: new Date(),
     },
   });
 
@@ -93,7 +113,7 @@ export default function RegisterForm(props: { userId: string }) {
       waiverSignDate: date,
       parentName: values.parentName?.at(0)?.name,
       parentSignature: values.parentName?.at(0)?.parentSignature,
-      minorDOB: values.parentName?.at(0)?.DOB,
+      parentDOB: values.parentName?.at(0)?.DOB,
     });
   }
 
@@ -158,6 +178,54 @@ export default function RegisterForm(props: { userId: string }) {
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="dob"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Date of birth</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-[240px] pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          captionLayout="dropdown-buttons"
+                          fromYear={1900}
+                          toYear={2023}
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date > new Date() || date < new Date("1900-01-01")
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>
+                      Your date of birth is used to calculate your age.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               {fields.length >= 1
                 ? fields?.map((field, index) => (
                     <>
@@ -190,7 +258,7 @@ export default function RegisterForm(props: { userId: string }) {
                           </>
                         )}
                       />
-                      <FormField
+                      {/* <FormField
                         control={form.control}
                         key={field.id}
                         name={`parentName.${index}.DOB`}
@@ -210,6 +278,58 @@ export default function RegisterForm(props: { userId: string }) {
                               <FormMessage />
                             </FormItem>
                           </>
+                        )}
+                      /> */}
+                      <FormField
+                        control={form.control}
+                        key={field.id}
+                        name={`parentName.${index}.DOB`}
+                        render={({ field }) => (
+                          <FormItem className="flex flex-col">
+                            <FormLabel>Date of birth</FormLabel>
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <FormControl>
+                                  <Button
+                                    variant={"outline"}
+                                    className={cn(
+                                      "w-[240px] pl-3 text-left font-normal",
+                                      !field.value && "text-muted-foreground"
+                                    )}
+                                  >
+                                    {field.value ? (
+                                      format(field.value, "PPP")
+                                    ) : (
+                                      <span>Pick a date</span>
+                                    )}
+                                    <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                  </Button>
+                                </FormControl>
+                              </PopoverTrigger>
+                              <PopoverContent
+                                className="w-auto p-0"
+                                align="start"
+                              >
+                                <Calendar
+                                  mode="single"
+                                  captionLayout="dropdown-buttons"
+                                  fromYear={1900}
+                                  toYear={2023}
+                                  selected={field.value}
+                                  onSelect={field.onChange}
+                                  disabled={(date) =>
+                                    date > new Date() ||
+                                    date < new Date("1900-01-01")
+                                  }
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormDescription>
+                              Your date of birth is used to calculate your age.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
                         )}
                       />
                       <FormField
@@ -274,7 +394,11 @@ export default function RegisterForm(props: { userId: string }) {
                 size="sm"
                 className="mt-2"
                 onClick={() =>
-                  append({ name: "", parentSignature: "", DOB: "" })
+                  append({
+                    name: "",
+                    parentSignature: "",
+                    DOB: new Date(),
+                  })
                 }
               >
                 IF YOU ARE A MINOR YOU NEED TO ADD A PARENT, CLICK THIS BUTTON:

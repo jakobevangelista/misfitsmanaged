@@ -6,7 +6,6 @@ import {
   boolean,
   int,
   datetime,
-  mysqlEnum,
   varchar,
   date,
   uniqueIndex,
@@ -27,7 +26,8 @@ export const members = mysqlTable("members", {
   realScanId: text("real_scan_id").notNull().default("0"),
   parentName: text("parent_name"),
   parentSignature: text("parent_signature"),
-  minorDOB: text("minor_dob"),
+
+  parentDOB: date("parent_dob"),
   DOB: date("DOB"),
   contractStatus: text("contract_status").default("none").notNull(), //"active","incomplete","incomplete_expired","past_due","canceled","unpaid","none",
   profilePicture: text("profile_picture"),

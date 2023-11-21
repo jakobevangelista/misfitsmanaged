@@ -1,19 +1,11 @@
-import { UserButton, redirectToSignIn } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs";
-import { currentUser } from "@clerk/nextjs";
-import { User } from "./columns";
-import { DataTable } from "./data-table";
 import { db } from "@/server/db";
-import { eq, lt, sql } from "drizzle-orm";
-import { members, contracts, products } from "@/server/db/schema/members";
-import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { RefreshPage } from "./refresh-page";
-import CustomButton from "./customButton";
-import { DataTableWithColumns } from "./columns";
-import { desc } from "drizzle-orm";
+import { contracts, members } from "@/server/db/schema/members";
+import { currentUser } from "@clerk/nextjs";
+import { desc, eq, lt, sql } from "drizzle-orm";
 import { DateTime } from "luxon";
+import { redirect } from "next/navigation";
+import { DataTableWithColumns, type User } from "./columns";
+import CustomButton from "./customButton";
 export const revalidate = 2; // revalidate this page every 2 seconds
 // export const dynamic = "force-dynamic";
 
@@ -139,7 +131,6 @@ export default async function AdminHome() {
 
   return (
     <>
-      <RefreshPage />
       <div className="flex flex-col">
         {/* <div className="flex justify-end">
           <UserButton afterSignOutUrl="/" />

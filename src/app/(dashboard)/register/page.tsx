@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { db } from "../../../server/db/index";
 import { members } from "../../../server/db/schema/members";
-import RegisterForm from "./RegisterForm";
+import RegisterForm from "@/components/forms/RegisterForm";
 
 export default async function Page() {
   const user = await currentUser();

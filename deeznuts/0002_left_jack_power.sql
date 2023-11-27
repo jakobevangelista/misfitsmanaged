@@ -1,1 +1,0 @@
-ALTER TABLE `members` ADD `email_address` text NOT NULL;

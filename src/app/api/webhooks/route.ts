@@ -1,22 +1,16 @@
-import Stripe from "stripe";
+import type Stripe from "stripe";
 import { stripe } from "../../../../utils/stripe";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { db } from "@/db";
+import { db } from "@/server/db";
 import {
   members,
   transactions,
   contracts,
   products,
-} from "@/db/schema/members";
+} from "@/server/db/schema/members";
 import { eq } from "drizzle-orm";
-import { string } from "zod";
-import {
-  createOrRetrieveCustomer,
-  manageSubscription,
-} from "../../../../utils/dbHelper";
-import { check } from "drizzle-orm/mysql-core";
-import { revalidate } from "@/app/transactions/data-table";
+import { manageSubscription } from "../../../../utils/dbHelper";
 import { revalidatePath } from "next/cache";
 import { DateTime } from "luxon";
 
@@ -39,14 +33,14 @@ interface PriceData {
 }
 
 export async function POST(req: Request) {
-  const body = await req.text();
+  const body = (await req.blob()).text();
   //   let event: Stripe.Event;
-  const sig = headers().get("Stripe-Signature") as string;
+  const sig = headers().get("Stripe-Signature")!;
   // const secret = "whsec_1GELcqsBjQT3lighVRSc0e7PerHopo2s"; // personal test mode
   // const secret = "whsec_Xjcs5cS81VExzwEIsVF12d2ePx0Kp8KL"; // personal live
-  const secret = process.env.STRIPE_WEBHOOK_SECRET as string;
+  const secret = process.env.STRIPE_WEBHOOK_SECRET!;
   const event = stripe.webhooks.constructEvent(
-    body,
+    await body,
     sig,
     secret
   ) as Stripe.DiscriminatedEvent;
@@ -54,7 +48,7 @@ export async function POST(req: Request) {
   // Handle the event
   switch (event.type) {
     case "checkout.session.completed":
-      const checkoutSession = event.data.object as Stripe.Checkout.Session;
+      const checkoutSession = event.data.object;
 
       const now = DateTime.now().setZone("America/Chicago");
 
@@ -65,25 +59,40 @@ export async function POST(req: Request) {
         }
       );
 
-      for (var i = 0; i < itemsPurchased.data.length; i++) {
+      // for (let i = 0; i < itemsPurchased.data.length; i++) {
+      //   const itemName = await stripe.products.retrieve(
+      //     itemsPurchased.data[i]!.price!.product as string
+      //   );
+      //   await db.insert(transactions).values({
+      //     ownerId: event.data.object.customer_details?.email || " ",
+      //     amount: itemsPurchased.data[i]!.amount_total,
+      //     date: now.toLocaleString(DateTime.DATETIME_SHORT),
+      //     paymentMethod: "card",
+      //     type: itemName.name,
+      //     createdAt: now.toJSDate(),
+      //     quantity: itemsPurchased.data[i]!.quantity,
+      //   });
+      // }
+
+      for (const item of itemsPurchased.data) {
         const itemName = await stripe.products.retrieve(
-          itemsPurchased.data[i].price!.product as string
+          item.price!.product as string
         );
         await db.insert(transactions).values({
-          ownerId: event.data.object.customer_details?.email || " ",
-          amount: itemsPurchased.data[i].amount_total,
+          ownerId: event.data.object.customer_details!.email!,
+          amount: item.amount_total,
           date: now.toLocaleString(DateTime.DATETIME_SHORT),
           paymentMethod: "card",
           type: itemName.name,
           createdAt: now.toJSDate(),
-          quantity: itemsPurchased.data[i].quantity,
+          quantity: item.quantity,
         });
       }
 
       if (checkoutSession.mode === "subscription") {
         const subscriptionId = checkoutSession.subscription as string;
         const customer = checkoutSession.customer as string;
-        manageSubscription(subscriptionId!, customer!);
+        await manageSubscription(subscriptionId, customer);
         revalidatePath(`/adminHome`);
 
         break;
@@ -92,23 +101,22 @@ export async function POST(req: Request) {
 
       break;
     case "customer.subscription.created":
-      const customerSubscriptionCreated = event.data
-        .object as Stripe.Subscription;
-      const subscriptionCreatedId = customerSubscriptionCreated.id as string;
+      const customerSubscriptionCreated = event.data.object;
+      const subscriptionCreatedId = customerSubscriptionCreated.id;
       const subscriptionCreatedCustomer =
         customerSubscriptionCreated.customer as string;
       console.log(customerSubscriptionCreated);
       const subscriptionCreated = await db.query.products.findFirst({
         where: eq(
           products.priceId,
-          customerSubscriptionCreated.items.data[0].price.id
+          customerSubscriptionCreated.items.data[0]!.price.id
         ),
       });
       // Then define and call a function to handle the event customer.subscription.created
       if (
-        customerSubscriptionCreated.items.data[0].price.recurring?.interval ===
+        customerSubscriptionCreated.items.data[0]!.price.recurring?.interval ===
           "day" ||
-        customerSubscriptionCreated.items.data[0].id ===
+        customerSubscriptionCreated.items.data[0]!.id ===
           "price_1NYRbrD5u1cDehOfLWSsrUWc"
       ) {
         await stripe.subscriptions.update(customerSubscriptionCreated.id, {
@@ -146,7 +154,10 @@ export async function POST(req: Request) {
         //     )
         //   );
       }
-      manageSubscription(subscriptionCreatedId!, subscriptionCreatedCustomer!);
+      await manageSubscription(
+        subscriptionCreatedId,
+        subscriptionCreatedCustomer
+      );
 
       revalidatePath(`/adminHome`);
       return NextResponse.json({ processed: "customer.subscription.created" });
@@ -155,11 +166,11 @@ export async function POST(req: Request) {
     case "customer.subscription.updated":
       const customerSubscriptionUpdated = event.data.object;
       // Then define and call a function to handle the event customer.subscription.updated
-      const subscriptionUpdate = event.data.object as Stripe.Subscription;
+      const subscriptionUpdate = event.data.object;
 
-      const subscriptionId = subscriptionUpdate.id as string;
+      const subscriptionId = subscriptionUpdate.id;
       const customer = subscriptionUpdate.customer as string;
-      manageSubscription(subscriptionId!, customer!);
+      await manageSubscription(subscriptionId, customer);
       revalidatePath(`/adminHome`);
       return NextResponse.json({ processed: "customer.subscription.updated" });
 
@@ -167,11 +178,11 @@ export async function POST(req: Request) {
 
     case "customer.subscription.deleted":
       // Then define and call a function to handle the event customer.subscription.updated
-      const subscriptionDelete = event.data.object as Stripe.Subscription;
+      const subscriptionDelete = event.data.object;
 
-      const subscriptionIdDelete = subscriptionDelete.id as string;
+      const subscriptionIdDelete = subscriptionDelete.id;
       const customerDelete = subscriptionDelete.customer as string;
-      manageSubscription(subscriptionIdDelete!, customerDelete!);
+      await manageSubscription(subscriptionIdDelete, customerDelete);
       revalidatePath(`/adminHome`);
       return NextResponse.json({ processed: "customer.subscription.deleted" });
 
@@ -182,12 +193,15 @@ export async function POST(req: Request) {
       console.log(chargeSucceeded.metadata.line_items);
       console.log(chargeSucceeded.customer);
 
-      const priceDataArray: PriceData[] = chargeSucceeded.metadata.line_items
-        .trim()
+      const priceDataArray: PriceData[] = chargeSucceeded.metadata
+        .line_items!.trim()
         .split(",")
         .map((entry) => {
-          const [priceId, quantity] = entry.trim().split(":");
-          return { priceId, quantity: parseInt(quantity, 10) };
+          const [priceId, quantity] = entry.trim().split(":")!;
+          return {
+            priceId: priceId!.toString(),
+            quantity: parseInt(quantity!, 10),
+          };
         });
       for (const priceData of priceDataArray) {
         const singleProductAmount = await db.query.products.findFirst({
@@ -199,7 +213,7 @@ export async function POST(req: Request) {
         console.log(totalAmount + " total amount");
 
         await db.insert(transactions).values({
-          ownerId: chargeSucceeded.receipt_email as string,
+          ownerId: chargeSucceeded.receipt_email!,
           amount: totalAmount,
           date: DateTime.now()
             .setZone("America/Chicago")
@@ -216,7 +230,7 @@ export async function POST(req: Request) {
       break;
     case "price.created":
     case "price.updated":
-      const updatePrice = event.data.object as Stripe.Price;
+      const updatePrice = event.data.object;
       const productName = await stripe.products.retrieve(
         updatePrice.product as string
       );
@@ -235,14 +249,14 @@ export async function POST(req: Request) {
         });
       break;
     case "price.deleted":
-      const deletePrice = event.data.object as Stripe.Price;
+      const deletePrice = event.data.object;
 
       await db.delete(products).where(eq(products.priceId, deletePrice.id));
       break;
     case "product.created":
       break;
     case "product.updated":
-      const updateProduct = event.data.object as Stripe.Product;
+      const updateProduct = event.data.object;
       const updatedProductName = await stripe.products.retrieve(
         updateProduct.id
       );
@@ -254,18 +268,18 @@ export async function POST(req: Request) {
         .values({
           priceId: updateProduct.default_price as string,
           name: updatedProductName.name,
-          price: updatedProductPrice.unit_amount as number,
+          price: updatedProductPrice.unit_amount!,
         })
         .onDuplicateKeyUpdate({
           set: {
             priceId: updateProduct.default_price as string,
-            price: updatedProductPrice.unit_amount as number,
+            price: updatedProductPrice.unit_amount!,
           },
         });
       break;
     case "customer.created":
     case "customer.updated":
-      const customerCreated = event.data.object as Stripe.Customer;
+      const customerCreated = event.data.object;
       await db
         .update(members)
         .set({
@@ -274,7 +288,7 @@ export async function POST(req: Request) {
         .where(eq(members.emailAddress, customerCreated.email!));
       break;
     case "invoice.payment_failed":
-      const invoicePaymentFailed = event.data.object as Stripe.Invoice;
+      const invoicePaymentFailed = event.data.object;
       await db
         .update(contracts)
         .set({
@@ -306,7 +320,7 @@ export async function POST(req: Request) {
       revalidatePath(`/adminHome`);
       break;
     case "invoice.paid":
-      const invoicePaid = event.data.object as Stripe.Invoice;
+      const invoicePaid = event.data.object;
       const invoicePaidSubscription = await stripe.subscriptions.retrieve(
         invoicePaid.subscription as string
       );

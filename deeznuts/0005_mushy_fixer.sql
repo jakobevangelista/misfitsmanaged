@@ -1,1 +1,0 @@
-ALTER TABLE `members` MODIFY COLUMN `email_address` text NOT NULL;
